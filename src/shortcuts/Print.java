@@ -6,4 +6,9 @@ public class Print {
 	{
 		System.out.println("" + text.toString());
 	}
+	
+	public void print(Object text)
+	{
+		System.out.print("" + text.toString());
+	}
 }
