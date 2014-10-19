@@ -28,21 +28,53 @@ public class Nlp {
 			+ "wire or conduit or allow any of them to be so damaged or destroyed as to interfere with the proper or accurate metering of electric current, "
 			+ "constitute the actus resus of the crime.";
 	
+	//FilePath here includes already the file name
+	final static String defaultFilePath    = "/Users/laurenztolentino/Eclipse/workspace/Simpatico/src/preprocess/NlpOutput.txt";
+	String filePath						   = "";
+	ReaderWrite rw 						   = new ReaderWrite(this.filePath);
 	
 	public Nlp()
 	{
 		// Temporary
+		p.println("No filePath Made. Using default filePath instead. (/preprocess/NlpOutput.txt)");
+		filePath = defaultFilePath;
+	}
+	
+	public Nlp(String filePath)
+	{
+		this.filePath = filePath;
+		if(filePath.equals("")) {
+			p.println("The filePath you entered is blank. Will resort use defaultFilePath instead");
+			filePath = defaultFilePath;
+		}
 	}
 	
 	public static void main(String[] args)
 	{
 		p.println("Running Nlp.java");
-		Nlp nlp = new Nlp();
-		nlp.TestNlp();
+		//Nlp nlp = new Nlp();
+		//nlp.TestNlp();		
+		
+	}
+	
+	public void SetFilePath(String filePath)
+	{
+		// in case you need to update your file path.
+		this.filePath = filePath;
+	}
+	
+	public String GetFilePath()
+	{
+		return this.filePath;
 	}
 	
 	public Boolean StartNlp(String text)
 	{
+		
+		//ReaderWrite now has a defined FilePath. 		
+		
+		String temp 		= "";
+		String finalOutput 	= "";
 		
 		/* Creates a StanfordCoreNLP Object, with POS Tagging, Lemmatization, NER, Parsing, and Corerefernce resolution*/
 		Properties props = new Properties();
@@ -71,14 +103,22 @@ public class Nlp {
 			{
 				// this is the text of the token
 				String word	= token.get(TextAnnotation.class);
-				p.println("word: " + word);
+				//p.println("word: " + word);
 				// this is the POS tag of the token
 				String pos	= token.get(PartOfSpeechAnnotation.class);
-				p.println("pos: " + pos);
+				//p.println("pos: " + pos);
 				// this is the NER label of the token
 				String ne 	= token.get(NamedEntityTagAnnotation.class);
-				p.println("ne: " + ne);
+				//p.println("ne: " + ne);
+				
+				temp = word + "/" + pos;
+				finalOutput = finalOutput + temp;
+				finalOutput = finalOutput + "\n";
+				
 			}
+			
+			p.println(finalOutput);
+			rw.CreateFile(finalOutput);
 			
 			// this is the parse tree 
 			Tree tree = sentence.get(TreeAnnotation.class);
@@ -93,7 +133,7 @@ public class Nlp {
 		 * along with a method for getting the most representative mention
 		 * Both sentence and token offsets start at 1!	
 		 */
-		Map<Integer, CorefChain> graph = document.get(CorefChainAnnotation.class);
+		Map<Integer, CorefChain> graph = document.get(CorefChainAnnotation.class); //I have no idea what this actually does
 		/*
 		CorefChain test = graph.get(1);
 		p.println("document: " + document.toString());
@@ -101,6 +141,11 @@ public class Nlp {
 		p.println("end of run");
 		*/
 		return true;
+	}
+	
+	public String GetDefaultFilePath()
+	{
+		return this.defaultFilePath;
 	}
 	
 	public Boolean TestNlp()

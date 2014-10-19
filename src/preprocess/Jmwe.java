@@ -21,6 +21,11 @@ public class Jmwe {
 
 	static Print p = new Print();
 	
+	public Jmwe()
+	{
+		
+	}
+	
 	public static void main(String[] args)
 	{
 		Jmwe main = new Jmwe();

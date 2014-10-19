@@ -23,7 +23,7 @@ public class ReaderWrite {
 	String filePath 					= "";
 	String textContent					= "";
 	String fileName 					= "";
-	String finishedText					= "";
+	String fileContent					= "";
 	
 	public ReaderWrite()
 	{
@@ -42,8 +42,8 @@ public class ReaderWrite {
 			p.println("No File Path Written");
 			
 		} else {
-			
-			ReadFile(filePath);
+			p.println("Path registered. Please double check later.");
+			//ReadFile(filePath);
 		}
 		
 	}
@@ -73,7 +73,7 @@ public class ReaderWrite {
 	public String GetFileContent()
 	{
 		//Send it to the caller
-		return this.finishedText;
+		return this.fileContent;
 	}
 	
 	/*
@@ -101,7 +101,7 @@ public class ReaderWrite {
 		p.println("ReadFile() now running");
 			
 		BufferedReader reader 	= null;
-		String finishedText 	= "";
+		String fileContent 	= "";
 		String temp 			= "";
 		
 		try 
@@ -121,11 +121,11 @@ public class ReaderWrite {
 				while ((line = reader.readLine()) != null) 
 				{
 					p.println(line);
-					finishedText = finishedText + line + " ";
+					fileContent = fileContent + line + " ";
 				}
 				
 				//Reader has finished reading
-				this.finishedText = finishedText;
+				this.fileContent = fileContent;
 				return true;
 			} else {
 				
@@ -154,10 +154,30 @@ public class ReaderWrite {
 		return false;
 	}
 	
+	
+	
+	/* Only use when there is already a declared value in filePath. This was made in order to reduce code writing in other classes.*/
+	public Boolean ReadFile()
+	{
+		
+		// if filePath has a value
+		if(!filePath.equals("")) {
+			return ReadFile(this.filePath);
+		}
+		else {
+			return false;
+		}
+	}
+	
 	public void SetWriteContent(String content)
 	{
 		//set value of textContent via the caller
 		this.textContent = content;
+	}
+	
+	public String GetWriteContent()
+	{
+		return this.textContent;
 	}
 	
 	public void SetFilePath(String path)
@@ -170,18 +190,36 @@ public class ReaderWrite {
 		this.filePath = path;
 	}
 	
+	public void SetFileName(String name)
+	{
+		
+		this.fileName = name;
+	}
+	
 	public String GetFilePath()
 	{
 		//Set the FilePath string in the class
 		return this.filePath;
 	}
 	
-	public Boolean TestCreateFile()
+	public Boolean CreateFile(String text)
 	{
 		
-		String textContent  = this.textContent; //template for the actual CreateFile
-		String path			= testFilePath;		
-		textContent 		= "This is a sample textContent for TestCreateFile. This string is needed in orderr to create a file.";
+		//use only when filePath actually has an existing value.
+		if (filePath.equals("")) {
+			p.println("Cannot use this yet. Variable filePath still has no value.");
+			return false;
+		}
+		
+		CreateFile(text, filePath);
+		return true;
+	}
+	
+	public Boolean CreateFile(String text, String pathCur)
+	{
+		
+		String textContent  = text;
+		String path			= pathCur;				
 		
 		if(textContent.equals("")){
 			p.println("You are creating a file without any content. Please add content before proceeding");
@@ -190,11 +228,11 @@ public class ReaderWrite {
 		
 		try {
 			
-			String tempPath = path + "write.txt";
+			String tempPath = path;
 			File file = new File(tempPath) ;		
 			//Also changed filePath content to tempPath in order to be able to test ReadFile()
 			filePath = tempPath;
-			fileName = "write.txt";
+			fileName = "";
 			
 			if(!file.exists())
 			{
@@ -221,6 +259,17 @@ public class ReaderWrite {
 			//When error strikes
 			return false;
 		}
+	}
+	
+	public Boolean TestCreateFile()
+	{
+		
+		String textContent  = this.textContent; //template for the actual CreateFile
+		String path			= testFilePath;		
+		textContent 		= "This is a sample textContent for TestCreateFile. This string is needed in orderr to create a file.";
+		String tempPath 	= path + "write.txt";
+		
+		return CreateFile(textContent, tempPath);		
 	}
 	
 	public Boolean TestReadFile()

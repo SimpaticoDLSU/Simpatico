@@ -1,10 +1,11 @@
 package preprocess;
 
 import shortcuts.Print;
-
+import shortcuts.Scan;
 public class Main 
 {
 	static Print p = new Print();
+	static Scan s  = new Scan();
 	public static void main(String[] args)
 	{
 		/* if you are looking for CoreNLP code, it has been transfered to Nlp.java 
@@ -24,6 +25,21 @@ public class Main
 		GUI_Splash gs = new GUI_Splash();
 		*/
 		
+		int choice;
+		
+		choice = s.GetInt();
+		
+		p.println("Test the ff: 1)ReaderWriter 2)CoreNLP 3)RwToNlp 4)Jmwe 5) CoreNLP2Jmwe");
+		switch (choice)
+		{
+			case 1	:	TestReaderWriter();
+						break;
+			case 2	: 	TestCoreNLP();
+						break;
+			case 3 	: 	TestRwToNlp();
+						break;
+			default	:	p.println("None yet.");
+		}
 		TestReaderWriter();
 		
 	}
@@ -47,6 +63,12 @@ public class Main
 		if(test1 == true && test2 == true && test3 == true) {
 			p.println("All 3 test cases for Read and Write are all passed. Congrats!");
 		}
+	}
+	
+	public static void TestCoreNLP()
+	{
+		Nlp nlp = new Nlp();
+		nlp.TestNlp();
 	}
 	
 	public static void TestRwToNlp()
