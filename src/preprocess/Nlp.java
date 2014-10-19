@@ -22,16 +22,35 @@ import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
 import edu.stanford.nlp.util.CoreMap;
 
 public class Nlp {
+	
 	static Print p = new Print();
+	static final String sampleLegalText = "Damage or destroy an electricity meter, equipment, "
+			+ "wire or conduit or allow any of them to be so damaged or destroyed as to interfere with the proper or accurate metering of electric current, "
+			+ "constitute the actus resus of the crime.";
+	
+	
+	public Nlp()
+	{
+		// Temporary
+	}
+	
 	public static void main(String[] args)
 	{
+		p.println("Running Nlp.java");
+		Nlp nlp = new Nlp();
+		nlp.TestNlp();
+	}
+	
+	public Boolean StartNlp(String text)
+	{
+		
 		/* Creates a StanfordCoreNLP Object, with POS Tagging, Lemmatization, NER, Parsing, and Corerefernce resolution*/
 		Properties props = new Properties();
 		props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
 		StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 		
 		// read some text in the text variable 
-		String text = "She filed a case in the pambansang korte.";
+		//String text = "She filed a case in the pambansang korte.";
 		
 		// Creates an empty Annotation just with the given text
 		Annotation document = new Annotation(text);
@@ -75,10 +94,17 @@ public class Nlp {
 		 * Both sentence and token offsets start at 1!	
 		 */
 		Map<Integer, CorefChain> graph = document.get(CorefChainAnnotation.class);
-		
+		/*
 		CorefChain test = graph.get(1);
 		p.println("document: " + document.toString());
 		p.println("Sample run: " + test.toString());
 		p.println("end of run");
+		*/
+		return true;
+	}
+	
+	public Boolean TestNlp()
+	{
+		return StartNlp(sampleLegalText);
 	}
 }
