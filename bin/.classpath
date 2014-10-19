@@ -19,5 +19,6 @@
 	<classpathentry kind="lib" path="/Users/laurenztolentino/Dropbox/Thesis References/importMe/stanford-corenlp-full-2014-08-27/xom-1.2.10-src.jar"/>
 	<classpathentry kind="lib" path="/Users/laurenztolentino/Dropbox/Thesis References/importMe/stanford-corenlp-full-2014-08-27/xom.jar"/>
 	<classpathentry kind="lib" path="/Users/laurenztolentino/Dropbox/Thesis References/importMe/edu.mit.jmwe_1.0.1_all/edu.mit.jmwe_1.0.1_javadoc.zip"/>
+	<classpathentry kind="lib" path="miglayout15-swing.jar" sourcepath="miglayout-src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

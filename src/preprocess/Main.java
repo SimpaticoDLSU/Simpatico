@@ -16,11 +16,10 @@ public class Main
 		 * 3) Nlp.java output will be transferred to Jmwe.java
 		 * 4) Finish processing and finishing touches to input for the delight of other developers.
 		 *
-		 */
-		
-		GUI_Start.main(args);
+		 */		
 		ReaderWrite rw = new ReaderWrite("filepath");
 		Nlp nlp = new Nlp();
+		GUI_Splash gs = new GUI_Splash();
 		
 	}
 }

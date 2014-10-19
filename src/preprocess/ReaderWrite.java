@@ -1,3 +1,8 @@
+/*
+ * This class was created to make reading and writing text files easier.
+ * All classes that would require reading and writing of .txt and other files must interact with this class.
+ * 
+ * */
 package preprocess;
 
 import java.io.BufferedReader;
@@ -118,6 +123,12 @@ public class ReaderWrite {
 			}
 		}
 			
+		return false;
+	}
+	
+	public Boolean CreateFile(String path)
+	{
+		
 		return false;
 	}
 	
