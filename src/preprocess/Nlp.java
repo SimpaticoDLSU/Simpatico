@@ -52,8 +52,8 @@ public class Nlp {
 	public static void main(String[] args)
 	{
 		p.println("Running Nlp.java");
-		//Nlp nlp = new Nlp();
-		//nlp.TestNlp();		
+		Nlp nlp = new Nlp();
+		nlp.TestNlp();		
 		
 	}
 	
@@ -66,6 +66,16 @@ public class Nlp {
 	public String GetFilePath()
 	{
 		return this.filePath;
+	}
+	
+	public void SetReaderWriter(ReaderWrite rw)
+	{
+		this.rw = rw;
+	}
+	
+	public void SetReaderWriterFilePath (String filePathNew)
+	{
+		this.rw.SetFilePath(filePathNew);
 	}
 	
 	public Boolean StartNlp(String text)
@@ -117,7 +127,7 @@ public class Nlp {
 				
 			}
 			
-			p.println(finalOutput);
+			//p.println(finalOutput);
 			rw.CreateFile(finalOutput);
 			
 			// this is the parse tree 
@@ -150,6 +160,8 @@ public class Nlp {
 	
 	public Boolean TestNlp()
 	{
+		this.filePath = defaultFilePath;
+		rw.SetFilePath(this.filePath);
 		return StartNlp(sampleLegalText);
 	}
 }

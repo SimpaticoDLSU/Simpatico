@@ -124,6 +124,8 @@ public class ReaderWrite {
 					fileContent = fileContent + line + " ";
 				}
 				
+				p.println("FileContent" + fileContent);
+				
 				//Reader has finished reading
 				this.fileContent = fileContent;
 				return true;

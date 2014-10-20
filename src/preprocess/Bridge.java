@@ -30,13 +30,21 @@ public class Bridge {
 			
 		// Uses defaultFilePath instead.
 		Nlp nlp = new Nlp();
-		this.nlpFilePath = nlp.defaultFilePath;
+		p.println("defaultFilePath has been set as nlpFilePath");
+		//set nlpFilePath as the same as the defaultFilePath
+		this.nlpFilePath = nlp.GetDefaultFilePath();
+		//set filePath of nlp to defaultFilePath
 		nlp.filePath	 = this.nlpFilePath;
+		// set filePath of this class to defaultFilePath
+		this.filePath	 = nlpFilePath;
+		p.println("filePath = " + this.filePath);
 		//ReaderWrite rw = new ReaderWrite(nlp.GetDefaultFilePath());
+		p.println("Running TestNlp() at the Bridge."); 
 		nlp.TestNlp();
 		
 		
 		//Run Converter
+		p.println("Running ConverttextToString");
 		ConvertTxtToString(nlpFilePath);
 		
 		return true;
@@ -44,8 +52,11 @@ public class Bridge {
 	
 	public void ConvertTxtToString(String filePath)
 	{
+		p.println("Getting content from: " + filePath);
 		ReaderWrite rw = new ReaderWrite(filePath);
+		rw.ReadFile(nlpFilePath);
 		String originalText = rw.GetFileContent();
+		//p.println("oringinalText is: " + originalText);
 		String[] splittedText = originalText.split("/");
 		
 		for(int i = 0; i < splittedText.length; i++) {
