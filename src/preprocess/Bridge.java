@@ -6,6 +6,7 @@ package preprocess;
 import shortcuts.Print;
 import shortcuts.Scan;
 
+
 public class Bridge {
 
 	Print p = new Print();
@@ -23,6 +24,8 @@ public class Bridge {
 	{
 		Bridge m = new Bridge();
 		m.TestConnectNlpToJmwe();
+		
+		
 	}
 	
 	public Boolean TestConnectNlpToJmwe()
@@ -52,6 +55,7 @@ public class Bridge {
 	
 	public void ConvertTxtToString(String filePath)
 	{
+		
 		p.println("Getting content from: " + filePath);
 		ReaderWrite rw = new ReaderWrite(filePath);
 		rw.ReadFile(nlpFilePath);
@@ -62,6 +66,8 @@ public class Bridge {
 		for(int i = 0; i < splittedText.length; i++) {
 			p.println(splittedText[i]);
 		}
+		
+		
 	}
 	
 	public Boolean ValidateNlpToJmwe()
