@@ -3,6 +3,9 @@
  * */
 package preprocess;
 
+import java.awt.List;
+import java.util.ArrayList;
+
 import shortcuts.Print;
 import shortcuts.Scan;
 
@@ -48,13 +51,17 @@ public class Bridge {
 		
 		//Run Converter
 		p.println("Running ConverttextToString");
-		ConvertTxtToString(nlpFilePath);
+		ConvertToWordList(nlpFilePath);
 		
 		return true;
 	}
 	
-	public void ConvertTxtToString(String filePath)
+	/*
+	 * Gets the list of word and tags from NlpOutput txt file into an ArrayList of Word(s)
+	 * */
+	public ArrayList<Word> ConvertToWordList(String filePath)
 	{
+		ArrayList<Word>  word = new ArrayList<Word>();
 		
 		p.println("Getting content from: " + filePath);
 		ReaderWrite rw = new ReaderWrite(filePath);
@@ -64,10 +71,27 @@ public class Bridge {
 		String[] splittedText = originalText.split("/");
 		
 		for(int i = 0; i < splittedText.length; i++) {
-			p.println(splittedText[i]);
+			Word temp = new Word();
+			temp.setWord(splittedText[i]);
+			if(i+1 < splittedText.length)
+				temp.setPartOfSpeech(splittedText[i+1]);
+			temp.setLemma(splittedText[i]);
+			//p.println(splittedText[i]);			
+			word.add(temp);
+			i++;
 		}
 		
-		
+		return word;
+	}
+	
+	public ArrayList<Sentence> ConvertToSentenceList()
+	{
+		ArrayList<Sentence> sentence = new ArrayList<Sentence>();
+		Sentence temp = new Sentence();
+		//for loop
+		//iterate from text file
+		sentence.add(temp);
+		return sentence;
 	}
 	
 	public Boolean ValidateNlpToJmwe()
