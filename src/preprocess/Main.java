@@ -38,10 +38,18 @@ public class Main
 						break;
 			case 3 	: 	TestRwToNlp();
 						break;
+			case 4  : 	TestReadFile();
+						break;
 			default	:	p.println("None yet.");
 		}
 		TestReaderWriter();
 		
+	}
+	
+	public static void TestReadFile()
+	{
+		ReaderWrite rw = new ReaderWrite();
+		rw.TestReadFile("sample.txt");
 	}
 	
 	public static void TestReaderWriter()
@@ -67,7 +75,9 @@ public class Main
 	
 	public static void TestCoreNLP()
 	{
-		Nlp nlp = new Nlp();
+		ReaderWrite rw = new ReaderWrite();
+		@SuppressWarnings("static-access")
+		Nlp nlp = new Nlp(rw.testPathComplete);
 		nlp.TestNlp();
 	}
 	

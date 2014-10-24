@@ -1,5 +1,6 @@
 package preprocess;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -24,75 +25,121 @@ import edu.stanford.nlp.util.CoreMap;
 public class Nlp {
 	
 	static Print p = new Print();
-	static final String sampleLegalText = "Damage or destroy an electricity meter, equipment, "
-			+ "wire or conduit or allow any of them to be so damaged or destroyed as to interfere with the proper or accurate metering of electric current, "
-			+ "constitute the actus resus of the crime.";
-	
 	//FilePath here includes already the file name
-	final static String defaultFilePath    = "/Users/laurenztolentino/Eclipse/workspace/Simpatico/src/preprocess/NlpOutput.txt";
-	String filePath						   = "";
-	ReaderWrite rw 						   = new ReaderWrite(this.filePath);
+	final static String defaultFile    		= "/Users/laurenztolentino/Eclipse/workspace/Simpatico/src/preprocess/NlpOutput.txt";
+	final String defaultFilePath		   	= "/Users/laurenztolentino/Eclipse/workspace/Simpatico/src/preprocess/";
+	String fileName						   	= "";			
+	String filePath						   	= "";
+	String filePathContainer				= "";
+	ReaderWrite rw;
+	ArrayList<String> wordList;
+	ArrayList<String> posList;
+	ArrayList<String> neList;	
 	
-	public Nlp()
+	/*
+	 * Pass a reader to make life easier.
+	 * Make sure you call a ReaderWrite on the method that calls this method and class.
+	 */
+	public Nlp(ReaderWrite reader)
 	{
-		// Temporary
-		p.println("No filePath Made. Using default filePath instead. (/preprocess/NlpOutput.txt)");
-		filePath = defaultFilePath;
+		this.rw = reader;
+		this.filePath = rw.GetFilePath();		
 	}
 	
+	/*
+	 * If you have not specified a ReaderWrite(), you can specify the filePath and this constructor
+	 * will create the necessary ReaderWrite for you.
+	 */
 	public Nlp(String filePath)
 	{
-		this.filePath = filePath;
+		
+		// Automatically set the filePath
+		SetFilePath(filePath);
+		rw = new ReaderWrite(filePath);
 		if(filePath.equals("")) {
 			p.println("The filePath you entered is blank. Will resort use defaultFilePath instead");
 			filePath = defaultFilePath;
 		}
 	}
 	
+	
 	public static void main(String[] args)
 	{
+		ReaderWrite rw = new ReaderWrite();
+		
 		p.println("Running Nlp.java");
-		Nlp nlp = new Nlp();
+		
+		Nlp nlp = new Nlp(rw.testPathComplete);
 		nlp.TestNlp();		
 		
 	}
 	
+	/*
+	 * Acquires text from SampleLegalText.txt
+	 * Just a custom version of GetFileContent via a ReaderWrite
+	 */
+	public String GetSampleLegalText()
+	{
+		p.println("You called GetSampleLegalText");
+		ReaderWrite read = new ReaderWrite(defaultFilePath + "SampleLegalText.txt");
+		read.ReadFile();
+		p.println("Trace: " + read.GetFilePath());
+		return read.GetFileContent();
+	}
+	
+	/*
+	 * Set the filePath to be used by the entire class
+	 */
 	public void SetFilePath(String filePath)
 	{
+	
 		// in case you need to update your file path.
 		this.filePath = filePath;
 	}
 	
+	/*
+	 * Gets the filePath used by the class.
+	 * Created in case you need to check.
+	 */
 	public String GetFilePath()
 	{
+		
 		return this.filePath;
 	}
 	
+	
 	public void SetReaderWriter(ReaderWrite rw)
 	{
+		
 		this.rw = rw;
 	}
 	
+	
 	public void SetReaderWriterFilePath (String filePathNew)
 	{
+		
 		this.rw.SetFilePath(filePathNew);
 	}
 	
+	
+	/*
+	 * This method is responsible for annotating every word in the provided text with 
+	 * Part-of-Speech (POS) tags.
+	 */
 	public Boolean StartNlp(String text)
 	{
 		
 		//ReaderWrite now has a defined FilePath. 		
-		
-		String temp 		= "";
-		String finalOutput 	= "";
+		ArrayList<String> wordList 	= new ArrayList<String>();
+		ArrayList<String> posList	= new ArrayList<String>();
+		ArrayList<String> neList	= new ArrayList<String>();
+		String temp 				= "";
+		String finalOutput 			= "";
 		
 		/* Creates a StanfordCoreNLP Object, with POS Tagging, Lemmatization, NER, Parsing, and Corerefernce resolution*/
 		Properties props = new Properties();
 		props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
 		StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
-		
-		// read some text in the text variable 
-		//String text = "She filed a case in the pambansang korte.";
 		
 		// Creates an empty Annotation just with the given text
 		Annotation document = new Annotation(text);
@@ -121,20 +168,36 @@ public class Nlp {
 				String ne 	= token.get(NamedEntityTagAnnotation.class);
 				//p.println("ne: " + ne);
 				
+				// Add them to class variables.
+				wordList.add(word);
+				posList.add(pos);
+				neList.add(ne);
+				
 				temp = word + "/" + pos;
 				finalOutput = finalOutput + temp;
 				finalOutput = finalOutput + "\n";
 				
 			}
 			
-			//p.println(finalOutput);
-			rw.CreateFile(finalOutput);
+			p.println("finalOutput: \n " + finalOutput);
 			
-			// this is the parse tree 
+			// Update the class ArrayList variables
+			this.wordList 	= wordList;
+			this.posList 	= posList;
+			this.neList		= neList;
+			
+			// Create NlpOutput.txt with the content in this format: <word>/<pos>
+			rw.SetFileName("NlpOutput.txt");
+			rw.SetFilePath(defaultFile); //redundant creation
+			rw.CreateFile(finalOutput, defaultFile);
+			
+			// this is the parse tree. And I have no idea what it's for
 			Tree tree = sentence.get(TreeAnnotation.class);
 			
 			// this is the Stanford dependency graph of the current sentence
 			SemanticGraph dependencies = sentence.get(CollapsedCCProcessedDependenciesAnnotation.class);
+			// Also I have no idea what the one above is for
+			
 		}
 		
 		/*
@@ -153,6 +216,22 @@ public class Nlp {
 		return true;
 	}
 	
+	
+	public ArrayList<String> GetWordList()
+	{
+		return this.wordList;
+	}
+	
+	public ArrayList<String> GetPosList()
+	{
+		return this.posList;
+	}
+	
+	public ArrayList<String> GetNeList()
+	{
+		return this.neList;
+	}
+	
 	public String GetDefaultFilePath()
 	{
 		return this.defaultFilePath;
@@ -160,8 +239,10 @@ public class Nlp {
 	
 	public Boolean TestNlp()
 	{
+		ReaderWrite rw = new ReaderWrite();	
 		this.filePath = defaultFilePath;
-		rw.SetFilePath(this.filePath);
-		return StartNlp(sampleLegalText);
+		//rw.ReadFile(defaultFile);
+		//rw.SetFilePath(this.filePath);
+		return StartNlp(GetSampleLegalText());
 	}
 }

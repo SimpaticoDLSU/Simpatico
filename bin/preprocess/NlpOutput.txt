@@ -8,6 +8,7 @@ meter/NN
 equipment/NN
 ,/,
 wire/NN
+,/,
 or/CC
 conduit/NN
 or/CC
@@ -33,11 +34,9 @@ metering/NN
 of/IN
 electric/JJ
 current/JJ
-,/,
-constitute/VBP
-the/DT
-actus/NN
-resus/NN
+constitutethe/NN
+actus/VBZ
+reus/NN
 of/IN
 the/DT
 crime/NN
