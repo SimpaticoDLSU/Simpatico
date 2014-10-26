@@ -1,5 +1,5 @@
 
-/.classpath
+*.classpath
 /edu.mit.jmwe_1.0.1_all/*
 /stanford-corenlp-full-2014-08-27/*
 # Compiled source #
