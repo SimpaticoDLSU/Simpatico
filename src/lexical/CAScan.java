@@ -34,6 +34,7 @@ public class CAScan
 		Word prevail = new Word("prevail");
 		Word pursuant = new Word("pursuant");
 		Word fly = new Word("fly");
+	
 		
 		justice.setComplex(true);
 		justice.setStopWord(false);

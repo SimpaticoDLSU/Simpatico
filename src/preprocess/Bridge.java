@@ -3,7 +3,6 @@
  * */
 package preprocess;
 
-import java.awt.List;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -123,8 +122,8 @@ public class Bridge {
 		String[] splittedText = originalText.split("/");
 
 		for(int i = 0; i < splittedText.length; i++) {
-			Word temp = new Word();
-			temp.setWord(splittedText[i]);
+			Word temp = new Word(splittedText[i]);
+			
 			if(i+1 < splittedText.length)
 				temp.setPartOfSpeech(splittedText[i+1]);
 			temp.setLemma(splittedText[i]);

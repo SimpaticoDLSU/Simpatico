@@ -1,4 +1,5 @@
 package preprocess;
+
 import java.util.ArrayList;
 
 
@@ -8,7 +9,11 @@ public class Word {
 	private boolean isComplex;
 	private boolean isStopWord;
 	private String partOfSpeech;
-	private ArrayList<Word> substitute;
+	private ArrayList<String> substitute;
+	
+	public Word(String word){
+		this.word = word;
+	}
 	
 	public String getWord() {
 		return word;
@@ -40,10 +45,10 @@ public class Word {
 	public void setPartOfSpeech(String partOfSpeech) {
 		this.partOfSpeech = partOfSpeech;
 	}
-	public ArrayList<Word> getSubstitute() {
+	public ArrayList<String> getSubstitute() {
 		return substitute;
 	}
-	public void setSubstitute(ArrayList<Word> substitute) {
+	public void setSubstitute(ArrayList<String> substitute) {
 		this.substitute = substitute;
 	}
 	
