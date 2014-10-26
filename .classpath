@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry excluding="src/" kind="src" path=""/>
+	<classpathentry excluding="lexical/Resources/WordNet/" kind="src" path="src"/>
+	<classpathentry excluding="src/|src/lexical/Resources/WordNet/" kind="src" path=""/>
+	<classpathentry kind="src" path="src/lexical/Resources/WordNet"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="lib" path="/Users/laurenztolentino/Dropbox/Thesis References/importMe/edu.mit.jmwe_1.0.1_all/edu.mit.jmwe_1.0.1_jdk.jar"/>
 	<classpathentry kind="lib" path="/Users/laurenztolentino/Dropbox/Thesis References/importMe/stanford-corenlp-full-2014-08-27/ejml-0.23.jar"/>
@@ -20,5 +21,24 @@
 	<classpathentry kind="lib" path="/Users/laurenztolentino/Dropbox/Thesis References/importMe/stanford-corenlp-full-2014-08-27/xom.jar"/>
 	<classpathentry kind="lib" path="/Users/laurenztolentino/Dropbox/Thesis References/importMe/edu.mit.jmwe_1.0.1_all/edu.mit.jmwe_1.0.1_javadoc.zip"/>
 	<classpathentry kind="lib" path="miglayout15-swing.jar" sourcepath="miglayout-src.zip"/>
+<<<<<<< HEAD
+	<classpathentry kind="lib" path="C:/Users/juanito/Dropbox/Thesis References/importMe/edu.mit.jmwe_1.0.1_all/edu.mit.jmwe_1.0.1_jdk.jar"/>
+	<classpathentry kind="lib" path="C:/Users/juanito/Dropbox/Thesis References/importMe/stanford-corenlp-full-2014-08-27/ejml-0.23.jar"/>
+	<classpathentry kind="lib" path="C:/Users/juanito/Dropbox/Thesis References/importMe/stanford-corenlp-full-2014-08-27/javax.json.jar"/>
+	<classpathentry kind="lib" path="C:/Users/juanito/Dropbox/Thesis References/importMe/stanford-corenlp-full-2014-08-27/javax.json-api-1.0-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/juanito/Dropbox/Thesis References/importMe/stanford-corenlp-full-2014-08-27/joda-time.jar"/>
+	<classpathentry kind="lib" path="C:/Users/juanito/Dropbox/Thesis References/importMe/stanford-corenlp-full-2014-08-27/joda-time-2.1-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/juanito/Dropbox/Thesis References/importMe/stanford-corenlp-full-2014-08-27/jollyday.jar"/>
+	<classpathentry kind="lib" path="C:/Users/juanito/Dropbox/Thesis References/importMe/stanford-corenlp-full-2014-08-27/jollyday-0.4.7-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/juanito/Dropbox/Thesis References/importMe/stanford-corenlp-full-2014-08-27/stanford-corenlp-3.4.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/juanito/Dropbox/Thesis References/importMe/stanford-corenlp-full-2014-08-27/stanford-corenlp-3.4.1-javadoc.jar"/>
+	<classpathentry kind="lib" path="C:/Users/juanito/Dropbox/Thesis References/importMe/stanford-corenlp-full-2014-08-27/stanford-corenlp-3.4.1-models.jar"/>
+	<classpathentry kind="lib" path="C:/Users/juanito/Dropbox/Thesis References/importMe/stanford-corenlp-full-2014-08-27/stanford-corenlp-3.4.1-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/juanito/Dropbox/Thesis References/importMe/stanford-corenlp-full-2014-08-27/xom.jar"/>
+	<classpathentry kind="lib" path="C:/Users/juanito/Dropbox/Thesis References/importMe/stanford-corenlp-full-2014-08-27/xom-1.2.10-src.jar"/>
+	<classpathentry kind="lib" path="src/lexical/Resources/rita.jar"/>
+	<classpathentry kind="lib" path="src/lexical/Resources/rita.support.jar"/>
+=======
+>>>>>>> parent of 05c8eef... initial integration
 	<classpathentry kind="output" path="bin"/>
 </classpath>
