@@ -11,6 +11,9 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import preprocess.Sentence;
+import preprocess.Word;
+
 public class RankingChooser {
 
     //The ranking that will be used to choose the best among the candidate substitutes.
@@ -29,7 +32,7 @@ public class RankingChooser {
 
     /* Gets the best candidates based from RANK_VALUE
      */
-    public void getWords() {
+    public ArrayList<Sentence> getWords(ArrayList<Sentence> sentenceList) {
         Scanner inputScanner;
         String substituteWord;
 
@@ -71,10 +74,24 @@ public class RankingChooser {
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         }
+        
+        int index = 0;
+        
+        for (Sentence sentence : sentenceList) {
+            ArrayList<Word> wordList = sentence.getWordList();
+            
+            //Traverse the words contained in a sentence.
+            for (Word word : wordList) {
+                ArrayList<String> substituteWords = word.getSubstitute();
+
+                //if word has a list of substitutes, then add its corresponding replacement word.
+                if (!substituteWords.isEmpty()) {
+                    word.setBestSubstitute(replacementWords.get(index++));
+                }
+            }
+        }
+        
+        return sentenceList;
     }
 
-    public static void main(String[] args) {
-        RankingChooser rc = new RankingChooser();
-        rc.getWords();
-    }
 }

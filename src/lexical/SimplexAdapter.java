@@ -21,7 +21,7 @@ import preprocess.Word;
 public class SimplexAdapter {
 
     //Directory where simplex is stored.
-    private final String SIMPLEX_DIRECTORY = "C:/Users/Miguel/Dropbox/[School]/Thesis References/tools/Simplex/";
+    private final String SIMPLEX_DIRECTORY = "/Resources/Simplex";
     //the name of the output text file to be read by simplex.
     private final String OUTPUT_NAME = "simpatico";
     //List of sentences to be processed

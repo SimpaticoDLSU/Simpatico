@@ -11,7 +11,7 @@ import shortcuts.Scan;
 
 
 public class Bridge {
-	final String defaultFileContainer 	= "/Users/laurenztolentino/Eclipse/workspace/Simpatico/src/preprocess/";	
+	final String defaultFileContainer 	= "/Users/juanito/Documents/GitHub/Simpatico/src/preprocess";	
 	
 	Print p 							= new Print();
 	Scan s  							= new Scan();	
@@ -81,7 +81,7 @@ public class Bridge {
 		
 	}
 
-	public Boolean TestConnectNlpToJmwe()
+	public ArrayList<Sentence> TestConnectNlpToJmwe()
 	{
 
 		ReaderWrite rw = new ReaderWrite();
@@ -104,7 +104,7 @@ public class Bridge {
 		p.println("Running ConvertToWordList");
 		ConvertToWordList(nlpFilePath);
 
-		return true;
+		return ConvertToSentenceList();
 	}
 
 	/*
@@ -135,13 +135,18 @@ public class Bridge {
 		return word;
 	}
 
+	public Boolean CheckIfStopWord()
+	{
+		return false;
+	}
+	
 	/*
 	 * Use Word instead to generate content in sentence.
 	 * */
 	public ArrayList<Sentence> ConvertToSentenceList()
-	{
+	{	
 		ArrayList<Sentence> sentence = new ArrayList<Sentence>();
-		Sentence temp = new Sentence();
+		Sentence temp = new Sentence(0);
 		//for loop
 		//iterate from text file
 		sentence.add(temp);

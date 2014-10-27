@@ -10,7 +10,16 @@ public class Word {
 	private boolean isStopWord;
 	private String partOfSpeech;
 	private ArrayList<String> substitute;
+	private String bestSubstitute;
 	
+	public String getBestSubstitute() {
+		return bestSubstitute;
+	}
+
+	public void setBestSubstitute(String bestSubstitute) {
+		this.bestSubstitute = bestSubstitute;
+	}
+
 	public Word(String word){
 		this.word = word;
 	}
