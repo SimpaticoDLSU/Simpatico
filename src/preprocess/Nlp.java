@@ -26,8 +26,8 @@ public class Nlp {
 	
 	static Print p = new Print();
 	//FilePath here includes already the file name
-	final static String defaultFile    		= "/Users/laurenztolentino/Eclipse/workspace/Simpatico/src/preprocess/NlpOutput.txt";
-	final String defaultFilePath		   	= "/Users/laurenztolentino/Eclipse/workspace/Simpatico/src/preprocess/";
+	final static String defaultFile    		= "src/documents/NlpOutput.txt";
+	final String defaultFilePath		   	= "src/documents/";
 	String fileName						   	= "";			
 	private String filePath						   	= "";
 	String filePathContainer				= "";
@@ -253,4 +253,11 @@ public class Nlp {
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
 	}
+	
+	public Boolean isStopWord(String word)
+	{
+		
+		return false;
+	}
+	
 }

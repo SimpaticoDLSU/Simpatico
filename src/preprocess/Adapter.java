@@ -20,7 +20,7 @@ import shortcuts.Scan;
 
 
 public class Adapter {
-	final String defaultFileContainer 	= "/Users/laurenztolentino/Eclipse/workspace/Simpatico/src/preprocess/";	
+	final String defaultFileContainer 	= "src/preprocess/";	
 	
 	Print p 							= new Print();
 	Scan s  							= new Scan();	
@@ -33,7 +33,7 @@ public class Adapter {
 	final String testPathComplete = rw.testPathComplete;
 	 
 	public Adapter()
-	{
+	{ 
 		// None yet
 	}
 

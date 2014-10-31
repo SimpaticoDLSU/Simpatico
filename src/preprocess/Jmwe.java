@@ -105,7 +105,7 @@ public class Jmwe {
 
 	private File getMWEIndexDataFile() {
 		//File file = new File("src/jwme_test/mweindex_wordnet3.0_Semcor1.6.data");
-		File file 	= new File("/Users/laurenztolentino/Eclipse/workspace/Simpatico/src/preprocess/mweindex_wordnet3.0_Semcor1.6.data");
+		File file 	= new File("src/documents/mweindex_wordnet3.0_Semcor1.6.data");
 		return file;
 	}
 	

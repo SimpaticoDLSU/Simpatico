@@ -13,7 +13,7 @@ public class Scan {
 		return result;		
 	}
 	
-	public String GetLine()
+	public String GetLine()  
 	{
 		String result;
 		result = sc.nextLine();
