@@ -11,7 +11,7 @@ import shortcuts.Scan;
 
 
 public class Adapter {
-	final String defaultFileContainer 	= "/src/preprocess";	
+	final String defaultFileContainer 	= "src/preprocess/";	
 	
 	Print p 							= new Print();
 	Scan s  							= new Scan();	
@@ -32,7 +32,8 @@ public class Adapter {
 	{
 		Adapter m = new Adapter();
 		//m.Test_NLPtoJMWE();
-		m.Test_SentenceConversion("src/preprocess/NlpOutput.txt");
+		
+		m.Test_NLPtoJMWE();
 
 	}
 
@@ -104,9 +105,9 @@ public class Adapter {
 
 		//Run Converter
 		p.println("Running ConvertToWordList");
-		ConvertToWordList(nlpFilePath);
+		ConvertToWordList(nlpFilePath+"NlpOutput.txt");
 		//test sentence
-		Test_SentenceConversion(nlpFilePath);
+		Test_SentenceConversion(nlpFilePath+"NlpOutput.txt");
 		return true;
 	}
 
