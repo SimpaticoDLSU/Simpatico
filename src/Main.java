@@ -5,7 +5,6 @@ import lexical.RankingChooser;
 import lexical.SimplexAdapter;
 import preprocess.Adapter;
 import preprocess.PreSentence;
-import preprocess.Sentence;
 import preprocess.Word;
 
 
@@ -13,17 +12,16 @@ import preprocess.Word;
 public class Main {
 	public static void main(String[] args)
 	{
-		//Bridge bridge = new Bridge();
-		//LexSubmodules lexSubmodules = new LexSubmodules();
-		//SimplexAdapter adapter;
-		//RankingChooser rankingChooser = new RankingChooser();
-		//ArrayList<PreSentence> sentenceList = new ArrayList<PreSentence>();
+		Adapter Adapter = new Adapter();
+		LexSubmodules lexSubmodules = new LexSubmodules();
+		SimplexAdapter adapter;
+		RankingChooser rankingChooser = new RankingChooser();
+		ArrayList<PreSentence> sentenceList = new ArrayList<PreSentence>();
 		
 		//perform preprocessing. If returned list is empty then abort.
-		/*
-		if(!(sentenceList = bridge.TestConnectNlpToJmwe()).isEmpty())
+		if(!(sentenceList = Adapter.ConvertToSentenceList("src/preprocess/NlpOutput.txt")).isEmpty())
 		{
-			for(Sentence sentence : sentenceList)
+			for(PreSentence sentence : sentenceList)
 			{
 				for(Word word:sentence.getWordList())
 				{
@@ -37,22 +35,26 @@ public class Main {
 			sentenceList =	lexSubmodules.candidateSelection(sentenceList);
 			adapter = new SimplexAdapter(sentenceList);
 			
-			//convert sentenceList into a format that Simplex can understand
-			adapter.translateToTxtFile();
-			
 			//run simplex
-			adapter.runSimplex();
-			
+			adapter.start();
+						
 			//rank the substitute words and get the best substitute for each complex word
-			rankingChooser.getWords(sentenceList);
+			sentenceList = rankingChooser.getWords(sentenceList);
 			
 			
 			
 		} //end if
-		
-		*/
+		System.out.println("Output:");
+		for(PreSentence s: sentenceList){
+			for(Word w: s.getWordList()){
+				System.out.print(w.getLemma()+" ");
+			}
+		}
 		
 		
 		
 	}
+	
+
 }
+

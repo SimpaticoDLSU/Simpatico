@@ -2,8 +2,6 @@ package preprocess;
 
 import java.util.ArrayList;
 
-import preprocess.Word;
-
 
 public class PreSentence {
 	private ArrayList<Word> wordList = new ArrayList<Word>();

@@ -13,9 +13,10 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Scanner;
 
-import preprocess.Sentence;
+import preprocess.PreSentence;
 import preprocess.Word;
-import rita.*;
+import rita.RiWordNet;
+
 
 
 public class LexSubmodules 
@@ -25,9 +26,11 @@ public class LexSubmodules
 		
 		LexSubmodules s= new LexSubmodules();
 		
-		ArrayList<Sentence> sentences = new ArrayList<Sentence>();
-		Sentence s_one = new Sentence(0);
-		Sentence s_two = new Sentence(1);
+		ArrayList<PreSentence> sentences = new ArrayList<PreSentence>();
+		PreSentence s_one = new PreSentence();
+		PreSentence s_two = new PreSentence();
+		s_one.setId(0);
+		s_two.setId(1);
 		Word justice = new Word("justice");
 		Word jury = new Word("jury");
 		Word aftermath = new Word("aftermath");
@@ -81,8 +84,8 @@ public class LexSubmodules
 		
 		
 		
-		ArrayList<Sentence> res = s.candidateSelection(sentences);
-		for(Sentence sentence: res)
+		ArrayList<PreSentence> res = s.candidateSelection(sentences);
+		for(PreSentence sentence: res)
 		{				
 			for(Word w: sentence.getWordList())
 			{
@@ -106,7 +109,7 @@ public class LexSubmodules
 	 */
 	public boolean isComplex(String word)
 	{
-		File lemmacorpus = new File("Resources/lemmacorpus.txt");
+		File lemmacorpus = new File("src/lexical/Resources/lemmacorpus.txt");
 		try (BufferedReader reader = new BufferedReader(new FileReader(lemmacorpus.getAbsolutePath()))) 
 		{
 		    String line = null;
@@ -133,7 +136,7 @@ public class LexSubmodules
 	} 
 	
 	
-	public ArrayList<Sentence> candidateSelection(ArrayList<Sentence> sentences)
+	public ArrayList<PreSentence> candidateSelection(ArrayList<PreSentence> sentences)
 	{	
 	
 		RiWordNet wordnet = new RiWordNet("src/lexical/Resources/WordNet-3.1");
@@ -141,7 +144,7 @@ public class LexSubmodules
 		wordnet.ignoreUpperCaseWords(true);
 		wordnet.randomizeResults(false);
 		
-		for(Sentence sentence: sentences)
+		for(PreSentence sentence: sentences)
 		{				
 			for(Word w: sentence.getWordList())
 			{
@@ -152,7 +155,7 @@ public class LexSubmodules
 				    
 				    w.setSubstitute(new ArrayList<String>());
 				    String pos = null;
-				    
+				    System.out.println(w.getLemma());
 				    switch(w.getPartOfSpeech().toUpperCase().charAt(0)){
 					    case 'J': pos = RiWordNet.ADJ; 
 					    	break;
