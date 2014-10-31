@@ -11,7 +11,7 @@ import shortcuts.Scan;
 
 
 public class Adapter {
-	final String defaultFileContainer 	= "/src/documents";	
+	final String defaultFileContainer 	= "src/documents/";	
 	
 	Print p 							= new Print();
 	Scan s  							= new Scan();	
@@ -26,17 +26,26 @@ public class Adapter {
 	public Adapter()
 	{
 		// None yet
-	}
+	} 
 
 	public static void main(String[] args)
 	{
 		Adapter m = new Adapter();
-		//m.Test_NLPtoJMWE();
-		m.Test_SentenceConversion("src/documents/NlpOutput.txt");
+		m.Test_NLPtoJMWE();
+		//m.Test_SentenceConversion("src/documents/NlpOutput.txt");
 
 	}
 
-
+	public void StartModule(String filePath)
+	{
+		
+		ReaderWrite rw 	= new ReaderWrite(filePath); // Initiate RW and perform ReadFile() on the filePath
+		Nlp nlp			= new Nlp(rw);
+		Jmwe jmwe 		= new Jmwe();
+		
+		
+	}
+	
 	public void NLPtoJMWE(String fileName) throws IOException
 	{
 		String filePath; 
@@ -51,6 +60,7 @@ public class Adapter {
 		p.println(mweResult);
 		
 	}
+	
 	
 	/*
 	 * Sends the data coming from NLP and then transfers them to JMWE 
@@ -83,6 +93,7 @@ public class Adapter {
 		TestConnectNlpToJmwe();
 	}
 
+	
 	public Boolean TestConnectNlpToJmwe()
 	{
 		p.println("Running TestConnectNlpToJmwe");
@@ -115,22 +126,21 @@ public class Adapter {
 	 * */
 	public ArrayList<Word> ConvertToWordList(String filePath)
 	{
-		ArrayList<Word>  word = new ArrayList<Word>();
-
-		p.println("Getting content from: " + filePath);
-		ReaderWrite rw = new ReaderWrite(filePath);
+		ArrayList<Word> word 	=	 new ArrayList<Word>();
+		Nlp nlp 				= new Nlp();
+		ReaderWrite rw 			= new ReaderWrite(filePath);
 		rw.ReadFile(filePath); // original nlpFilePath
-		String originalText = rw.GetFileContent();
-		//p.println("oringinalText is: " + originalText);
-		String[] splittedText = originalText.split(" ");
+		String originalText 	= rw.GetFileContent();
+		String[] splittedText 	= originalText.split(" ");
 
 		for(int i = 0; i < splittedText.length; i++) {
 			
 			String[] split = splittedText[i].split("/");
 			
-			Word temp = new Word(split[0]);
-			temp.setPartOfSpeech(split[1]);
+			Word temp = new Word(split[0]); 
+			temp.setPartOfSpeech(split[1]); 
 			temp.setLemma(split[0]);
+			temp.setStopWord(nlp.isStopWord(temp.getWord()));
 			//p.println(splittedText[i]);
 			word.add(temp);
 		
@@ -211,3 +221,4 @@ public class Adapter {
 
 
 }
+
