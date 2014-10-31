@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 import java.util.ArrayList;
 
 import lexical.LexSubmodules;
