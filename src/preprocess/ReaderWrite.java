@@ -19,8 +19,8 @@ public class ReaderWrite
 {
 
 	//testFileName is only used for testing the ReaderWrite methods
-	final public static String testPathComplete= "/Users/laurenztolentino/Eclipse/workspace/Simpatico/src/preprocess/sample.txt";
-	final static String testFilePath    = "/Users/laurenztolentino/Eclipse/workspace/Simpatico/src/preprocess/";
+	final public static String testPathComplete= "src/preprocess/sample.txt";
+	final static String testFilePath    = "src/preprocess/";
 	final static String testFileName	= "sample.txt";
 	static Print p 						= new Print();
 	String filePath 					= "";

@@ -12,7 +12,42 @@ public class Word {
 	private ArrayList<String> substitute;
 	private String bestSubstitute;
 	
-	public String getBestSubstitute() {
+	public Word()
+	{
+		// None
+	}
+	
+	public Word(String word)
+	{
+		this.word = word;
+	}
+	
+	public Word(String word, String partOfSpeech, String lemma)
+	{
+		this.word 			= word;
+		this.partOfSpeech 	= partOfSpeech;
+		this.lemma 			= lemma;
+	}
+	
+	public Word(String word, String partOfSpeech, String lemma, boolean isStopWord)
+	{
+		this.partOfSpeech 	= partOfSpeech;
+		this.word 			= word;
+		this.lemma			= lemma;
+		this.isStopWord		= isStopWord;		
+	}
+	
+	public Word(String word, String partOfSpeech, String lemma, boolean isStopWord, boolean isComplex)
+	{
+		this.partOfSpeech 	= partOfSpeech;
+		this.word 			= word;
+		this.lemma			= lemma;
+		this.isStopWord		= isStopWord;		
+		this.isComplex 		= isComplex;
+	}
+	
+	public String getBestSubstitute() 
+	{
 		return bestSubstitute;
 	}
 
@@ -20,16 +55,15 @@ public class Word {
 		this.bestSubstitute = bestSubstitute;
 	}
 
-	public Word(String word){
-		this.word = word;
-	}
-	
 	public String getWord() {
 		return word;
 	}
+	
+	
 	public void setWord(String word) {
 		this.word = word;
 	}
+	
 	public String getLemma() {
 		return lemma;
 	}

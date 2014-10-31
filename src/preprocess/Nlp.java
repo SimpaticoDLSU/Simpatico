@@ -29,7 +29,7 @@ public class Nlp {
 	final static String defaultFile    		= "/Users/laurenztolentino/Eclipse/workspace/Simpatico/src/preprocess/NlpOutput.txt";
 	final String defaultFilePath		   	= "/Users/laurenztolentino/Eclipse/workspace/Simpatico/src/preprocess/";
 	String fileName						   	= "";			
-	String filePath						   	= "";
+	private String filePath						   	= "";
 	String filePathContainer				= "";
 	ReaderWrite rw;
 	ArrayList<String> wordList;
@@ -43,7 +43,7 @@ public class Nlp {
 	public Nlp(ReaderWrite reader)
 	{
 		this.rw = reader;
-		this.filePath = rw.GetFilePath();		
+		this.setFilePath(rw.GetFilePath());		
 	}
 	
 	/*
@@ -94,7 +94,7 @@ public class Nlp {
 	{
 	
 		// in case you need to update your file path.
-		this.filePath = filePath;
+		this.setFilePath(filePath);
 	}
 	
 	/*
@@ -104,7 +104,7 @@ public class Nlp {
 	public String GetFilePath()
 	{
 		
-		return this.filePath;
+		return this.getFilePath();
 	}
 	
 	
@@ -240,9 +240,17 @@ public class Nlp {
 	public Boolean TestNlp()
 	{
 		ReaderWrite rw = new ReaderWrite();	
-		this.filePath = defaultFilePath;
+		this.setFilePath(defaultFilePath);
 		//rw.ReadFile(defaultFile);
 		//rw.SetFilePath(this.filePath);
 		return StartNlp(GetSampleLegalText());
+	}
+
+	public String getFilePath() {
+		return filePath;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
 	}
 }
