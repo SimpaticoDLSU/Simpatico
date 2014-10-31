@@ -11,8 +11,9 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import preprocess.Sentence;
+import preprocess.PreSentence;
 import preprocess.Word;
+import edu.stanford.nlp.ling.Sentence;
 
 public class RankingChooser {
 
@@ -32,7 +33,7 @@ public class RankingChooser {
 
     /* Gets the best candidates based from RANK_VALUE
      */
-    public ArrayList<Sentence> getWords(ArrayList<Sentence> sentenceList) {
+    public ArrayList<PreSentence> getWords(ArrayList<PreSentence> sentenceList) {
         Scanner inputScanner;
         String substituteWord;
 
@@ -77,7 +78,7 @@ public class RankingChooser {
         
         int index = 0;
         
-        for (Sentence sentence : sentenceList) {
+        for (PreSentence sentence : sentenceList) {
             ArrayList<Word> wordList = sentence.getWordList();
             
             //Traverse the words contained in a sentence.

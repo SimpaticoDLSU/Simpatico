@@ -15,22 +15,32 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import preprocess.Sentence;
+import preprocess.PreSentence;
 import preprocess.Word;
 
 public class SimplexAdapter {
 
     //Directory where simplex is stored.
-    private final String SIMPLEX_DIRECTORY = "/Resources/Simplex";
+    private final String SIMPLEX_DIRECTORY = "src/lexical/Resources/Simplex";
     //the name of the output text file to be read by simplex.
     private final String OUTPUT_NAME = "simpatico";
     //List of sentences to be processed
-    private final ArrayList<Sentence> sentences;
+    private final ArrayList<PreSentence> sentences;
 
     //Contructor of SimplexAdapter
-    public SimplexAdapter(ArrayList<Sentence> sentences) {
+    public SimplexAdapter(ArrayList<PreSentence> sentences) {
         this.sentences = sentences;
     }
+    
+    /*
+	 *	Start the translation of the sentences and simplex
+	 * 	Run the RankingChooser Afterwards.
+	 */
+	public void start() {
+		translateToTxtFile();
+		runSimplex();
+		
+	}
 
     /*
      *  Translate to text file.
@@ -48,7 +58,7 @@ public class SimplexAdapter {
             int id = 0; //The counter for the words
 
             //Traverse the sentences
-            for (Sentence sentence : sentences) {
+            for (PreSentence sentence : sentences) {
                 ArrayList<Word> wordList = sentence.getWordList();
 
                 //Traverse the words contained in a sentence.

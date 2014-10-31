@@ -3,24 +3,15 @@
  * */
 package preprocess;
 
-import java.awt.List;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.print.attribute.standard.PrinterLocation;
-
-import preprocess.Jmwe;
-import preprocess.Nlp;
-import preprocess.PreSentence;
-import preprocess.ReaderWrite;
-import preprocess.Word;
-import edu.stanford.nlp.ling.Sentence;
 import shortcuts.Print;
 import shortcuts.Scan;
 
 
 public class Adapter {
-	final String defaultFileContainer 	= "/Users/laurenztolentino/Eclipse/workspace/Simpatico/src/preprocess/";	
+	final String defaultFileContainer 	= "/src/preprocess";	
 	
 	Print p 							= new Print();
 	Scan s  							= new Scan();	
@@ -31,7 +22,7 @@ public class Adapter {
 	// This is a ReaderWrite that uses testPathComplete as filePath (for testing only).
 	ReaderWrite rw = new ReaderWrite();
 	final String testPathComplete = rw.testPathComplete;
-	 
+	
 	public Adapter()
 	{
 		// None yet
@@ -40,8 +31,8 @@ public class Adapter {
 	public static void main(String[] args)
 	{
 		Adapter m = new Adapter();
-		// Run NLP to JMWE connector
-		m.Test_NLPtoJMWE();
+		//m.Test_NLPtoJMWE();
+		m.Test_SentenceConversion("src/preprocess/NlpOutput.txt");
 
 	}
 
@@ -67,8 +58,7 @@ public class Adapter {
 	public void Test_NLPtoJMWE()
 	{
 		
-		//ReaderWrite rw 			= new ReaderWrite(defaultFileContainer + "SampleLegalText.txt");
-		ReaderWrite rw 			= new ReaderWrite("src/preprocess/SampleLegalText.txt");
+		ReaderWrite rw 			= new ReaderWrite(defaultFileContainer + "SampleLegalText.txt");
 		Nlp nlp					= new Nlp(rw);
 		Jmwe mwe				= new Jmwe();
 		String mweResult		= "";
@@ -78,11 +68,8 @@ public class Adapter {
 		// Start POS Tagging by getting the file content from RW.
 		nlp.StartNlp(rw.GetFileContent());
 		
-		try 
-		{
-			// Applying MWE detector in NlpOutput.txt
-			p.println("Applying MWE Detector in NlpOutput.txt");
-			mweResult = mwe.ApplyMweDetector(nlp.GetWordList(), nlp.GetPosList());	
+		try {
+			mweResult = mwe.ApplyMweDetector(nlp.GetWordList(), nlp.GetPosList());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -91,25 +78,22 @@ public class Adapter {
 			p.println("Error encountered in using ApplyMweDetector.");
 		}
 		
-		p.println("MWE Result from Bridge: ");
-		p.println(mweResult);
-		p.println("Calling method TestConnectNlpToJmwe()");
-		//TestConnectNlpToJmwe();
+		//p.println("MWE Result from Bridge: ");
+		//p.println(mweResult);		
+		TestConnectNlpToJmwe();
 	}
 
 	public Boolean TestConnectNlpToJmwe()
 	{
-		
 		p.println("Running TestConnectNlpToJmwe");
 		ReaderWrite rw = new ReaderWrite();
 		// Uses defaultFileContainer instead.
 		Nlp nlp = new Nlp(rw.testPathComplete);
 		p.println("defaultFileContainer has been set as nlpFilePath");
-		p.println("testPathComplete: " + rw.testPathComplete);
 		//set nlpFilePath as the same as the defaultFileContainer
 		this.nlpFilePath = nlp.GetDefaultFilePath();
 		//set filePath of nlp to defaultFileContainer
-		nlp.setFilePath(this.nlpFilePath);
+		nlp.SetFilePath(nlpFilePath);
 		// set filePath of this class to defaultFilePath
 		this.filePath	 = nlpFilePath;
 		p.println("filePath = " + this.filePath);
@@ -133,26 +117,23 @@ public class Adapter {
 	{
 		ArrayList<Word>  word = new ArrayList<Word>();
 
-		p.println("Getting content from: " + filePath + "NlpOutput.txt");
-		// Create a RW to read the contents of nlpOutput.txt
+		p.println("Getting content from: " + filePath);
 		ReaderWrite rw = new ReaderWrite(filePath);
-		// start reading
 		rw.ReadFile(filePath); // original nlpFilePath
-		// Get content of the filePath
 		String originalText = rw.GetFileContent();
 		//p.println("oringinalText is: " + originalText);
-		String[] splittedText = originalText.split("/");
+		String[] splittedText = originalText.split(" ");
 
-		// Split the contents in the file and turn each word into an object of Word()
 		for(int i = 0; i < splittedText.length; i++) {
-			Word temp = new Word();
-			temp.setWord(splittedText[i]);
-			if(i+1 < splittedText.length)
-				temp.setPartOfSpeech(splittedText[i+1]);
-			temp.setLemma(splittedText[i]);
+			
+			String[] split = splittedText[i].split("/");
+			
+			Word temp = new Word(split[0]);
+			temp.setPartOfSpeech(split[1]);
+			temp.setLemma(split[0]);
 			//p.println(splittedText[i]);
 			word.add(temp);
-			i++;
+		
 		}
 
 		return word;
@@ -176,16 +157,16 @@ public class Adapter {
 		
 		// Scan each Word object. This loop detects where to split the input into sentences by checking their punctuation marks. 
 		for(int i = 0; i < words.size(); i++) {		
-			
-			tempWord = words.get(i);
-			p.println("tempWord: " + tempWord.getWord());
 			// If a Word() is not equal to a punctuation mark .,?,! then add them to newWords
-			if (!words.get(i).getWord().equals(".") || !words.get(i).getWord().equals("?") || !words.get(i).getWord().equals("!") ) {
-				
+			
+			if (!(words.get(i).getWord().equals(".") || words.get(i).getWord().equals("?") || words.get(i).getWord().equals("!")) ) {
+			
 				newWords.add(words.get(i));
+				
 			}
 			// If they are a punctuation mark, add them to the sentence object. The other lines make sure that this effectively splits the original text into sentences. 
 			else {
+				
 				newWords.add(words.get(i));
 				tempSentence.setWordList(newWords);
 				sentence.add(tempSentence);
@@ -205,11 +186,12 @@ public class Adapter {
 	 * This tests ConvertToSentenceList if it works positively. 
 	 * Makes use of nlpFilePath.
 	 */
-	public void Test_SentenceConversion(String nlpFilePath)
+	public ArrayList<PreSentence> Test_SentenceConversion(String nlpFilePath)
 	{
 		ArrayList<PreSentence> pSentence = new ArrayList<PreSentence>();
 		pSentence = ConvertToSentenceList(nlpFilePath);
-		p.println("SentenceConversion Test: " + pSentence.get(0).getWordList().get(0).toString());
+		p.println("SentenceConversion Test: " + pSentence.get(0).getWordList().get(0).getLemma());
+		return pSentence;
 	}
 	
 	/*
