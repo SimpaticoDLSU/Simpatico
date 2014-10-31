@@ -19,8 +19,8 @@ public class ReaderWrite
 {
 
 	//testFileName is only used for testing the ReaderWrite methods
-	final public static String testPathComplete= "src/preprocess/sample.txt";
-	final static String testFilePath    = "src/preprocess/";
+	final public static String testPathComplete= "src/documents/sample.txt";
+	final static String testFilePath    = "src/documents/";
 	final static String testFileName	= "sample.txt";
 	static Print p 						= new Print();
 	String filePath 					= "";
@@ -50,8 +50,10 @@ public class ReaderWrite
 			p.println("No File Path Written");
 
 		} else {
+			this.filePath = filePath;
 			p.println("Path registered. Please double check later.");
-			//ReadFile(filePath);
+			p.println("Automated File Reading when calling ReaderWrite(filePath)");
+			ReadFile(this.filePath);
 		}
 
 	}
@@ -106,7 +108,7 @@ public class ReaderWrite
 		p.println("ReadFile() now running");
 
 		BufferedReader reader 	= null;
-		String fileContent 	= "";
+		String fileContent 		= "";
 		String temp 			= "";
 
 		try
@@ -138,7 +140,7 @@ public class ReaderWrite
 				return true;
 			} else {
 
-				p.println("Problem with reading file. Error [0]");
+				p.println("Problem with reading file. Error[0]");
 				p.println("File: " + file.toString() + " does not exists");
 				return false;
 				//System.exit(1);
@@ -152,7 +154,7 @@ public class ReaderWrite
 		} finally {
 
 			try {
-				p.println("\nFile Reading Finished. No Errors");
+				p.println("\nFile Reading Finished.");
 				p.println("ReaderWrite will now be closed");
 				reader.close();
 			} catch (IOException e) {

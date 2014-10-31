@@ -37,6 +37,16 @@ public class Nlp {
 	ArrayList<String> neList;	
 	
 	/*
+	 * Not recommended to use.
+	 * Only use when you need to call the following methods:
+	 * 1) isStopWord
+	 */
+	public Nlp()
+	{
+		
+	}
+	
+	/*
 	 * Pass a reader to make life easier.
 	 * Make sure you call a ReaderWrite on the method that calls this method and class.
 	 */
@@ -70,7 +80,8 @@ public class Nlp {
 		p.println("Running Nlp.java");
 		
 		Nlp nlp = new Nlp(rw.testPathComplete);
-		nlp.TestNlp();		
+		//nlp.TestNlp();
+		nlp.isStopWord("couldn't");
 		
 	}
 	
@@ -256,6 +267,23 @@ public class Nlp {
 	
 	public Boolean isStopWord(String word)
 	{
+		p.println("running isStopWord");
+		
+		String stopWordsPath 	= "src/documents/stopwords.txt";
+		ReaderWrite rw 			= new ReaderWrite(stopWordsPath);
+		String[] stopWords;
+		String temp;
+		rw.ReadFile();
+		temp = rw.GetFileContent();
+		stopWords = temp.split(" ");
+		
+		for(String sw : stopWords)
+		{
+			if(word.equals(sw))
+			{
+				return true;
+			}
+		}
 		
 		return false;
 	}
