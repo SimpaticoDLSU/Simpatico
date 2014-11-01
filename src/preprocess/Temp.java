@@ -1,4 +1,10 @@
 /*
+ * REPLACE TEMP WITH ADAPTER.
+ * This is the original Adapter code.
+ * Temp resulted in the unknown events of the loss and death of the original Adapter.java
+ */
+
+/*
  * This was created in order to smoothen and ease the problem of abstracting the integration between CoreNLP and JMWE.
  * */
 package preprocess;
@@ -10,7 +16,7 @@ import shortcuts.Print;
 import shortcuts.Scan;
 
 
-public class Adapter {
+public class Temp {
 	final String defaultFileContainer 	= "src/documents/";	
 	
 	Print p 							= new Print();
@@ -23,7 +29,7 @@ public class Adapter {
 	ReaderWrite rw = new ReaderWrite();
 	final String testPathComplete = rw.testPathComplete;
 	
-	public Adapter()
+	public Temp()
 	{
 		// None yet
 	} 
