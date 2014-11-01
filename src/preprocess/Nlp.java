@@ -1,6 +1,7 @@
 package preprocess;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -8,12 +9,13 @@ import java.util.Properties;
 import shortcuts.Print;
 import edu.stanford.nlp.dcoref.CorefChain;
 import edu.stanford.nlp.dcoref.CorefCoreAnnotations.CorefChainAnnotation;
-import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.CoreAnnotations.LemmaAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
+import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.semgraph.SemanticGraph;
@@ -29,12 +31,15 @@ public class Nlp {
 	final static String defaultFile    		= "src/documents/NlpOutput.txt";
 	final String defaultFilePath		   	= "src/documents/";
 	String fileName						   	= "";			
-	private String filePath						   	= "";
+	private String filePath					= "";
 	String filePathContainer				= "";
 	ReaderWrite rw;
 	ArrayList<String> wordList;
 	ArrayList<String> posList;
 	ArrayList<String> neList;	
+	ArrayList<String> lemmaList;	
+	
+	 
 	
 	/*
 	 * Not recommended to use.
@@ -144,6 +149,7 @@ public class Nlp {
 		ArrayList<String> wordList 	= new ArrayList<String>();
 		ArrayList<String> posList	= new ArrayList<String>();
 		ArrayList<String> neList	= new ArrayList<String>();
+		ArrayList<String> lemmaList = new ArrayList<String>();
 		String temp 				= "";
 		String finalOutput 			= "";
 		
@@ -179,12 +185,16 @@ public class Nlp {
 				String ne 	= token.get(NamedEntityTagAnnotation.class);
 				//p.println("ne: " + ne);
 				
+				//this is the lemma of the token
+				String lemma = token.get(LemmaAnnotation.class);
+				
 				// Add them to class variables.
 				wordList.add(word);
 				posList.add(pos);
 				neList.add(ne);
+				lemmaList.add(lemma);
 				
-				temp = word + "/" + pos;
+				temp = word + "/" + pos + "/" + lemma;
 				finalOutput = finalOutput + temp;
 				finalOutput = finalOutput + "\n";
 				
@@ -196,6 +206,7 @@ public class Nlp {
 			this.wordList 	= wordList;
 			this.posList 	= posList;
 			this.neList		= neList;
+			this.lemmaList = lemmaList;
 			
 			// Create NlpOutput.txt with the content in this format: <word>/<pos>
 			rw.SetFileName("NlpOutput.txt");

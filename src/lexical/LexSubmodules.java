@@ -155,7 +155,7 @@ public class LexSubmodules
 				    
 				    w.setSubstitute(new ArrayList<String>());
 				    String pos = null;
-				    System.out.println(w.getLemma());
+				    
 				    switch(w.getPartOfSpeech().toUpperCase().charAt(0)){
 					    case 'J': pos = RiWordNet.ADJ; 
 					    	break;

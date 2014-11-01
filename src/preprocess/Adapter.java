@@ -115,9 +115,9 @@ public class Adapter {
 
 		//Run Converter
 		p.println("Running ConvertToWordList");
-		ConvertToWordList(nlpFilePath);
+		ConvertToWordList(nlpFilePath+"NlpOutput.txt");
 		//test sentence
-		Test_SentenceConversion(nlpFilePath);
+		Test_SentenceConversion(nlpFilePath+"NlpOutput.txt");
 		return true;
 	}
 
@@ -139,7 +139,7 @@ public class Adapter {
 			
 			Word temp = new Word(split[0]); 
 			temp.setPartOfSpeech(split[1]); 
-			temp.setLemma(split[0]);
+			temp.setLemma(split[2]);
 			temp.setStopWord(nlp.isStopWord(temp.getWord()));
 			//p.println(splittedText[i]);
 			word.add(temp);
@@ -200,7 +200,11 @@ public class Adapter {
 	{
 		ArrayList<PreSentence> pSentence = new ArrayList<PreSentence>();
 		pSentence = ConvertToSentenceList(nlpFilePath);
-		p.println("SentenceConversion Test: " + pSentence.get(0).getWordList().get(0).getLemma());
+		for(PreSentence s : pSentence){
+			for(Word w : s.getWordList()){
+				System.out.println(w.getWord()+ " "+w.getPartOfSpeech()+ " "+w.getLemma());
+			}
+		}
 		return pSentence;
 	}
 	
