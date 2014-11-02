@@ -16,6 +16,7 @@ public class Word {
 	private boolean isEndOfSentence		= false;
 	private boolean isOpeningBoundary 	= false;
 	private boolean isClosingBoundary 	= false;
+	private boolean isAppositive		= false;
 	
 	public Word()
 	{
@@ -149,5 +150,11 @@ public class Word {
 	}
 	public boolean getIsClosingBoundary() {
 		return this.isClosingBoundary;
+	}
+	public boolean getIsAppositive() {
+		return this.isAppositive;
+	}
+	public void setIsAppositive(boolean isAppositive) {
+		this.isAppositive = isAppositive;
 	}
 }

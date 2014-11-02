@@ -55,6 +55,8 @@ public class PreAnalysis {
 	
 	public void DecideNonRestrictiveRCBoundaries(ArrayList<Word> wordList, ArrayList<PreSentence> sentenceList)
 	{
+		
+		ArrayList<Word> tWordList = wordList;
 		int count	= 0;
 		int size 	= 0;
 		
@@ -69,8 +71,9 @@ public class PreAnalysis {
 				{
 					if ( wordList.get(i + 1).equals("which") || wordList.get(i + 1).equals("who") )
 					{
-						
-					}
+						// perform apposition marking here
+						tWordList = markAppositive(wordList); // marks the Words with the apposition attribute to true 
+					}	
 				}
 			}
 		}
@@ -94,6 +97,50 @@ public class PreAnalysis {
 		}
 		return count;
 		
+	}
+	
+	/*
+	 * Marking of Appositives is needed for Boundary marking.
+	 * Process: 
+	 * 1) X was a noun phrase and surrounded by punctuation on the treebank.
+	 * 2) The immediate enclosing bracket marked a noun phrase in the treebank.
+	 * 3) X was the right-most phrase in the enclosing bracket 
+	 */
+	
+	public ArrayList<Word> markAppositive(ArrayList<Word> wordList) 
+	{
+		int size 		= wordList.size();		
+		int openComma 	= 0;
+		int closeComma 	= 0;
+		
+		for ( int i = 0; i < size; i++ ) 
+		{
+			if ( wordList.get(i).equals(",") && i != size) 
+			{
+				openComma = i;
+				for ( int j = i + 1; j < size; ) 
+				{
+					if ( wordList.get(j).equals(",") ) 
+					{
+						closeComma = j;
+						for ( int k = 0; k < closeComma; k++ ) 
+						{
+							String temp = wordList.get(k).getPartOfSpeech();
+							if ( temp.equals("NN") || temp.equals("NNS") || temp.equals("NNP") || temp.equals("WP") || temp.equals("WP$") ) 
+							{
+								wordList.get(k).setIsAppositive(true);
+							}
+						}						
+						break;
+					}
+					else {
+						j++;
+					}
+				}
+			}
+		}
+		
+		return wordList; 
 	}
 	
 	
