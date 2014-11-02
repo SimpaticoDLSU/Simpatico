@@ -30,6 +30,13 @@ public class Jmwe {
 	{
 		
 		p.println("Running Jmwe.java!!");
+		Jmwe jm = new Jmwe();
+		try {
+			jm.simpleDetectorExample();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		/*
 		Jmwe main = new Jmwe();
 		try {
@@ -86,6 +93,7 @@ public class Jmwe {
 		// construct a test sentence:
 		// "She looked up the world record."
 		List <IToken> sentence = new ArrayList<IToken>();
+		/*
 		sentence.add(new Token ("She", 		"PRP"));
 		sentence.add(new Token ("filed", 	"VBD", "file"));
 		sentence.add(new Token ("a", 		"DT"));
@@ -95,11 +103,21 @@ public class Jmwe {
 		sentence.add(new Token ("supreme", 	"JJ"));
 		sentence.add(new Token ("court", 	"NN"));
 		sentence.add(new Token (".", 	"."));
+		*/
+		sentence.add(new Token ("It", 		"PRP"));
+		sentence.add(new Token ("constitutes", 	"VBZ"));
+		sentence.add(new Token ("the", 		"DT"));
+		sentence.add(new Token ("actus", 	"NN"));
+		sentence.add(new Token ("reus", 		"NN"));
+		sentence.add(new Token ("of", 		"IN"));
+		sentence.add(new Token ("the", 	"DT"));
+		sentence.add(new Token ("crime", 	"NN"));
+		sentence.add(new Token (".", 	"."));
 
 		// run detector and print out results
 		List<IMWE<IToken>> mwes = detector.detect(sentence);
 		for(IMWE<IToken> mwe : mwes) {
-			p.println("mwe: " + mwe);
+			p.println("mwe: " + mwe.getEntry() + " " + mwe.getEntry().getPOS().getIdentifier());
 		}
 	}
 
