@@ -22,6 +22,21 @@ public class Word {
 		this.word = word;
 	}
 	
+	public String[] getTokens() {
+		String[] tokens = {};
+		if(word.contains(" ")){
+			tokens = word.split(" ");
+		} else if (word.contains("-")) {
+			tokens = word.split("-");
+		}
+		return tokens;
+	}
+	
+	public void appendWord(String appendedWord){
+		this.word = this.word + " " + appendedWord.toLowerCase();
+		
+	}
+	
 	public Word(String word, String partOfSpeech, String lemma)
 	{
 		this.word 			= word;

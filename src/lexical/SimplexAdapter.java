@@ -21,7 +21,7 @@ import preprocess.Word;
 public class SimplexAdapter {
 
     //Directory where simplex is stored.
-    private final String SIMPLEX_DIRECTORY = "src/lexical/Resources/Simplex";
+    private final String SIMPLEX_DIRECTORY = "src/lexical/Resources/Simplex/";
     //the name of the output text file to be read by simplex.
     private final String OUTPUT_NAME = "simpatico";
     //List of sentences to be processed
@@ -71,6 +71,7 @@ public class SimplexAdapter {
 	
 	                    //Check if the word has any substitutes
 	                    if (!substituteWords.isEmpty()) {
+	                    	System.out.print("sub");
 	                        fileWriter.write("Sentence " + id + " rankings:");  //Initial printing before printing substitute words
 	
 	                        //Traverse list of substitute words.

@@ -209,7 +209,7 @@ public class Nlp {
 			this.neList		= neList;
 			this.lemmaList = lemmaList;
 			
-			// Create NlpOutput.txt with the content in this format: <word>/<pos>
+			// Create NlpOutput.txt with the content in this format: <word>/<pos>/<lemma>
 			rw.SetFileName("NlpOutput.txt");
 			rw.SetFilePath(defaultFile); //redundant creation
 			rw.CreateFile(finalOutput, defaultFile);

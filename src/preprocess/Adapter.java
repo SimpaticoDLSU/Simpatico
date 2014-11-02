@@ -32,7 +32,12 @@ public class Adapter {
 	public static void main(String[] args)
 	{
 		Adapter m = new Adapter();
-		m.Test_NLPtoJMWE();
+		try {
+			m.NLPtoJMWE("SampleLegalText.txt");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		//m.Test_SentenceConversion("src/documents/NlpOutput.txt");
 
 	}
@@ -47,19 +52,32 @@ public class Adapter {
 		
 	}
 	
-	public void NLPtoJMWE(String fileName) throws IOException
+	public ArrayList<PreSentence> NLPtoJMWE(String fileName) throws IOException
 	{
 		String filePath; 
-		String mweResult		="";
+		ArrayList<PreSentence>  mweResult;
+		Extractor ex			= new Extractor();
 		ReaderWrite	rw			= new ReaderWrite(defaultFileContainer + fileName); // Create a new ReaderWrite
 		Nlp nlp					= new Nlp(rw); // Create an new NLP object that uses values from ReaderWrite (such as paths).
 		Jmwe jmwe				= new Jmwe();
 		
-		mweResult	= jmwe.ApplyMweDetector(nlp.GetWordList(), nlp.GetPosList());
+		mweResult	= jmwe.ApplyMweDetector(ex.FileToSentenceList(defaultFileContainer +fileName));
 		
-		p.println("mweResult: ");
-		p.println(mweResult);
+		for(PreSentence sentence: mweResult)
+		{				
+			for(Word w: sentence.getWordList())
+			{
+				
+				
+			    
+				System.out.println("Word:"+w.getWord() +" " + w.getLemma() + " " + w.getPartOfSpeech());
+			    
+			    
+			}
+			
+		}
 		
+		return mweResult;
 	}
 	
 	
@@ -68,11 +86,11 @@ public class Adapter {
 	 */
 	public void Test_NLPtoJMWE()
 	{
-		
+		Extractor ex			= new Extractor();
 		ReaderWrite rw 			= new ReaderWrite(defaultFileContainer + "SampleLegalText.txt");
 		Nlp nlp					= new Nlp(rw);
 		Jmwe mwe				= new Jmwe();
-		String mweResult		= "";
+		ArrayList<PreSentence> mweResult;
 		
 		// Read the file from the specified path above. Make sure there is a path;
 		rw.ReadFile();
@@ -80,12 +98,12 @@ public class Adapter {
 		nlp.StartNlp(rw.GetFileContent());
 		
 		try {
-			mweResult = mwe.ApplyMweDetector(nlp.GetWordList(), nlp.GetPosList());
+			mweResult = mwe.ApplyMweDetector(ex.FileToSentenceList("src/documents/NlpOutput.txt"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			// 909 means error. Make sure to at least add 909 in cases wherein you will need this :)
-			mweResult = "909";
+			
+			
 			p.println("Error encountered in using ApplyMweDetector.");
 		}
 		

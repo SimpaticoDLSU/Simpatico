@@ -42,7 +42,7 @@ public class RankingChooser {
 
         try {
             //Get the ranking file
-            inputScanner = new Scanner(new File("input"));
+            inputScanner = new Scanner(new File("src/lexical/Resources/Simplex/simpatico-test"));
 
             //Scan through the file.
             while (inputScanner.hasNext()) {

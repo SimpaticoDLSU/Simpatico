@@ -1,5 +1,7 @@
 package preprocess;
 
+import java.io.IOException;
+
 import shortcuts.Print;
 import shortcuts.Scan;
 public class Main 
@@ -42,7 +44,7 @@ public class Main
 						break;
 			default	:	p.println("None yet.");
 		}
-		TestReaderWriter();
+		//TestReaderWriter();
 		
 	}
 	
@@ -76,9 +78,16 @@ public class Main
 	public static void TestCoreNLP()
 	{
 		ReaderWrite rw = new ReaderWrite();
+		Adapter adapter = new Adapter();
 		@SuppressWarnings("static-access")
 		Nlp nlp = new Nlp(rw.testPathComplete);
 		nlp.TestNlp();
+		try {
+			adapter.NLPtoJMWE("NlpOutput.txt");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public static void TestRwToNlp()

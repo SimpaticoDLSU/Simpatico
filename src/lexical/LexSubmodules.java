@@ -176,6 +176,7 @@ public class LexSubmodules
 				 
 				    if(tmp.length > 0)
 					    for(String s:tmp){
+					    	System.out.println("Subs: "+s);
 					    	 w.getSubstitute().add(s);
 					    }
 				}// end if
