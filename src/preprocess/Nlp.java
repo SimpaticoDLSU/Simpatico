@@ -299,7 +299,7 @@ public class Nlp {
 		
 		for(String sw : stopWords)
 		{
-			if(word.equals(sw))
+			if(word.toUpperCase().equals(sw.toUpperCase()))
 			{
 				return true;
 			}

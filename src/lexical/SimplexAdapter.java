@@ -63,24 +63,26 @@ public class SimplexAdapter {
 
                 //Traverse the words contained in a sentence.
                 for (Word word : wordList) {
-                    ArrayList<String> substituteWords = word.getSubstitute();
-
-                    //Print out the next word that is being processed
-                    System.out.println("Processing word: " + word.getWord());
-
-                    //Check if the word has any substitutes
-                    if (!substituteWords.isEmpty()) {
-                        fileWriter.write("Sentence " + id + " rankings:");  //Initial printing before printing substitute words
-
-                        //Traverse list of substitute words.
-                        for (String s : substituteWords) {
-                            //Write the substitute word to the file
-                            fileWriter.write(" {" + s + "}");
-                        }
-                        fileWriter.write("\n");
-
-                        id++;
-                    }
+                	if(word.isComplex() && !word.isStopWord()){
+	                    ArrayList<String> substituteWords = word.getSubstitute();
+	
+	                    //Print out the next word that is being processed
+	                    System.out.println("Processing word: " + word.getWord());
+	
+	                    //Check if the word has any substitutes
+	                    if (!substituteWords.isEmpty()) {
+	                        fileWriter.write("Sentence " + id + " rankings:");  //Initial printing before printing substitute words
+	
+	                        //Traverse list of substitute words.
+	                        for (String s : substituteWords) {
+	                            //Write the substitute word to the file
+	                            fileWriter.write(" {" + s + "}");
+	                        }
+	                        fileWriter.write("\n");
+	
+	                        id++;
+	                    }
+                	}
                 }
             }
 

@@ -52,13 +52,7 @@ public class Extractor {
 		String originalText 	= rw.GetFileContent();
 		String[] splittedText 	= originalText.split(" ");
 		
-		String stopWordsPath 	= "src/documents/stopwords.txt";
-		ReaderWrite rwr 			= new ReaderWrite(stopWordsPath);
-		String[] stopWords;
-		String temp;
-		rw.ReadFile();
-		temp = rwr.GetFileContent();
-		stopWords = temp.split(" ");
+		nlp.LoadStopWordList();
 		
 		for(int i = 0; i < splittedText.length; i++) {
 			
@@ -67,18 +61,8 @@ public class Extractor {
 			Word wordTemp = new Word(split[0]); 
 			wordTemp.setPartOfSpeech(split[1]); 
 			wordTemp.setLemma(split[2]);
-			
-			wordTemp.setStopWord(false);
-			for(String sw : stopWords)
-			{	
-				if(wordTemp.getWord().toUpperCase().equals(sw.toUpperCase()))
-				{
-					
-					wordTemp.setStopWord(true);
-				}
-			}
-			
-			
+			wordTemp.setStopWord(nlp.isStopWord(wordTemp.getWord()));
+		
 			//p.println(splittedText[i]);
 			word.add(wordTemp);
 		
