@@ -4,6 +4,7 @@ import lexical.LexSubmodules;
 import lexical.RankingChooser;
 import lexical.SimplexAdapter;
 import preprocess.Adapter;
+import preprocess.Extractor;
 import preprocess.PreSentence;
 import preprocess.Word;
 
@@ -12,14 +13,15 @@ import preprocess.Word;
 public class Main {
 	public static void main(String[] args)
 	{
-		Adapter Adapter = new Adapter();
+		Adapter ad = new Adapter();
+		Extractor ex	= new Extractor();
 		LexSubmodules lexSubmodules = new LexSubmodules();
 		SimplexAdapter adapter;
 		RankingChooser rankingChooser = new RankingChooser();
 		ArrayList<PreSentence> sentenceList = new ArrayList<PreSentence>();
 		
 		//perform preprocessing. If returned list is empty then abort.
-		if(!(sentenceList = Adapter.ConvertToSentenceList("src/preprocess/NlpOutput.txt")).isEmpty())
+		if(!(sentenceList = ex.FileToSentenceList("src/preprocess/NlpOutput.txt")).isEmpty())
 		{
 			for(PreSentence sentence : sentenceList)
 			{
