@@ -51,21 +51,43 @@ public class Extractor {
 		rw.ReadFile(filePath); // original nlpFilePath
 		String originalText 	= rw.GetFileContent();
 		String[] splittedText 	= originalText.split(" ");
-
+		
+		String stopWordsPath 	= "src/documents/stopwords.txt";
+		ReaderWrite rwr 			= new ReaderWrite(stopWordsPath);
+		String[] stopWords;
+		String temp;
+		rw.ReadFile();
+		temp = rwr.GetFileContent();
+		stopWords = temp.split(" ");
+		
 		for(int i = 0; i < splittedText.length; i++) {
 			
 			String[] split = splittedText[i].split("/");
 			
-			Word temp = new Word(split[0]); 
-			temp.setPartOfSpeech(split[1]); 
-			temp.setLemma(split[2]);
-			temp.setStopWord(nlp.isStopWord(temp.getWord()));
+			Word wordTemp = new Word(split[0]); 
+			wordTemp.setPartOfSpeech(split[1]); 
+			wordTemp.setLemma(split[2]);
+			
+			wordTemp.setStopWord(false);
+			for(String sw : stopWords)
+			{	
+				if(wordTemp.getWord().toUpperCase().equals(sw.toUpperCase()))
+				{
+					
+					wordTemp.setStopWord(true);
+				}
+			}
+			
+			
 			//p.println(splittedText[i]);
-			word.add(temp);
+			word.add(wordTemp);
 		
 		}
 
 		return word;
+		
+		
+		
 	}
 	
 	public ArrayList<PreSentence> WordListToSentenceList(ArrayList<Word> wordList)

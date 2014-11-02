@@ -124,7 +124,7 @@ public class LexSubmodules
 	        		i = s.nextInt();
 	        	
 	        	if(s1.trim().toLowerCase().equals(word.toLowerCase()))
-		        	return true;
+		        	return false;
 			        
 		    }
 		   
@@ -132,7 +132,7 @@ public class LexSubmodules
 		{
 		    System.err.format("IOException: %s%n", x);
 		} 
-		return false;
+		return true;
 	} 
 	
 	
@@ -151,11 +151,13 @@ public class LexSubmodules
 				if(w.isComplex() && !w.isStopWord()){
 					
 					String[] tmp = {};
+				
+				
 				    String word = w.getLemma();
-				    
+				    System.out.println(w.getLemma());
 				    w.setSubstitute(new ArrayList<String>());
 				    String pos = null;
-				    
+				    System.out.println(w.getPartOfSpeech().toUpperCase().charAt(0));
 				    switch(w.getPartOfSpeech().toUpperCase().charAt(0)){
 					    case 'J': pos = RiWordNet.ADJ; 
 					    	break;
@@ -168,11 +170,14 @@ public class LexSubmodules
 					    default: pos = wordnet.getBestPos(w.getLemma());
 				    }
 				    
+				  
+				    
 				    tmp =  wordnet.getSynonyms(word, pos);
 				 
-				    for(String s:tmp){
-				    	 w.getSubstitute().add(s);
-				    }
+				    if(tmp.length > 0)
+					    for(String s:tmp){
+					    	 w.getSubstitute().add(s);
+					    }
 				}// end if
 			}// end for
 		}// end for
