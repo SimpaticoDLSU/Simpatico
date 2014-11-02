@@ -27,6 +27,7 @@ public class Word {
 		this.word 			= word;
 		this.partOfSpeech 	= partOfSpeech;
 		this.lemma 			= lemma;
+		this.isStopWord		= false;
 	}
 	
 	public Word(String word, String partOfSpeech, String lemma, boolean isStopWord)

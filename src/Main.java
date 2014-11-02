@@ -21,7 +21,7 @@ public class Main {
 		ArrayList<PreSentence> sentenceList = new ArrayList<PreSentence>();
 		
 		//perform preprocessing. If returned list is empty then abort.
-		if(!(sentenceList = ex.FileToSentenceList("src/preprocess/NlpOutput.txt")).isEmpty())
+		if(!(sentenceList = ex.FileToSentenceList("src/documents/NlpOutput.txt")).isEmpty())
 		{
 			for(PreSentence sentence : sentenceList)
 			{
