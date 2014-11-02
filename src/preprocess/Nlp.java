@@ -28,6 +28,7 @@ public class Nlp {
 	
 	static Print p = new Print();
 	//FilePath here includes already the file name
+	
 	final static String defaultFile    		= "src/documents/NlpOutput.txt";
 	final String defaultFilePath		   	= "src/documents/";
 	String fileName						   	= "";			
@@ -188,6 +189,9 @@ public class Nlp {
 				
 				//this is the lemma of the token
 				String lemma = token.get(LemmaAnnotation.class);
+				
+				// this is parse?
+				
 				
 				// Add them to class variables.
 				wordList.add(word);
