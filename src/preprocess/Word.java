@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 
 public class Word {
+	private int id;
 	private String word;
 	private String lemma;
 	private boolean isComplex;
@@ -11,6 +12,10 @@ public class Word {
 	private String partOfSpeech;
 	private ArrayList<String> substitute;
 	private String bestSubstitute;
+	private boolean isClausePart		= false;		
+	private boolean isEndOfSentence		= false;
+	private boolean isOpeningBoundary 	= false;
+	private boolean isClosingBoundary 	= false;
 	
 	public Word()
 	{
@@ -22,6 +27,14 @@ public class Word {
 		this.word = word;
 	}
 	
+	public Word(int id, String word, String partOfSpeech, String lemma)
+	{
+		this.id 			= id;
+		this.word 			= word;
+		this.partOfSpeech 	= partOfSpeech;
+		this.lemma 			= lemma;
+		this.isStopWord		= false;
+	}
 	public Word(String word, String partOfSpeech, String lemma)
 	{
 		this.word 			= word;
@@ -95,5 +108,29 @@ public class Word {
 	public void setSubstitute(ArrayList<String> substitute) {
 		this.substitute = substitute;
 	}
-	
+	public boolean getIsClausePart()
+	{
+		return this.isClausePart;
+	}
+	public void setIsClausePart (boolean isClausePart ) {
+		this.isClausePart = isClausePart;
+	}
+	public boolean getIsEndOfSentence() {
+		return this.isEndOfSentence;
+	}
+	public void setIsEndOfSentence( boolean isEndOfSentence ) {
+		this.isEndOfSentence = isEndOfSentence;
+	}
+	public void setIsOpeningBoundary( boolean isOpeningBoundary ) {
+		this.isOpeningBoundary = isOpeningBoundary;
+	}
+	public boolean getIsOpeningBoundary() {
+		return this.isOpeningBoundary;
+	}
+	public void setIsClosingBoundary( boolean isClosingBoundary ) {
+		this.isClosingBoundary = isClosingBoundary;
+	}
+	public boolean getIsClosingBoundary() {
+		return this.isClosingBoundary;
+	}
 }
