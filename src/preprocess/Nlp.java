@@ -33,6 +33,7 @@ public class Nlp {
 	String fileName						   	= "";			
 	private String filePath					= "";
 	String filePathContainer				= "";
+	String[] stopWords;
 	ReaderWrite rw;
 	ArrayList<String> wordList;
 	ArrayList<String> posList;
@@ -276,17 +277,25 @@ public class Nlp {
 		this.filePath = filePath;
 	}
 	
-	public Boolean isStopWord(String word)
+	public void LoadStopWordList()
 	{
-		p.println("running isStopWord");
+		p.println("Loading Stop Words list from stopwords.txt");
 		
 		String stopWordsPath 	= "src/documents/stopwords.txt";
-		ReaderWrite rw 			= new ReaderWrite(stopWordsPath);
+		ReaderWrite rw			= new ReaderWrite(stopWordsPath);	
 		String[] stopWords;
 		String temp;
+		
 		rw.ReadFile();
-		temp = rw.GetFileContent();
-		stopWords = temp.split(" ");
+		temp 			= rw.GetFileContent();
+		stopWords 		= temp.split(" ");
+		this.stopWords 	= stopWords;
+	}
+	
+	public Boolean isStopWord(String word)
+	{
+		String[] stopWords = this.stopWords;
+		
 		
 		for(String sw : stopWords)
 		{
