@@ -42,7 +42,7 @@ public class RankingChooser {
 
         try {
             //Get the ranking file
-            inputScanner = new Scanner(new File("src/lexical/Resources/Simplex/simpatico-test"));
+            inputScanner = new Scanner(new File("src/lexical/Resources/Simplex/test-input"));
 
             //Scan through the file.
             while (inputScanner.hasNext()) {
@@ -86,9 +86,10 @@ public class RankingChooser {
                 ArrayList<String> substituteWords = word.getSubstitute();
 
                 //if word has a list of substitutes, then add its corresponding replacement word.
-                if (!substituteWords.isEmpty()) {
-                    word.setBestSubstitute(replacementWords.get(index++));
-                }
+                if(substituteWords != null)
+	                if (!substituteWords.isEmpty()) {
+	                    word.setBestSubstitute(replacementWords.get(index++));
+	                }
             }
         }
         

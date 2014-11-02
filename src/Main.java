@@ -62,7 +62,10 @@ public class Main {
 		System.out.println("Output:");
 		for(PreSentence s: sentenceList){
 			for(Word w: s.getWordList()){
-				System.out.print(w.getLemma()+" ");
+				if(w.getBestSubstitute() != null)
+					System.out.print(w.getBestSubstitute()+" ");
+				else
+					System.out.print(w.getWord()+" ");
 			}
 		}
 		
