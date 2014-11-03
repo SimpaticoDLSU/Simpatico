@@ -59,7 +59,7 @@ public class PreAnalysis {
 		ArrayList<Word> tWordList = wordList;
 		int count	= 0;
 		int size 	= 0;
-		
+		int n		= 0;
 		// n be the number of commas
 		int numCommas 	= getInstanceCount(",", wordList);
 		
@@ -142,6 +142,7 @@ public class PreAnalysis {
 		
 		return wordList; 
 	}
+	
 	
 	
 }
