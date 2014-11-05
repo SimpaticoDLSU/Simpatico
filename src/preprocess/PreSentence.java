@@ -6,6 +6,8 @@ import java.util.ArrayList;
 public class PreSentence {
 	private ArrayList<Word> wordList = new ArrayList<Word>();
 	private int id;
+	private String openingBoundary;
+	private Phrase nounPhrase;
 	
 	public ArrayList<Word> getWordList() {
 		return wordList;

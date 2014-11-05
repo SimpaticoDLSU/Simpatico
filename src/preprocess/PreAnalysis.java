@@ -1,3 +1,7 @@
+/*
+ * Perform all custom marking such as Apposition marking on the text before proceeding.
+ */
+
 package preprocess;
 
 import java.util.ArrayList;
@@ -17,42 +21,38 @@ public class PreAnalysis {
 	Print p = new Print();
 	Scan s  = new Scan();
 	
+	// Global variables
+	String xmlContent = "";
 	
 	public PreAnalysis()
 	{
 		
 	}
 	
-	public static void Main(String[] args)
+	public static void main(String[] args)
 	{
-		DocumentReader dr = new DocumentReader();
+		//DocumentReader dr = new DocumentReader();
+		PreAnalysis pa = new PreAnalysis();
+		pa.samplePutSequence();
+	}
+	
+	public void StartAnalysis(ArrayList<Word> wordList)
+	{
+		ArrayList<Word> wordListNew	= new ArrayList<Word>();
+		
+		/* Start applying markers */
+		
+		/*  */
 		
 	}
 	
-	public void StartAnalysis(String text)
-	{
-		/* Creates a StanfordCoreNLP Object, with POS Tagging, Lemmatization, NER, Parsing, and Corerefernce resolution*/
-		Properties props = new Properties();
-		props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
-		StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
-		
-		// Creates an empty Annotation just with the given text
-		Annotation document = new Annotation(text);
-		
-		// run all Annotators on this text
-		pipeline.annotate(document);
-		
-		// these are all the sentences in this document
-		// a CoreMap is essentially a Map that uses class objects as keys and has values with custom types
-		List<CoreMap> sentences = document.get(SentencesAnnotation.class);
-		
-		for(CoreMap sentence: sentences)
-		{
-			
-		}
-		
-	}
 	
+	/**
+	 * Declares the boundaries of the text.
+	 * Unfinished and probably will be deprecated once a new version is put out.
+	 * @param wordList
+	 * @param sentenceList
+	 */
 	public void DecideNonRestrictiveRCBoundaries(ArrayList<Word> wordList, ArrayList<PreSentence> sentenceList)
 	{
 		
@@ -71,8 +71,9 @@ public class PreAnalysis {
 				{
 					if ( wordList.get(i + 1).equals("which") || wordList.get(i + 1).equals("who") )
 					{
-						// perform apposition marking here
-						tWordList = markAppositive(wordList); // marks the Words with the apposition attribute to true 
+						// make sure that all appositives have been marked before proceeding here
+						
+						// 
 					}	
 				}
 			}
@@ -83,6 +84,16 @@ public class PreAnalysis {
 		
 	}
 	
+	
+	/**
+	 * Counts the number of instances that a certain string appeared on the ArrayList of Word()s
+	 * @param searchParameter
+	 * 		Is the string that will be used to search and count the number of instances
+	 * @param wordList
+	 * 		This should be coming from an already POS-tagged word list fron NLP.startNLP()
+	 * @return
+	 * 	returns an integer whose value is the number of instances searchParameter appeared in thw wordList
+	 */
 	public int getInstanceCount(String searchParameter, ArrayList<Word> wordList)
 	{
 		int count 	= 0;
@@ -143,10 +154,103 @@ public class PreAnalysis {
 		return wordList; 
 	}
 	
+	public void samplePutSequence()
+	{
+		String noun = "I";
+		String verb	= "ran.";
+		
+		putSentence(putNounPhrase(noun) + putVerbPhrase(verb));
+		p.println(putSentence(putNounPhrase(noun) + putVerbPhrase(verb)));
+		
+	}
+	
+	/**
+	 * Put a sentence markup inside the original XML file.
+	 * Automatically generates <sentence> & </sentence> mark-ups when writing.
+	 * @param text
+	 * 	will be put between the markup tags
+	 */
+	public String putSentence(String text)
+	{
+		String sStart 	= "<sentence>";
+		String sEnd 	= "</sentence>";
+		
+		xmlContent		= sStart + text + sEnd;
+		return sStart + text + sEnd;
+	}
+	
+	/**
+	 * Put a Noun Phrase markup inside the original XML file.
+	 * Automatically generates <nounphrase> & </nounphrase> mark-ups when writing.
+	 * @param text
+	 * 	goes between the mark-up tags
+	 * @author Laurenz Tolentino
+	 */
+	public String putNounPhrase(String text)
+	{
+		String npStart	= "<nounphrase>";
+		String npEnd	= "</nounphrase>";
+		
+		xmlContent		= npStart + text + npEnd;
+		return npStart + text + npEnd;
+	}
+	
+	/**
+	 * Put a Verb Phrase mark-up inside the original XML file.
+	 * Automatically generates <verbphrase> & </verbphrase> mark-ups when writing.
+	 * @param text
+	 * 	goes between the mark-up tags
+	 * @author Laurenz Tolentino
+	 */
+	public String putVerbPhrase(String text)
+	{
+		String vpStart	= "<verbphrase>";
+		String vpEnd	= "</verbphrase>";
+		
+		xmlContent		= vpStart + text + vpEnd;
+		return vpStart + text + vpEnd;
+	}
 	
 	
 }
 
+/*
+ * I was walking across the street
+	
+	<sentence>
+		
+		<nounphrase>
+			<noun>
+				I
+			<noun>		
+		</nounphrase>
+		
+		<verbphrase>
+			<verb>
+				was 
+			</verb>
+			<verb>
+				walking 
+			</verb>
+			<preposition>
+				across
+			</prepositon>
+		</verbphrase>
+		
+		<nounphrase>
+		
+			<determiner>
+				the 
+			</determiner>
+			
+			<noun>
+				street
+			</noun>
+				
+		</nounphrase>
+		
+	</sentence>
+ */
 
 
 

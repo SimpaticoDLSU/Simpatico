@@ -24,6 +24,11 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
 import edu.stanford.nlp.util.CoreMap;
 
+/**
+ * 
+ * @author laurenztolentino
+ *	NLP Class tags Part of Speech and possible xml file creation during running :(
+ */
 public class Nlp {
 	
 	static Print p = new Print();
@@ -43,7 +48,7 @@ public class Nlp {
 	
 	 
 	
-	/*
+	/**
 	 * Not recommended to use.
 	 * Only use when you need to call the following methods:
 	 * 1) isStopWord
@@ -53,7 +58,7 @@ public class Nlp {
 		
 	}
 	
-	/*
+	/**
 	 * Pass a reader to make life easier.
 	 * Make sure you call a ReaderWrite on the method that calls this method and class.
 	 */
@@ -63,7 +68,7 @@ public class Nlp {
 		this.setFilePath(rw.GetFilePath());		
 	}
 	
-	/*
+	/**
 	 * If you have not specified a ReaderWrite(), you can specify the filePath and this constructor
 	 * will create the necessary ReaderWrite for you.
 	 */
@@ -87,12 +92,12 @@ public class Nlp {
 		p.println("Running Nlp.java");
 		
 		Nlp nlp = new Nlp(rw.testPathComplete);
-		//nlp.TestNlp();
-		nlp.isStopWord("couldn't");
+		nlp.TestNlp();
+		//nlp.isStopWord("couldn't");
 		
 	}
 	
-	/*
+	/**
 	 * Acquires text from SampleLegalText.txt
 	 * Just a custom version of GetFileContent via a ReaderWrite
 	 */
@@ -105,7 +110,7 @@ public class Nlp {
 		return read.GetFileContent();
 	}
 	
-	/*
+	/**
 	 * Set the filePath to be used by the entire class
 	 */
 	public void SetFilePath(String filePath)
@@ -115,7 +120,7 @@ public class Nlp {
 		this.setFilePath(filePath);
 	}
 	
-	/*
+	/**
 	 * Gets the filePath used by the class.
 	 * Created in case you need to check.
 	 */
@@ -140,7 +145,7 @@ public class Nlp {
 	}
 	
 	
-	/*
+	/**
 	 * This method is responsible for annotating every word in the provided text with 
 	 * Part-of-Speech (POS) tags.
 	 */
@@ -154,6 +159,9 @@ public class Nlp {
 		ArrayList<String> lemmaList = new ArrayList<String>();
 		String temp 				= "";
 		String finalOutput 			= "";
+		
+		/* Load list of stop words to stopWords[] */
+		LoadStopWordList();
 		
 		/* Creates a StanfordCoreNLP Object, with POS Tagging, Lemmatization, NER, Parsing, and Corerefernce resolution*/
 		Properties props = new Properties();
@@ -174,6 +182,8 @@ public class Nlp {
 		{
 			//traversing the words in the current sentence
 			// a CoreLabel is a CoreMap with additional token-specific methods
+			
+			p.println("CoreMap sentence: " + sentence.toString());
 			
 			for(CoreLabel token: sentence.get(TokensAnnotation.class))
 			{
@@ -224,6 +234,8 @@ public class Nlp {
 			// this is the Stanford dependency graph of the current sentence
 			SemanticGraph dependencies = sentence.get(CollapsedCCProcessedDependenciesAnnotation.class);
 			// Also I have no idea what the one above is for
+			
+			
 			
 		}
 		
