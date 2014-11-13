@@ -250,6 +250,8 @@ public class ReaderWrite
 		return true;
 	}
 	
+	
+	
 	/*
 	 * Creates a file.
 	 * Requires a text for the file content and filePath.
@@ -552,6 +554,8 @@ public class ReaderWrite
 			e.printStackTrace();
 		}
 	}
+	
+	
 	
 	/*
 	 * Code below follows this format

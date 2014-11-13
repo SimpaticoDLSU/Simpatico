@@ -72,7 +72,7 @@ public class PreAnalysis {
 					if ( wordList.get(i + 1).equals("which") || wordList.get(i + 1).equals("who") )
 					{
 						// make sure that all appositives have been marked before proceeding here
-						
+							
 						// 
 					}	
 				}
@@ -106,18 +106,19 @@ public class PreAnalysis {
 				count++;
 			}
 		}
-		return count;
-		
+		return count;	
 	}
 	
-	/*
+	/**
 	 * Marking of Appositives is needed for Boundary marking.
 	 * Process: 
 	 * 1) X was a noun phrase and surrounded by punctuation on the treebank.
 	 * 2) The immediate enclosing bracket marked a noun phrase in the treebank.
 	 * 3) X was the right-most phrase in the enclosing bracket 
+	 * 
+	 * @param wordList
+	 * @return a wordList marked with Appositives ( word.isAppositive)
 	 */
-	
 	public ArrayList<Word> markAppositive(ArrayList<Word> wordList) 
 	{
 		int size 		= wordList.size();		
@@ -141,7 +142,9 @@ public class PreAnalysis {
 							{
 								wordList.get(k).setIsAppositive(true);
 							}
-						}						
+							
+						}	
+						// after closeComma should be a verb (VB..)
 						break;
 					}
 					else {

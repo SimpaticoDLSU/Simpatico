@@ -23,6 +23,9 @@ import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.CollapsedCCProcess
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
 import edu.stanford.nlp.util.CoreMap;
+import edu.stanford.nlp.util.*;
+import edu.stanford.nlp.time.SUTime;
+import edu.stanford.nlp.time.SUTimeMain;
 
 /**
  * 
@@ -51,7 +54,7 @@ public class Nlp {
 	/**
 	 * Not recommended to use.
 	 * Only use when you need to call the following methods:
-	 * 1) isStopWord
+	 * 1) isStopWord -- has deprecated 
 	 */
 	public Nlp()
 	{
@@ -84,7 +87,10 @@ public class Nlp {
 		}
 	}
 	
-	
+	/**
+	 * Made only for testing.
+	 * @param args
+	 */
 	public static void main(String[] args)
 	{
 		ReaderWrite rw = new ReaderWrite();
@@ -236,8 +242,16 @@ public class Nlp {
 			// Also I have no idea what the one above is for
 			
 			
+			// THIS PRINTS OUT THE MOTHA-F****** ROOT TREEEEEE #GROOT #ROOT #GOOT #OYEA #SOMUCHTIMEWASTEDTOGETTHISOUTPUT
+			p.println("tree: " + tree.toString());
+			
+			ReaderWrite rootFile = new ReaderWrite();
+			rootFile.SetFilePath("src/documents/root.txt");
+			rootFile.AddNewWriteLine(tree.toString());
 			
 		}
+		
+		
 		
 		/*
 		 * This is the coreference link graph
@@ -246,16 +260,70 @@ public class Nlp {
 		 * Both sentence and token offsets start at 1!	
 		 */
 		Map<Integer, CorefChain> graph = document.get(CorefChainAnnotation.class); //I have no idea what this actually does
+		
 		/*
 		CorefChain test = graph.get(1);
 		p.println("document: " + document.toString());
 		p.println("Sample run: " + test.toString());
 		p.println("end of run");
 		*/
+		
+		//st.annotationToXmlDocument(document);
+		p.println("document in string: " + document.toString()); // document consists only of the input text 
+		
+		// please fix me
+		// SUTimeMain.annotationToXmlDocument(document); // This thing outputs the xml thingy somewhere :v
+		
 		return true;
 	}
 	
+	/**
+	 * Generates a tree-like structure and markup provided by Stanford CoreNLP.
+	 * Format is (ROOT (S ( ... ) ) )
+	 * @param text
+	 * @return an ArrayList<String> that consists of strings of sentences that has been given a parsed tree notation by CoreNLP.
+	 */
+	public ArrayList<String> AcquireTree(String text)
+	{
+		ArrayList<String> sentenceTree = new ArrayList<String>();
+		String finalTreeContent = ""; 
+		String temp = "";
+		
+		/* Creates a StanfordCoreNLP Object, with POS Tagging, Lemmatization, NER, Parsing, and Corerefernce resolution*/
+		Properties props = new Properties();
+		props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
+		StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
+		
+		// Creates an empty Annotation just with the given text
+		Annotation document = new Annotation(text);
+		
+		// run all Annotators on this text
+		pipeline.annotate(document);
+		
+		// these are all the sentences in this document
+		// a CoreMap is essentially a Map that uses class objects as keys and has values with custom types
+		List<CoreMap> sentences = document.get(SentencesAnnotation.class);
+		
+		for(CoreMap sentence: sentences)
+		{			
+			Tree tree = sentence.get(TreeAnnotation.class); // Tree Annotation creates (ROOT) something something			
+			temp = tree.toString();
+			sentenceTree.add(temp);
+		}
+		
+		//Creates a txt file that contains the root  
+		ReaderWrite treeFile = new ReaderWrite();
+		treeFile.SetFilePath("src/documents/tree.txt");
+		treeFile.CreateFile(finalTreeContent);
+		
+		return sentenceTree;
+		
+	}
 	
+	/**
+	 * ArrayList of Words()
+	 * @return an array list of the Word() class
+	 */
 	public ArrayList<String> GetWordList()
 	{
 		return this.wordList;
@@ -282,7 +350,8 @@ public class Nlp {
 		this.setFilePath(defaultFilePath);
 		//rw.ReadFile(defaultFile);
 		//rw.SetFilePath(this.filePath);
-		return StartNlp(GetSampleLegalText());
+		//return StartNlp(GetSampleLegalText());
+		return AcquireTree(GetSampleLegalText());
 	}
 
 	public String getFilePath() {
