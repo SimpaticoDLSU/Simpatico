@@ -278,9 +278,10 @@ public class Nlp {
 	}
 	
 	/**
-	 * Generates a tree-like structure and markup provided by Stanford CoreNLP.
+	 * Generates a tree-like structure and markup provided by Stanford CoreNLP only.
 	 * Format is (ROOT (S ( ... ) ) )
 	 * @param text
+	 * 			An input text that needs the application of POS Tagging
 	 * @return an ArrayList<String> that consists of strings of sentences that has been given a parsed tree notation by CoreNLP.
 	 */
 	public ArrayList<String> AcquireTree(String text)
@@ -320,6 +321,14 @@ public class Nlp {
 		
 	}
 	
+	public void LaunchNLP()
+	{
+		//structure
+		/*
+		 * 
+		 */
+	}
+	
 	/**
 	 * ArrayList of Words()
 	 * @return an array list of the Word() class
@@ -344,7 +353,7 @@ public class Nlp {
 		return this.defaultFilePath;
 	}
 	
-	public Boolean TestNlp()
+	public ArrayList<String> TestNlp()
 	{
 		ReaderWrite rw = new ReaderWrite();	
 		this.setFilePath(defaultFilePath);

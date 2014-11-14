@@ -1,15 +1,15 @@
 import java.io.IOException;
 import java.util.ArrayList;
 
+import objects.PreSentence;
+import objects.Word;
 import lexical.LexSubmodules;
 import lexical.RankingChooser;
 import lexical.SimplexAdapter;
 import preprocess.Adapter;
 import preprocess.Extractor;
 import preprocess.Nlp;
-import preprocess.PreSentence;
 import preprocess.ReaderWrite;
-import preprocess.Word;
 
 
 

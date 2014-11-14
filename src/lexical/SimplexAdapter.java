@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import preprocess.PreSentence;
-import preprocess.Word;
+import objects.PreSentence;
+import objects.Word;
 
 public class SimplexAdapter {
 

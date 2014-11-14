@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Scanner;
 
-import preprocess.PreSentence;
-import preprocess.Word;
+import objects.PreSentence;
+import objects.Word;
 import rita.RiWordNet;
 
 

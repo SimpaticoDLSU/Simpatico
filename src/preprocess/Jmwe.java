@@ -8,6 +8,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import objects.PreSentence;
+import objects.Word;
 import shortcuts.Print;
 import edu.mit.jmwe.data.IMWE;
 import edu.mit.jmwe.data.IToken;

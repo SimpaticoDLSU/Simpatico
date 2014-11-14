@@ -12,6 +12,8 @@ package preprocess;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import objects.PreSentence;
+import objects.Word;
 import shortcuts.Print;
 import shortcuts.Scan;
 
@@ -60,7 +62,7 @@ public class Temp {
 		Nlp nlp					= new Nlp(rw); // Create an new NLP object that uses values from ReaderWrite (such as paths).
 		Jmwe jmwe				= new Jmwe();
 		
-		mweResult	= jmwe.ApplyMweDetector(nlp.GetWordList(), nlp.GetPosList());
+		//mweResult	= jmwe.ApplyMweDetector(nlp.GetWordList(), nlp.GetPosList());
 		
 		p.println("mweResult: ");
 		p.println(mweResult);
@@ -83,16 +85,6 @@ public class Temp {
 		rw.ReadFile();
 		// Start POS Tagging by getting the file content from RW.
 		nlp.StartNlp(rw.GetFileContent());
-		
-		try {
-			mweResult = mwe.ApplyMweDetector(nlp.GetWordList(), nlp.GetPosList());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			// 909 means error. Make sure to at least add 909 in cases wherein you will need this :)
-			mweResult = "909";
-			p.println("Error encountered in using ApplyMweDetector.");
-		}
 		
 		//p.println("MWE Result from Bridge: ");
 		//p.println(mweResult);		

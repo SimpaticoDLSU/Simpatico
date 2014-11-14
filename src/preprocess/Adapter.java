@@ -7,6 +7,8 @@ package preprocess;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import objects.PreSentence;
+import objects.Word;
 import shortcuts.Print;
 import shortcuts.Scan;
 

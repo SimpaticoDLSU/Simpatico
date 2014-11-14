@@ -11,8 +11,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import preprocess.PreSentence;
-import preprocess.Word;
+import objects.PreSentence;
+import objects.Word;
 import edu.stanford.nlp.ling.Sentence;
 
 public class RankingChooser {
