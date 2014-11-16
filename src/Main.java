@@ -25,7 +25,7 @@ public class Main {
 		ArrayList<PreSentence> sentenceList = new ArrayList<PreSentence>();
 		
 		
-		//nlp.TestNlp();
+		//nlp.TestNlpFileGenerate();
 		try {
 			sentenceList = ad.NLPtoJMWE("NlpOutput.txt");
 		} catch (IOException e) {
@@ -33,6 +33,8 @@ public class Main {
 			e.printStackTrace();
 		}
 		
+		sentenceList = lexSubmodules.directSubstitution(sentenceList);
+		sentenceList = lexSubmodules.identifyIgnorables(sentenceList);
 		//perform preprocessing. If returned list is empty then abort.
 		if(!sentenceList.isEmpty())
 		{
@@ -41,7 +43,8 @@ public class Main {
 				for(Word word:sentence.getWordList())
 				{
 					//determine if each word is complex or not
-					word.setComplex(lexSubmodules.isComplex(word.getLemma()));
+					if(!word.isStopWord() && word.getWordType() != Word.COMPOUND_WORD)
+						word.setComplex(lexSubmodules.isComplex(word.getLemma()));
 					
 				}//end Word for
 			}//end Sentence for

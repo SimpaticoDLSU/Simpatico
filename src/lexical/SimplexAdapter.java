@@ -63,7 +63,7 @@ public class SimplexAdapter {
 
                 //Traverse the words contained in a sentence.
                 for (Word word : wordList) {
-                	if(word.isComplex() && !word.isStopWord()){
+                	if(word.isComplex() && !word.isStopWord() && !word.isIgnore()){
 	                    ArrayList<String> substituteWords = word.getSubstitute();
 	
 	                    //Print out the next word that is being processed

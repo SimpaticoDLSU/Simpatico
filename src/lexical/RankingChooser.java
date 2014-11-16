@@ -77,7 +77,7 @@ public class RankingChooser {
         }
         
         int index = 0;
-        
+       
         for (PreSentence sentence : sentenceList) {
             ArrayList<Word> wordList = sentence.getWordList();
             
