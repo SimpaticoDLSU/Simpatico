@@ -4,12 +4,19 @@ import java.util.ArrayList;
 
 
 public class Word {
+	public static final int SINGLE_WORD = 0;
+	public static final int COMPOUND_WORD = 1;
+	public static final int MULTI_WORD = 2;
+	public static final int NER = 3;
+	
 	private int id;
 	private String word;
 	private String lemma;
+	private boolean isIgnore;
 	private boolean isComplex;
 	private boolean isStopWord;
 	private String partOfSpeech;
+	private int wordType = SINGLE_WORD;
 	private ArrayList<String> substitute;
 	private String bestSubstitute;
 	private boolean isClausePart		= false;		
@@ -17,6 +24,7 @@ public class Word {
 	private boolean isOpeningBoundary 	= false;
 	private boolean isClosingBoundary 	= false;
 	private boolean isAppositive		= false;
+	
 	
 	public Word()
 	{
@@ -39,7 +47,7 @@ public class Word {
 	}
 	
 	public void appendWord(String appendedWord){
-		this.word = this.word + " " + appendedWord.toLowerCase();
+		this.word = this.word + " " + appendedWord;
 		
 	}
 	
@@ -76,6 +84,22 @@ public class Word {
 		this.lemma			= lemma;
 		this.isStopWord		= isStopWord;		
 		this.isComplex 		= isComplex;
+	}
+	
+	public int getWordType() {
+		return wordType;
+	}
+	
+	public boolean isIgnore() {
+		return isIgnore;
+	}
+
+	public void isIgnore(boolean isIgnore) {
+		this.isIgnore = isIgnore;
+	}
+
+	public void setWordType(int wordType) {
+		this.wordType = wordType;
 	}
 	
 	public String getBestSubstitute() 

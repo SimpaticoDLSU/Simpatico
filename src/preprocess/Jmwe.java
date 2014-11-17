@@ -93,6 +93,9 @@ public class Jmwe {
 							int addIndex = 1;
 							if(isTokensEqualToIndex(tempSentence,tokens, i)){
 								
+								//change wordType of the word
+								tempSentence.get(i).setWordType(Word.MULTI_WORD);
+								
 								// change part of speech of the first token to the pos of the MWE
 								tempSentence.get(i).setPartOfSpeech(""+mwe.getEntry().getPOS().getIdentifier());
 								

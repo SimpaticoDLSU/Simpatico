@@ -204,10 +204,7 @@ public class Nlp {
 				//p.println("ne: " + ne);
 				
 				//this is the lemma of the token
-				String lemma = token.get(LemmaAnnotation.class);
-				
-				// this is parse?
-				
+				String lemma = token.get(LemmaAnnotation.class);		
 				
 				// Add them to class variables.
 				wordList.add(word);
@@ -216,6 +213,7 @@ public class Nlp {
 				lemmaList.add(lemma);
 				
 				temp = word + "/" + pos + "/" + lemma;
+				System.out.println("NER: "+ ne);
 				finalOutput = finalOutput + temp;
 				finalOutput = finalOutput + "\n";
 				
@@ -362,7 +360,16 @@ public class Nlp {
 		//return StartNlp(GetSampleLegalText());
 		return AcquireTree(GetSampleLegalText());
 	}
-
+	
+	public Boolean TestNlpFileGenerate()
+	{
+		ReaderWrite rw = new ReaderWrite();	
+		this.setFilePath(defaultFilePath);
+		//rw.ReadFile(defaultFile);
+		//rw.SetFilePath(this.filePath);
+		return StartNlp(GetSampleLegalText());
+	}
+	
 	public String getFilePath() {
 		return filePath;
 	}
