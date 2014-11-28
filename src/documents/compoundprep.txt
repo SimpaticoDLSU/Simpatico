@@ -1,23 +1,23 @@
 at that point in time:then
 by means of:by
 by reason of:because of
-by virtue of:by,under
+by virtue of:under
 for the purpose of:to
 for the reason that:because
-from the point of view of:from,for
-in accordance with:by,under
+from the point of view of:from
+in accordance with:under
 inasmuch as:since
-in connection with:with,about,concerning
+in connection with:concerning
 in favor of:for
 in order to:to
-in relation to:about,concerning
+in relation to:concerning
 in terms of:in
 in the event that:if
 in the nature of:like
-on the basis of:by,from
+on the basis of:from
 prior to:before
 subsequent to:after
 with a view to:to
-with reference to:about,concerning
-with regard to:about,concerning
-with respect to:on,about
+with reference to:concerning
+with regard to:concerning
+with respect to:about

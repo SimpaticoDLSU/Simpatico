@@ -25,7 +25,7 @@ public class Main {
 		ArrayList<PreSentence> sentenceList = new ArrayList<PreSentence>();
 		
 		
-		//nlp.TestNlpFileGenerate();
+		nlp.TestNlpFileGenerate();
 		try {
 			sentenceList = ad.NLPtoJMWE("NlpOutput.txt");
 		} catch (IOException e) {

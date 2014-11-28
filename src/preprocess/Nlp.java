@@ -1,7 +1,6 @@
 package preprocess;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -23,9 +22,6 @@ import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.CollapsedCCProcess
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.*;
-import edu.stanford.nlp.time.SUTime;
-import edu.stanford.nlp.time.SUTimeMain;
 
 /**
  * 
@@ -206,6 +202,7 @@ public class Nlp {
 				//this is the lemma of the token
 				String lemma = token.get(LemmaAnnotation.class);		
 				
+				
 				// Add them to class variables.
 				wordList.add(word);
 				posList.add(pos);
@@ -234,7 +231,8 @@ public class Nlp {
 			
 			// this is the parse tree. And I have no idea what it's for
 			Tree tree = sentence.get(TreeAnnotation.class);
-			
+			System.out.println(tree.flatten());
+		    
 			// this is the Stanford dependency graph of the current sentence
 			SemanticGraph dependencies = sentence.get(CollapsedCCProcessedDependenciesAnnotation.class);
 			// Also I have no idea what the one above is for

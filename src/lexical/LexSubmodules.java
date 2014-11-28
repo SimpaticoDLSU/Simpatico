@@ -10,26 +10,24 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Scanner;
-
-
-
-
-
-
-
-
-import org.apache.commons.lang3.StringUtils;
 
 import objects.PreSentence;
 import objects.Word;
+
+import org.apache.commons.lang3.StringUtils;
+
 import rita.RiWordNet;
 
 
 
 public class LexSubmodules 
 {
+	private Map<String, Double> map;
 
 	public static void main(String args[])
 	{	Locale.setDefault(Locale.ENGLISH);
@@ -114,39 +112,49 @@ public class LexSubmodules
 		}
 	}
 	
+	
+	
 	/**
 	 * Determines if word is complex or not
 	 * @param word whose complexity is determined
 	 * @return true if complex, false otherwise
 	 */
 	public boolean isComplex(String word)
-	{
-		File lemmacorpus = new File("src/lexical/Resources/lemmacorpus.txt");
-		try (BufferedReader reader = new BufferedReader(new FileReader(lemmacorpus.getAbsolutePath()))) 
+	{	
+		if(map == null)
 		{
-		    String line = null;
-		    while ((line = reader.readLine()) != null) 
-		    {
-		        
-		        Scanner s = new Scanner(line.trim());
-	        	String s1 = s.next();
-	        	int i = 0;
-	        	
-	        	if(s.hasNextInt())
-	        		i = s.nextInt();
-	        	
-	        	
-	        	
-	        	if(s1.trim().toLowerCase().equals(word.toLowerCase()))
-		        	return false;
+			map = new HashMap<String, Double>();
+			File lemmacorpus = new File("src/lexical/Resources/lemmacorpus.txt");
+			double sum = 0;
+			try (BufferedReader reader = new BufferedReader(new FileReader(lemmacorpus.getAbsolutePath()))) 
+			{
+			    String line = null;
+			    while ((line = reader.readLine()) != null) 
+			    {
 			        
-		    }
-		   
-		} catch (IOException x) 
-		{
-		    System.err.format("IOException: %s%n", x);
-		} 
+			        Scanner s = new Scanner(line.trim());
+		        	String s1 = s.next();
+		        	double freq = s.nextDouble();
+		        	sum+=freq;
+		        	map.put(s1, freq);
+				        
+			    }
+			    
+			    
+			   
+			} catch (IOException x) 
+			{
+			    System.err.format("IOException: %s%n", x);
+			} 
+		}
+		Iterator iterator = map.entrySet().iterator();
+	    while(iterator.hasNext()){
+	    	Map.Entry<String, Double> pairs =(Map.Entry<String, Double>)iterator.next();
+	    	if(pairs.getKey().equalsIgnoreCase(word))
+	    		return false;
+	    }
 		return true;
+		
 	} 
 	
 	/**
@@ -195,7 +203,7 @@ public class LexSubmodules
 				    else
 				    	tmp =  wordnet.getSynset(w.getLemma().toLowerCase(), pos);
 				    
-				    w.getSubstitute().add(lemma);
+				    
 				    if(tmp.length > 0)
 					    for(String s:tmp){
 					    	System.out.println("Subs: "+s);
