@@ -12,8 +12,13 @@ package preprocess;
 import java.io.IOException;
 import java.util.ArrayList;
 
+<<<<<<< HEAD
 import language.PreSentence;
 import language.Word;
+=======
+import objects.PreSentence;
+import objects.Word;
+>>>>>>> FETCH_HEAD
 import shortcuts.Print;
 import shortcuts.Scan;
 
@@ -39,7 +44,11 @@ public class Temp {
 	public static void main(String[] args)
 	{
 		Adapter m = new Adapter();
+<<<<<<< HEAD
 		//m.Test_NLPtoJMWE();
+=======
+		m.Test_NLPtoJMWE();
+>>>>>>> FETCH_HEAD
 		//m.Test_SentenceConversion("src/documents/NlpOutput.txt");
 
 	}
@@ -100,7 +109,11 @@ public class Temp {
 		Nlp nlp = new Nlp(rw.testPathComplete);
 		p.println("defaultFileContainer has been set as nlpFilePath");
 		//set nlpFilePath as the same as the defaultFileContainer
+<<<<<<< HEAD
 		// this.nlpFilePath = nlp.GetDefaultFilePath();
+=======
+		this.nlpFilePath = nlp.GetDefaultFilePath();
+>>>>>>> FETCH_HEAD
 		//set filePath of nlp to defaultFileContainer
 		nlp.SetFilePath(nlpFilePath);
 		// set filePath of this class to defaultFilePath
@@ -108,7 +121,11 @@ public class Temp {
 		p.println("filePath = " + this.filePath);
 		//ReaderWrite rw = new ReaderWrite(nlp.GetDefaultFilePath());
 		p.println("Running TestNlp() at the Bridge.");
+<<<<<<< HEAD
 		// nlp.TestNlp();
+=======
+		nlp.TestNlp();
+>>>>>>> FETCH_HEAD
 
 
 		//Run Converter
@@ -138,7 +155,11 @@ public class Temp {
 			Word temp = new Word(split[0]); 
 			temp.setPartOfSpeech(split[1]); 
 			temp.setLemma(split[0]);
+<<<<<<< HEAD
 			//temp.setStopWord(nlp.isStopWord(temp.getWord()));
+=======
+			temp.setStopWord(nlp.isStopWord(temp.getWord()));
+>>>>>>> FETCH_HEAD
 			//p.println(splittedText[i]);
 			word.add(temp);
 		

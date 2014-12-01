@@ -49,3 +49,19 @@ Thumbs.db
 *.class
 
 *.class
+
+.classpath
+
+*.class
+
+*.class
+
+*.class
+
+bin/Main.class
+
+bin/preprocess/Jmwe.class
+
+bin/preprocess/Main.class
+
+bin/preprocess/Nlp.class

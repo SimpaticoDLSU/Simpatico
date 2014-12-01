@@ -7,19 +7,28 @@ package preprocess;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+<<<<<<< HEAD
 import java.util.Set;
 
 import language.PreSentence;
 import language.Text;
 import language.Word;
+=======
+
+import objects.PreSentence;
+import objects.Word;
+>>>>>>> FETCH_HEAD
 import edu.stanford.nlp.ling.DocumentReader;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
 import shortcuts.*;
+<<<<<<< HEAD
 import edu.stanford.nlp.patterns.*;
 import edu.stanford.nlp.patterns.surface.ConstantsAndVariables;
+=======
+>>>>>>> FETCH_HEAD
 
 public class PreAnalysis {
 	
@@ -163,6 +172,7 @@ public class PreAnalysis {
 		return wordList; 
 	}
 	
+<<<<<<< HEAD
 	/**
 	 * Removes or does some magic when seeing stopwords in the text.
 	 */
@@ -218,6 +228,8 @@ public class PreAnalysis {
 		return output;
 	}
 	
+=======
+>>>>>>> FETCH_HEAD
 	public void samplePutSequence()
 	{
 		String noun = "I";
@@ -244,7 +256,10 @@ public class PreAnalysis {
 	}
 	
 	/**
+<<<<<<< HEAD
 	 * DEPRECATED. TO BE REPLACED SOMETIME
+=======
+>>>>>>> FETCH_HEAD
 	 * Put a Noun Phrase markup inside the original XML file.
 	 * Automatically generates <nounphrase> & </nounphrase> mark-ups when writing.
 	 * @param text

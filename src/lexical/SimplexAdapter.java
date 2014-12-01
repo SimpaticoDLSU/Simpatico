@@ -15,8 +15,13 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+<<<<<<< HEAD
 import language.PreSentence;
 import language.Word;
+=======
+import objects.PreSentence;
+import objects.Word;
+>>>>>>> FETCH_HEAD
 
 public class SimplexAdapter {
 
