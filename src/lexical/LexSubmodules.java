@@ -16,8 +16,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
 
-import objects.PreSentence;
-import objects.Word;
+import language.PreSentence;
+import language.Word;
 
 import org.apache.commons.lang3.StringUtils;
 

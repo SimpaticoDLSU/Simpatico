@@ -9,13 +9,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-<<<<<<< HEAD
 import language.PreSentence;
 import language.Word;
-=======
-import objects.PreSentence;
-import objects.Word;
->>>>>>> FETCH_HEAD
 import shortcuts.Print;
 import edu.mit.jmwe.data.IMWE;
 import edu.mit.jmwe.data.IToken;
