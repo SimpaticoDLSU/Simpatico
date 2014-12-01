@@ -1,10 +1,12 @@
 package lexical;
 /*
+
  * CAScan.java
  * Class for complexity analysis module
  * 
  * Author: Joren Sorilla
  */
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -16,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
 
+import jigsaw.data.TokenGroup;
 import language.PreSentence;
 import language.Word;
 
@@ -24,13 +27,21 @@ import org.apache.commons.lang3.StringUtils;
 import rita.RiWordNet;
 
 
-
+/**
+ * CAScan.java
+ * class for complexity analysis module
+ * @author Joren Sorilla 
+ *
+ */
 public class LexSubmodules 
 {
 	private Map<String, Double> map;
-
+	private static File configFile = new File("resources/jigsaw.properties");
+	private static JIGSAW jig;
+	
 	public static void main(String args[])
-	{	Locale.setDefault(Locale.ENGLISH);
+	{	
+		Locale.setDefault(Locale.ENGLISH);
 		
 		LexSubmodules s= new LexSubmodules();
 		
@@ -39,13 +50,13 @@ public class LexSubmodules
 		PreSentence s_two = new PreSentence();
 		s_one.setId(0);
 		s_two.setId(1);
-		Word justice = new Word("justice");
-		Word jury = new Word("jury");
-		Word aftermath = new Word("aftermath");
-		Word fiscal = new Word("fiscal");
-		Word prevail = new Word("prevail");
-		Word pursuant = new Word("pursuant");
-		Word fly = new Word("fly");
+		Word justice 	= new Word("justice");
+		Word jury 		= new Word("jury");
+		Word aftermath 	= new Word("aftermath");
+		Word fiscal 	= new Word("fiscal");
+		Word prevail 	= new Word("prevail");
+		Word pursuant 	= new Word("pursuant");
+		Word fly 		= new Word("fly");
 	
 		
 		justice.setComplex(true);
@@ -382,7 +393,40 @@ public class LexSubmodules
 		return sentences;
 	}
 	
-	
+	/**
+	 * 
+	 * @param word
+	 * A string that requires a SynSet id to be retrieved.
+	 * Requires configFile and JIGSAW to be set up as static variables.
+	 * Please do make sure that the resource folder is set as src and in the build path and import the necessary JIGSAW libraries.
+	 * @return
+	 * 8 digit integer containing the wordnet id
+	 * @throws Exception
+	 */
+	public static int generateSynId(String word) throws Exception
+    {
+        TokenGroup tg = null;
+        int syn		  = 0;
+        tg = jig.mapText(word);
+        
+        if (tg != null) {
+            System.out.println();
+            for (int i = 0; i < tg.size(); i++) {
+                System.out.print(tg.get(i).getToken());
+                System.out.print(" ");
+                System.out.print(tg.get(i).getStem());
+                System.out.print(" ");
+                System.out.print(tg.get(i).getPosTag());
+                System.out.print(" ");
+                System.out.print(tg.get(i).getLemma());
+                System.out.print(" ");
+                System.out.print(tg.get(i).getSyn());
+                System.out.println();
+            }            
+        }
+            
+       return syn;
+    }
 	
 	    
 	
