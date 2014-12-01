@@ -15,13 +15,13 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import preprocess.PreSentence;
-import preprocess.Word;
+import language.PreSentence;
+import language.Word;
 
 public class SimplexAdapter {
 
     //Directory where simplex is stored.
-    private final String SIMPLEX_DIRECTORY = "src/lexical/Resources/Simplex";
+    private final String SIMPLEX_DIRECTORY = "src/lexical/Resources/Simplex/";
     //the name of the output text file to be read by simplex.
     private final String OUTPUT_NAME = "simpatico";
     //List of sentences to be processed
@@ -63,24 +63,27 @@ public class SimplexAdapter {
 
                 //Traverse the words contained in a sentence.
                 for (Word word : wordList) {
-                    ArrayList<String> substituteWords = word.getSubstitute();
-
-                    //Print out the next word that is being processed
-                    System.out.println("Processing word: " + word.getWord());
-
-                    //Check if the word has any substitutes
-                    if (!substituteWords.isEmpty()) {
-                        fileWriter.write("Sentence " + id + " rankings:");  //Initial printing before printing substitute words
-
-                        //Traverse list of substitute words.
-                        for (String s : substituteWords) {
-                            //Write the substitute word to the file
-                            fileWriter.write(" {" + s + "}");
-                        }
-                        fileWriter.write("\n");
-
-                        id++;
-                    }
+                	if(word.isComplex() && !word.isStopWord() && !word.isIgnore()){
+	                    ArrayList<String> substituteWords = word.getSubstitute();
+	
+	                    //Print out the next word that is being processed
+	                    System.out.println("Processing word: " + word.getWord());
+	
+	                    //Check if the word has any substitutes
+	                    if (!substituteWords.isEmpty()) {
+	                    	System.out.print("sub");
+	                        fileWriter.write("Sentence " + id + " rankings:");  //Initial printing before printing substitute words
+	
+	                        //Traverse list of substitute words.
+	                        for (String s : substituteWords) {
+	                            //Write the substitute word to the file
+	                            fileWriter.write(" {" + s + "}");
+	                        }
+	                        fileWriter.write("\n");
+	
+	                        id++;
+	                    }
+                	}
                 }
             }
 

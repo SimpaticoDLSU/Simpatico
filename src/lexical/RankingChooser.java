@@ -11,8 +11,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import preprocess.PreSentence;
-import preprocess.Word;
+import language.PreSentence;
+import language.Word;
 import edu.stanford.nlp.ling.Sentence;
 
 public class RankingChooser {
@@ -42,7 +42,7 @@ public class RankingChooser {
 
         try {
             //Get the ranking file
-            inputScanner = new Scanner(new File("input"));
+            inputScanner = new Scanner(new File("src/lexical/Resources/Simplex/test-input"));
 
             //Scan through the file.
             while (inputScanner.hasNext()) {
@@ -77,7 +77,7 @@ public class RankingChooser {
         }
         
         int index = 0;
-        
+       
         for (PreSentence sentence : sentenceList) {
             ArrayList<Word> wordList = sentence.getWordList();
             
@@ -86,9 +86,10 @@ public class RankingChooser {
                 ArrayList<String> substituteWords = word.getSubstitute();
 
                 //if word has a list of substitutes, then add its corresponding replacement word.
-                if (!substituteWords.isEmpty()) {
-                    word.setBestSubstitute(replacementWords.get(index++));
-                }
+                if(substituteWords != null)
+	                if (!substituteWords.isEmpty()) {
+	                    word.setBestSubstitute(replacementWords.get(index++));
+	                }
             }
         }
         

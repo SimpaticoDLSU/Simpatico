@@ -34,8 +34,9 @@ metering/NN
 of/IN
 electric/JJ
 current/JJ
-constitutethe/NN
-actus/VBZ
+constitute/VBP
+the/DT
+actus/NN
 reus/NN
 of/IN
 the/DT
