@@ -13,14 +13,29 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+ 
+
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import shortcuts.Print;
 
 public class ReaderWrite 
 {
 
 	//testFileName is only used for testing the ReaderWrite methods
-	final public static String testPathComplete= "src/preprocess/sample.txt";
-	final static String testFilePath    = "src/preprocess/";
+	final public static String testPathComplete= "src/documents/sample.txt";
+	final static String testFilePath    = "src/documents/";
 	final static String testFileName	= "sample.txt";
 	static Print p 						= new Print();
 	String filePath 					= "";
@@ -50,8 +65,10 @@ public class ReaderWrite
 			p.println("No File Path Written");
 
 		} else {
+			this.filePath = filePath;
 			p.println("Path registered. Please double check later.");
-			//ReadFile(filePath);
+			p.println("Automated File Reading when calling ReaderWrite(filePath)");
+			ReadFile(this.filePath);
 		}
 
 	}
@@ -72,6 +89,8 @@ public class ReaderWrite
 		p.println("Test output: ");
 		p.println(test);
 		*/
+		ReaderWrite rw = new ReaderWrite();		
+		rw.WriteXMLFile();
 
 	}
 
@@ -106,7 +125,7 @@ public class ReaderWrite
 		p.println("ReadFile() now running");
 
 		BufferedReader reader 	= null;
-		String fileContent 	= "";
+		String fileContent 		= "";
 		String temp 			= "";
 
 		try
@@ -138,7 +157,7 @@ public class ReaderWrite
 				return true;
 			} else {
 
-				p.println("Problem with reading file. Error [0]");
+				p.println("Problem with reading file. Error[0]");
 				p.println("File: " + file.toString() + " does not exists");
 				return false;
 				//System.exit(1);
@@ -152,7 +171,7 @@ public class ReaderWrite
 		} finally {
 
 			try {
-				p.println("\nFile Reading Finished. No Errors");
+				p.println("\nFile Reading Finished.");
 				p.println("ReaderWrite will now be closed");
 				reader.close();
 			} catch (IOException e) {
@@ -230,6 +249,8 @@ public class ReaderWrite
 		CreateFile(text, filePath);
 		return true;
 	}
+	
+	
 	
 	/*
 	 * Creates a file.
@@ -463,6 +484,158 @@ public class ReaderWrite
 	{
 
 		this.fileName = name;
+	}
+	
+	public void WriteXMLFile()
+	{
+		try
+		{
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+	 
+			// root elements
+			Document doc = docBuilder.newDocument();
+			Element rootElement = doc.createElement("company");
+			doc.appendChild(rootElement);
+	 
+			// staff elements
+			Element staff = doc.createElement("Staff");
+			rootElement.appendChild(staff);
+	 
+			// set attribute to staff element
+			Attr attr = doc.createAttribute("id");
+			attr.setValue("1");
+			staff.setAttributeNode(attr);
+	 
+			// shorten way
+			// staff.setAttribute("id", "1");
+	 
+			// firstname elements
+			Element firstname = doc.createElement("firstname");
+			firstname.appendChild(doc.createTextNode("yong"));
+			staff.appendChild(firstname);
+	 
+			// lastname elements
+			Element lastname = doc.createElement("lastname");
+			lastname.appendChild(doc.createTextNode("mook kim"));
+			staff.appendChild(lastname);
+	 
+			// nickname elements
+			Element nickname = doc.createElement("nickname");
+			nickname.appendChild(doc.createTextNode("mkyong"));
+			staff.appendChild(nickname);
+	 
+			// salary elements
+			Element salary = doc.createElement("salary");
+			salary.appendChild(doc.createTextNode("100000"));
+			staff.appendChild(salary);
+	 
+			// write the content into xml file
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(new File("src/documents/testfile.xml"));
+	 
+			// Output to console for testing
+			// StreamResult result = new StreamResult(System.out);
+	 
+			transformer.transform(source, result);
+	 
+			System.out.println("File saved!");
+		}
+		catch (ParserConfigurationException pce)
+		{
+			pce.printStackTrace();
+		} catch (TransformerConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
+	
+	/*
+	 * Code below follows this format
+	 * <?xml version="1.0" encoding="UTF-8" standalone="no" ?> 
+		<company>
+			<staff id="1">
+				<firstname>yong</firstname>
+				<lastname>mook kim</lastname>
+				<nickname>mkyong</nickname>
+				<salary>100000</salary>
+			</staff>
+		</company>
+	 */
+	public void Test_WriteXMLFile()
+	{
+		try
+		{
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+	 
+			// root elements
+			Document doc = docBuilder.newDocument();
+			Element rootElement = doc.createElement("company");
+			doc.appendChild(rootElement);
+	 
+			// staff elements
+			Element staff = doc.createElement("Staff");
+			rootElement.appendChild(staff);
+	 
+			// set attribute to staff element
+			Attr attr = doc.createAttribute("id");
+			attr.setValue("1");
+			staff.setAttributeNode(attr);
+	 
+			// shorten way
+			// staff.setAttribute("id", "1");
+	 
+			// firstname elements
+			Element firstname = doc.createElement("firstname");
+			firstname.appendChild(doc.createTextNode("yong"));
+			staff.appendChild(firstname);
+	 
+			// lastname elements
+			Element lastname = doc.createElement("lastname");
+			lastname.appendChild(doc.createTextNode("mook kim"));
+			staff.appendChild(lastname);
+	 
+			// nickname elements
+			Element nickname = doc.createElement("nickname");
+			nickname.appendChild(doc.createTextNode("mkyong"));
+			staff.appendChild(nickname);
+	 
+			// salary elements
+			Element salary = doc.createElement("salary");
+			salary.appendChild(doc.createTextNode("100000"));
+			staff.appendChild(salary);
+	 
+			// write the content into xml file
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(new File("src/documents/testfile.xml"));
+	 
+			// Output to console for testing
+			// StreamResult result = new StreamResult(System.out);
+	 
+			transformer.transform(source, result);
+	 
+			System.out.println("File saved!");
+		}
+		catch (ParserConfigurationException pce)
+		{
+			pce.printStackTrace();
+		} catch (TransformerConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
