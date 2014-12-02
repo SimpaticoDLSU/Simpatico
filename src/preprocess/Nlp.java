@@ -1,11 +1,8 @@
 package preprocess;
 
 import java.util.ArrayList;
-
 import java.util.Iterator;
 import java.util.LinkedList;
-
-
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -42,11 +39,9 @@ import edu.stanford.nlp.semgraph.SemanticGraphEdge;
 import edu.stanford.nlp.trees.GrammaticalRelation;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
-
 import edu.stanford.nlp.util.*;
 import edu.stanford.nlp.time.SUTime;
 import edu.stanford.nlp.time.SUTimeMain;
-
 import edu.stanford.nlp.util.CoreMap;
 
 

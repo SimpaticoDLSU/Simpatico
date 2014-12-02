@@ -1,15 +1,19 @@
 import java.io.IOException;
 import java.util.ArrayList;
 
+
 import language.PreSentence;
 import language.Word;
+
 import lexical.LexSubmodules;
 import lexical.RankingChooser;
 import lexical.SimplexAdapter;
+
 import preprocess.Adapter;
 import preprocess.Extractor;
 import preprocess.Nlp;
 import preprocess.ReaderWrite;
+import syntactic.Analysis;
 
 
 
@@ -24,8 +28,10 @@ public class Main {
 		RankingChooser rankingChooser = new RankingChooser();
 		ArrayList<PreSentence> sentenceList = new ArrayList<PreSentence>();
 		
-		
-		//nlp.TestNlpFileGenerate();
+
+		Analysis synanalysis = new Analysis();
+		nlp.TestNlpFileGenerate();
+
 		try {
 			sentenceList = ad.NLPtoJMWE("NlpOutput.txt");
 		} catch (IOException e) {
@@ -62,18 +68,35 @@ public class Main {
 			
 			
 		} //end if
+		
+		String lexicalOutput="";
 		System.out.println("Output:");
 		for(PreSentence s: sentenceList){
 			for(Word w: s.getWordList()){
 				if(w.getBestSubstitute() != null)
-					System.out.print(w.getBestSubstitute()+" ");
-				else
-					System.out.print(w.getWord()+" ");
+					lexicalOutput+=(w.getBestSubstitute()+" ");
+				else if(w.getWord().equalsIgnoreCase("-LSB-"))
+					lexicalOutput+=("["+" ");
+				else if(w.getWord().equalsIgnoreCase("-RSB-"))
+					lexicalOutput+=("]"+" ");
+				else if(w.getWord().equalsIgnoreCase("-LRB-"))
+					lexicalOutput+=("("+" ");
+				else if(w.getWord().equalsIgnoreCase("-RRB-"))
+					lexicalOutput+=(")"+" ");
+				else if(w.getWord().equalsIgnoreCase("``") || w.getWord().equalsIgnoreCase("''") )
+					lexicalOutput+=("\""+" ");
+				else if(w.getWord().equalsIgnoreCase("`") || w.getWord().equalsIgnoreCase("'") )
+					lexicalOutput+=("\'"+" ");
+				else 
+					lexicalOutput+=(w.getWord()+" ");
+				
 			}
 		}
+		System.out.print(lexicalOutput);
 		
-		
-		
+		/*
+		synanalysis.StartAnalysis(lexicalOutput);
+		*/
 	}
 	
 

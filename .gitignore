@@ -1,10 +1,10 @@
+bin/
 /src/lexical/Resources/Simplex/*
 /src/lexical/Resources/WordNet-3.1/*
 *.classpath
 *.project
 /edu.mit.jmwe_1.0.1_all/*
 /stanford-corenlp-full-2014-08-27/*
-/bin/*
 # Compiled source #
 ###################
 *.com
