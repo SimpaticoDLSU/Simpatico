@@ -55,17 +55,20 @@ public class Nlp {
 	static Print p = new Print();
 	//FilePath here includes already the file name
 	
-	private final String generalProperties = "tokenize, ssplit, pos, lemma, ner, parse, dcoref";
+	private final String generalProperties 	= "tokenize, ssplit, pos, lemma, ner, parse, dcoref";
+	private final String defaultFile		= "src/documents/NlpOutput.txt";
 	String fileName						   	= "";			
 	private String filePath					= "";
 	String filePathContainer				= "";
 	String[] stopWords;
-	ReaderWrite rw;
-	ArrayList<String> wordList			= new ArrayList<String>();
-	ArrayList<String> posList			= new ArrayList<String>();	
-	ArrayList<String> neList			= new ArrayList<String>();	
-	ArrayList<String> lemmaList 		= new ArrayList<String>();	
-	ArrayList<Tree> sentenceTreeList	= new ArrayList<Tree>();
+	Boolean classError = false;
+	private ReaderWrite rw;
+	private ArrayList<String> wordList			= new ArrayList<String>();
+	private ArrayList<String> posList			= new ArrayList<String>();	
+	private ArrayList<String> neList			= new ArrayList<String>();	
+	private ArrayList<String> lemmaList 		= new ArrayList<String>();	
+	private ArrayList<Tree> sentenceTreeList	= new ArrayList<Tree>();
+	
 	Text text;
 	 
 	/**
@@ -135,7 +138,19 @@ public class Nlp {
 		Boolean boolTest = false;
 		
 		//convertToSentenceTrees(text);
-		iterateToText(generateSentenceCoreMapList(text));
+		//iterateToText(generateSentenceCoreMapList(text));
+		
+		iterateToTextFile(generateSentenceCoreMapList(text));
+		boolTest = this.classError;
+		return boolTest;
+	}
+	
+	public Boolean StartNlpNoFile(String text)
+	{
+		Boolean boolTest = false;
+		//convertToSentenceTrees(text);
+		//iterateToText(generateSentenceCoreMapList(text));
+		
 		return boolTest;
 	}
 	
@@ -179,7 +194,111 @@ public class Nlp {
 	
 		return sentenceTree;
 	}
+	
+	public void iterateToTextFile( List<CoreMap> sentences )
+	{
+		// Variables for the Text object 
+		Text documentText 				= new Text();
+		ArrayList<Tree> treeList		= new ArrayList<Tree>();
+		ArrayList<PreSentence> pSentList= new ArrayList<PreSentence>();
+		ArrayList<Word> pWordList		= new ArrayList<Word>();
+		// Variables for each token
+		ArrayList<String> wordList		= new ArrayList<String>();
+		ArrayList<String> posList		= new ArrayList<String>();
+		ArrayList<String> neList		= new ArrayList<String>();
+		ArrayList<String> lemmaList		= new ArrayList<String>();
+		
+		// To text file variables
+		String temp 				= "";
+		String finalOutput 			= "";
 
+		for ( CoreMap sentence : sentences )
+		{
+			int sentenceID			= 0;
+			Tree tree 				= sentence.get(TreeAnnotation.class);
+			Word preWord 			= new Word();
+			PreSentence pSentence 	= new PreSentence();
+			ArrayList<Word> allWord = new ArrayList<Word>();
+
+			for( CoreLabel token : sentence.get(TokensAnnotation.class) )
+			{
+				// Get token annotations
+				String word 	= token.get(TextAnnotation.class);
+				String pos 		= token.get(PartOfSpeechAnnotation.class);
+				String ne 		= token.get(NamedEntityTagAnnotation.class);
+				String lemma 	= token.get(LemmaAnnotation.class);
+				String common	= token.get(CommonWordsAnnotation.class);
+				// add each token to token lists
+				p.println( word + " : " + common );
+				wordList.add(word);
+				posList.add(pos);
+				neList.add(ne);
+				lemmaList.add(lemma);		
+				// add tokens to Word()   
+				preWord.setWord(word);
+				preWord.setPartOfSpeech(pos);
+				preWord.setLemma(lemma);		
+				// add the Word to WordList
+				pWordList.add(preWord);
+
+				/* Lines below is for printing it in a text file in the "<word>/<pos>/<lemma>" format. */
+				temp = word + "/" + pos + "/" + lemma;
+				//System.out.println("NER: "+ ne);
+				finalOutput = finalOutput + temp;
+				finalOutput = finalOutput + "\n";
+			
+				tree.printLocalTree();
+			} // end for tokens
+			
+			treeList.add(tree);
+			// Add to PreSentence
+			/*
+			pSentence.setId(sentenceID);
+			pSentence.setWordList(pWordList);
+			pSentence.setSentenceTree(tree);
+			pSentence.setOpeningBoundary();
+			pSentence.setClosingBoundary();
+			pSentence.setNounPhrase();
+			pSentence.setVerbPhrase();
+			// Add to documentText
+			documentText.setSentenceTrees(treeList);
+			documentText.setPreSentences();
+			documentText.setPhrases();
+			documentText.setWords();
+			 */
+			// For transferring results to the tree
+			p.println("finalOutput: \n " + finalOutput);
+			
+			// Update the class ArrayList variables
+			this.wordList 	= wordList;
+			this.posList 	= posList;
+			this.neList		= neList;
+			this.lemmaList = lemmaList;
+			
+			// Create NlpOutput.txt with the content in this format: <word>/<pos>/<lemma>
+			rw.SetFileName("NlpOutput.txt");
+			rw.SetFilePath(defaultFile); //redundant creation
+			rw.CreateFile(finalOutput, defaultFile);
+			
+			// this is the parse tree. And I have no idea what it's for
+			//Tree tree = sentence.get(TreeAnnotation.class);
+			
+			// this is the Stanford dependency graph of the current sentence
+			SemanticGraph dependencies = sentence.get(CollapsedCCProcessedDependenciesAnnotation.class);
+			// Also I have no idea what the one above is for
+			
+			
+			// THIS PRINTS OUT THE MOTHA-F****** ROOT TREEEEEE #GROOT #ROOT #GOOT #OYEA #SOMUCHTIMEWASTEDTOGETTHISOUTPUT
+			p.println("tree: " + tree.toString());
+			
+			
+			ReaderWrite rootFile = new ReaderWrite();
+			rootFile.SetFilePath("src/documents/root.txt");
+			rootFile.AddNewWriteLine(tree.toString());
+
+		} // end for sentences
+	} // end method
+	
 	public void iterateToText( List<CoreMap> sentences )
 	{
 		// Variables for the Text object 
