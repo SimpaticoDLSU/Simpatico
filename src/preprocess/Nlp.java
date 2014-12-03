@@ -195,6 +195,48 @@ public class Nlp {
 		return sentenceTree;
 	}
 	
+	public ArrayList<PreSentence> generatePreSentences(List<CoreMap> sentences)
+	{
+		ArrayList<PreSentence> sentenceList = new ArrayList<PreSentence>();
+		ArrayList<Word> words = new ArrayList<Word>();
+		
+		for ( CoreMap sentence : sentences )
+		{
+			
+			PreSentence pSentence = new PreSentence();
+			
+			
+			for ( CoreLabel token : sentence.get(TokensAnnotation.class) )
+			{
+				Word preWord		  = new Word();
+				// Get token annotations
+				String word 	= token.get(TextAnnotation.class);
+				String pos 		= token.get(PartOfSpeechAnnotation.class);
+				String ne 		= token.get(NamedEntityTagAnnotation.class);
+				String lemma 	= token.get(LemmaAnnotation.class);
+				String common	= token.get(CommonWordsAnnotation.class);
+				//p.println("word: " + word);
+				// add tokens to Word()   
+				preWord.setWord(word);
+				preWord.setPartOfSpeech(pos);
+				preWord.setLemma(lemma);
+				// add the Word to WordList
+				
+				words.add(preWord);
+				// p.println("preword: " + preWord.getWord());
+				// p.println("words: " + words.get(0).getWord());
+			}
+			
+			p.println("wordsSize: " + words.size());
+			
+			pSentence.setWordList(words);
+			sentenceList.add(pSentence);
+		}
+		
+		
+		return sentenceList;
+	}
+	
 	public void iterateToTextFile( List<CoreMap> sentences )
 	{
 		// Variables for the Text object 

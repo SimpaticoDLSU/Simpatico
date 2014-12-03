@@ -2,8 +2,12 @@ package preprocess;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
+import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.util.CoreMap;
 import language.PreSentence;
+import lexical.LexSubmodules;
 import shortcuts.*;
 
 /**
@@ -22,11 +26,21 @@ public class Tester {
 	public static void main(String[] args)
 	{
 		Tester test = new Tester();
-		Nlp nlp = new Nlp();
-		nlp.StartNlp(GetSampleLegalText());
-		
+		try {
+			test.testLexSub();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//test.sentenceIdentifier();
+		//Nlp nlp = new Nlp();
+		//nlp.StartNlp(GetSampleLegalText());
 	}
 	
+	/**
+	 * Not working.
+	 * ConstantsAndVariables is not available in Stanford CoreNLP (missing files).
+	 */
 	public void CommonWordImplementor()
 	{
 		ArrayList<String> example 	= new ArrayList<String>();
@@ -52,6 +66,19 @@ public class Tester {
 		
 	}
 	
+	public void sentenceIdentifier()
+	{
+		Object[] temp;
+		Nlp nlp = new Nlp();
+		ArrayList<Tree> tree = nlp.convertToSentenceTrees(getSampleLegalText());
+		temp = tree.toArray();
+		p.println(tree.toString());
+		
+		p.println("printing single part: ");
+		p.println("" + tree.get(0).toString());
+		
+	}
+	
 	public void TestNlp(Nlp nlp)
 	{
 		
@@ -74,6 +101,8 @@ public class Tester {
 	}
 	
 
+	
+	
 	/**
 	 * Acquires text from SampleLegalText.txt
 	 * Just a custom version of GetFileContent via a ReaderWrite
@@ -85,6 +114,24 @@ public class Tester {
 		read.ReadFile();
 		p.println("Trace: " + read.GetFilePath());
 		return read.GetFileContent().toString();
+	}
+	
+	public static String getSampleLegalText()
+	{
+		return GetSampleLegalText();
+	}
+	
+	public void testLexSub() throws Exception
+	{
+		ArrayList<Tree> tree 		= new ArrayList<Tree>();
+		ArrayList<PreSentence> ps 	= new ArrayList<PreSentence>(); 
+		LexSubmodules ls 			= new LexSubmodules();
+		List<CoreMap> coreMap;
+		Nlp nlp 					= new Nlp();
+		
+		coreMap = nlp.generateSentenceCoreMapList(getSampleLegalText());
+		ps = nlp.generatePreSentences(coreMap);
+		ls.generateSynId(ps);
 	}
 	
 	/*

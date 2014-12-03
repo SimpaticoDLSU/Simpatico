@@ -1,12 +1,20 @@
 package lexical;
 /*
-
  * CAScan.java
  * Class for complexity analysis module
  * 
  * Author: Joren Sorilla
  */
+import it.uniroma1.lcl.babelfy.Babelfy;
+import it.uniroma1.lcl.babelfy.Babelfy.AccessType;
+import it.uniroma1.lcl.babelfy.Babelfy.Matching;
+import it.uniroma1.lcl.babelfy.data.Annotation;
+import it.uniroma1.lcl.babelfy.data.BabelSynsetAnchor;
+import it.uniroma1.lcl.babelnet.BabelSynset;
+import it.uniroma1.lcl.jlt.util.Language;
+import it.uniroma1.lcl.jlt.wordnet.WordNet;
 
+import java.util.List;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -18,31 +26,33 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
 
+import jigsaw.data.Token;
 import jigsaw.data.TokenGroup;
 import language.PreSentence;
 import language.Word;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import edu.mit.jwi.item.ISynset;
 import rita.RiWordNet;
+import rita.wordnet.jwnl.JWNLException;
+import rita.wordnet.jwnl.wndata.POS;
+import rita.wordnet.jwnl.wndata.Synset;
+import shortcuts.*;
 
-
-/**
- * CAScan.java
- * class for complexity analysis module
- * @author Joren Sorilla 
- *
- */
 public class LexSubmodules 
 {
 	private Map<String, Double> map;
 	private static File configFile = new File("resources/jigsaw.properties");
 	private static JIGSAW jig;
+	private Print p = new Print();
 	
 	public static void main(String args[])
 	{	
 		Locale.setDefault(Locale.ENGLISH);
 		
+		/*
 		LexSubmodules s= new LexSubmodules();
 		
 		ArrayList<PreSentence> sentences = new ArrayList<PreSentence>();
@@ -50,13 +60,13 @@ public class LexSubmodules
 		PreSentence s_two = new PreSentence();
 		s_one.setId(0);
 		s_two.setId(1);
-		Word justice 	= new Word("justice");
-		Word jury 		= new Word("jury");
-		Word aftermath 	= new Word("aftermath");
-		Word fiscal 	= new Word("fiscal");
-		Word prevail 	= new Word("prevail");
-		Word pursuant 	= new Word("pursuant");
-		Word fly 		= new Word("fly");
+		Word justice = new Word("justice");
+		Word jury = new Word("jury");
+		Word aftermath = new Word("aftermath");
+		Word fiscal = new Word("fiscal");
+		Word prevail = new Word("prevail");
+		Word pursuant = new Word("pursuant");
+		Word fly = new Word("fly");
 	
 		
 		justice.setComplex(true);
@@ -120,7 +130,8 @@ public class LexSubmodules
 			    }
 			}
 			
-		}
+		}*/
+	
 	}
 	
 	
@@ -174,60 +185,110 @@ public class LexSubmodules
 	 * @return updated list of sentences wherein each complex word has their substitutes identified
 	 */
 	public ArrayList<PreSentence> candidateSelection(ArrayList<PreSentence> sentences)
-	{	
-	 
-		RiWordNet wordnet = new RiWordNet("src/lexical/Resources/WordNet-3.1");
+	{
+		RiWordNet wordnet = new RiWordNet("src/lexical/Resources/WordNet-3.0");
+		jig = new JIGSAW(configFile);
 		wordnet.ignoreUpperCaseWords(true);
 		wordnet.randomizeResults(false);
-	
-		System.out.println("Now performing candidate selection: ");
-		for(PreSentence sentence: sentences)
-		{				
-			for(Word w: sentence.getWordList())
-			{
-				if(w.isComplex() && !w.isStopWord() && w.getWordType() != Word.COMPOUND_WORD && !w.isIgnore()){
-					
-					String[] tmp = {};
 		
-				
-				    String lemma = w.getLemma();
-				    
-				    w.setSubstitute(new ArrayList<String>());
-				    String pos = null;
-				    switch(w.getPartOfSpeech().toUpperCase().charAt(0)){
-					    case 'J': pos = RiWordNet.ADJ; 
-					    	break;
-					    case 'V': pos = RiWordNet.VERB;  
-					    	break;
-					    case 'N': pos = RiWordNet.NOUN; 
-					    	break;
-					    case 'R': pos = RiWordNet.ADV;
-					    	break;
-					    default: pos = wordnet.getBestPos(w.getLemma());
-				    }
-				    
-				  
-				 
-				    System.out.println(w.getLemma()+" "+w.getPartOfSpeech().toUpperCase().charAt(0)+" "+w.getWord()+ " " + pos);
-				    if(pos == null)
-				    	continue;
-				    else
-				    	tmp =  wordnet.getSynset(w.getLemma().toLowerCase(), pos);
-				    
-				    
-				    if(tmp.length > 0)
-					    for(String s:tmp){
-					    	System.out.println("Subs: "+s);
-					    	 w.getSubstitute().add(s);
-					    }
-				}// end if
-			}// end for
+		
+			try {
+				sentences = generateSynId(sentences); // method sa baba
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			for(PreSentence sentence: sentences)
+			{				
+				for(Word w: sentence.getWordList())
+				{
+					if(w.isComplex() && !w.isStopWord() && w.getWordType() != Word.COMPOUND_WORD && !w.isIgnore() && w.getSenseId() != 0)
+					{
+						Synset tmp 		= null;
+						String lemma 	= w.getLemma();
+						POS pos;
+						w.setSubstitute(new ArrayList<String>());
+						pos = getMainPOS(w); // check if it's a J,V,N,R
+
+						System.out.println(w.getLemma()+" "+w.getPartOfSpeech().toUpperCase().charAt(0)+" "+w.getWord()+ " " + pos +" " +w.getSenseId());
+						
+						if(pos == null) {
+							continue;
+						} else {
+							try {
+								tmp =  wordnet.getDictionary().getSynsetAt(pos,w.getSenseId()); // hanapin yung SenseID
+							} catch (JWNLException e) {
+							// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+
+						if(tmp.getWordsSize() > 0) 
+						{
+							for(rita.wordnet.jwnl.wndata.Word word:tmp.getWords())
+							{
+					    		System.out.println("Subs: "+word.getLemma());
+					    		if(word.getLemma().equalsIgnoreCase(w.getLemma()))
+						    		continue;
+						    	else
+						    		w.getSubstitute().add(word.getLemma().replace('_', ' '));
+					    	}
+						}
+
+					}
+				}// end for
 		}// end for
-		
-		
+			
 		return sentences;
- 		
+	}	
+	
+	public POS getMainPOS(Word w)
+	{
+		POS pos = null;
+		switch(w.getPartOfSpeech().toUpperCase().charAt(0))
+		{ //gets the first letter of the POS tag
+		    case 'J': pos = POS.ADJECTIVE; 
+    				return pos;
+		    case 'V': pos = POS.VERB;  
+		    		return pos;
+		    case 'N': pos = POS.NOUN; 
+		    		return pos;
+		    case 'R': pos = POS.ADVERB;
+		    		return pos;
+		    default: return pos = null;
+	    }
 	}
+	
+	public String toString(ArrayList<PreSentence> sentences){
+		String lexicalOutput="";
+		
+		for(PreSentence s: sentences){
+			for(Word w: s.getWordList()){
+				if(w.getBestSubstitute() != null)
+					lexicalOutput+=(w.getBestSubstitute()+" ");
+				else if(w.getWord().equalsIgnoreCase("-LSB-"))
+					lexicalOutput+=("["+" ");
+				else if(w.getWord().equalsIgnoreCase("-RSB-"))
+					lexicalOutput+=("]"+" ");
+				else if(w.getWord().equalsIgnoreCase("-LRB-"))
+					lexicalOutput+=("("+" ");
+				else if(w.getWord().equalsIgnoreCase("-RRB-"))
+					lexicalOutput+=(")"+" ");
+				else if(w.getWord().equalsIgnoreCase("``") || w.getWord().equalsIgnoreCase("''") )
+					lexicalOutput+=("\""+" ");
+				else if(w.getWord().equalsIgnoreCase("`") || w.getWord().equalsIgnoreCase("'") )
+					lexicalOutput+=("\'"+" ");
+				else 
+					lexicalOutput+=(w.getWord()+" ");
+				
+			}
+		}
+	
+		return lexicalOutput;
+	}
+	
+	
 	
 	/**
 	 * finds words (or a set of words) that can be simplified using direct substitution
@@ -393,41 +454,198 @@ public class LexSubmodules
 		return sentences;
 	}
 	
-	/**
-	 * 
-	 * @param word
-	 * A string that requires a SynSet id to be retrieved.
-	 * Requires configFile and JIGSAW to be set up as static variables.
-	 * Please do make sure that the resource folder is set as src and in the build path and import the necessary JIGSAW libraries.
-	 * @return
-	 * 8 digit integer containing the wordnet id
-	 * @throws Exception
-	 */
-	public static int generateSynId(String word) throws Exception
-    {
-        TokenGroup tg = null;
-        int syn		  = 0;
-        tg = jig.mapText(word);
-        
-        if (tg != null) {
-            System.out.println();
-            for (int i = 0; i < tg.size(); i++) {
-                System.out.print(tg.get(i).getToken());
-                System.out.print(" ");
-                System.out.print(tg.get(i).getStem());
-                System.out.print(" ");
-                System.out.print(tg.get(i).getPosTag());
-                System.out.print(" ");
-                System.out.print(tg.get(i).getLemma());
-                System.out.print(" ");
-                System.out.print(tg.get(i).getSyn());
-                System.out.println();
-            }            
-        }
-            
-       return syn;
+	public ArrayList<PreSentence> generateSynId(ArrayList<PreSentence> sentences) throws Exception
+    {	
+		ArrayList<String> sentenceList 	= new ArrayList<String>();
+		ArrayList<String> posList 		= new ArrayList<String>();
+		ArrayList<String> tokenList  	= new ArrayList<String>();
+		
+		ArrayList<PreSentence> updatedSentenceList = new ArrayList<PreSentence>();
+		
+		p.println("Running generateSynId");
+		
+		for ( PreSentence sentence : sentences)
+		{
+			for ( Word w : sentence.getWordList())
+			{
+				if ( checkConditionsForComplexity(w) ) 
+				{
+					String pos = null;
+					pos = getMainPOS(w).toString();
+					posList.add(pos);
+				}
+			}
+		}
+		
+		// Insert Babelfy API Code for disambiguation below this comment.
+		for( PreSentence line : sentences )
+		{
+			PreSentence babelSentence 	= new PreSentence();
+			PreSentence updatedSentence = new PreSentence();
+			p.println("linePrint: " + line.toString());
+			String sentString = convertWordListToString(line.getWordList());
+			//String sentString = "I was walking across the street.";
+			p.println("sentString: " + sentString);
+			babelSentence = babelfyWSD(sentString);
+			updatedSentence = compareBabelToOriginalSentence(line, babelSentence);
+			updatedSentenceList.add(updatedSentence);
+		}
+		sentences = updatedSentenceList;
+		
+		for ( PreSentence tempSent : sentences) 
+		{
+			for( Word tempWord : tempSent.getWordList())
+			{
+				p.println("tempWord: " + tempWord.getWord());
+				if( tempWord.getSenseId() != 0 )
+				p.println("offset: " + tempWord.getSenseId());
+			}
+		}
+		
+		return sentences;
     }
 	
-	    
+	/**
+	 * For performing Word Sense Disambiguation
+	 * @param inputText
+	 * A single sentence in string format
+	 * @return
+	 * a PreSentence object containing all identified babelnetids and their corresponding word.
+	 * All are converted to Word()
+	 * @throws Exception
+	 */
+	public PreSentence babelfyWSD(String inputText) throws Exception
+	{
+		p.println("Running babelfyWSD");
+		PreSentence babelSentence 	= new PreSentence();
+		ArrayList<Word> babelList 	= new ArrayList<Word>();
+		WordNet wn 					= WordNet.getInstance();
+		Babelfy bfy 				= Babelfy.getInstance(AccessType.ONLINE);
+		
+		Annotation annotations = bfy.babelfy("", inputText, Matching.EXACT, Language.EN);
+		
+		for ( BabelSynsetAnchor annotation : annotations.getAnnotations() )
+		{
+			String temp 	= "";
+			String anchor 	= "";
+			Word babelWord 	= new Word();
+			
+			anchor = annotation.getAnchorText();
+			p.println("anchor: " + anchor);
+			babelWord.setWord( anchor );
+			
+			BabelSynset synset 			= annotation.getBabelSynset();
+			List<String> wordnetOffsets = synset.getWordNetOffsets();
+			temp = removeExtraOffsets(wordnetOffsets.toString());
+			if(!temp.equals(""))
+			{
+				p.println("temp ( with removeExtraOffsets): " + temp);
+				babelWord.setSenseId(Long.parseLong(temp));
+				babelList.add(babelWord);
+			}
+			//p.println("WordNet offsets: " + temp);
+			
+			/*
+			for ( String offset : wordnetOffsets ) 
+			{
+				p.println("offsetsCount: " + wordnetOffsets.size()); // always 1
+				ISynset wnSynset = wn.getSynsetFromOffset(offset); // id
+				if(wnSynset != null) 
+		    	{
+					// this is always null
+		    		System.out.print("OFFSETS:"+wnSynset.getOffset());
+		    	}
+			}
+			*/
+			
+			
+		}
+		babelSentence.setWordList(babelList);
+		return babelSentence;
+	}
+	
+	/**
+	 * A method for comparing and appending babelWSD data to the original PreSentence
+	 * @param original
+	 * The original PreSentence object that would contain an non-updated sentence.
+	 * @param babelSent
+	 * A sentence containing words with identified wordOffset through babelfy
+	 * @return
+	 * An updated PreSentence() that includes babelnet ids / word sense ids for the identified words only.
+	 */
+	public PreSentence compareBabelToOriginalSentence(PreSentence original, PreSentence babelSent)
+	{
+		ArrayList<Word> oWords = new ArrayList<Word>();
+		ArrayList<Word> bWords = new ArrayList<Word>();
+		
+		oWords = original.getWordList();
+		bWords = babelSent.getWordList();
+		
+		for( Word word : oWords )
+		{
+			for ( Word babel : bWords ) 
+			{
+				if(word.getWord().equals(babel.getWord())) {
+					word.setSenseId(Long.parseLong("" + babel.getSenseId()));
+				}
+			}
+		}
+		original.setWordList(null);
+		original.setWordList(oWords);
+		return original;
+	}
+	
+	public String removeExtraOffsets(String input)
+	{
+		String temp = input;
+		temp = temp.replace('[', ' ');
+		temp = temp.replace(']', ' ');
+		temp = temp.replace('a', ' ');
+		temp = temp.replace('v', ' ');
+		temp = temp.replace('j', ' ');
+		temp = temp.replace('r', ' ');
+		temp = temp.replace('n', ' ');
+		temp = temp.trim();
+		return temp;
+	}
+	
+	public void updatePreSentenceWithBabelfy()
+	{
+		
+	}
+	
+	public String convertWordListToString(ArrayList<Word> wordList)
+	{
+		String result = ""; 
+		
+		// an error message that checks if wordList is blank 
+		if(wordList.size() == 0) {
+			p.println("Cannot convertWordListToString because wordList is blank");
+		} else {
+			for ( int i = 0; i < wordList.size(); i++ )
+			{
+				if( i == wordList.size() - 1) {
+					result = result + wordList.get(i).getWord().toString();
+				} else {
+					result = result + wordList.get(i).getWord().toString() + " ";
+				}
+			}
+		}
+		return result;
+	}
+	
+	public Boolean checkConditionsForComplexity(Word w)
+	{
+		Boolean result = false;
+		
+		if(w.isComplex() && !w.isStopWord() && w.getWordType() != Word.COMPOUND_WORD && !w.isIgnore())
+			result = true;
+		return result;
+	}
 	
 }
+
+
+
+
+
