@@ -24,7 +24,7 @@ public class Word {
 	private boolean isOpeningBoundary 	= false;
 	private boolean isClosingBoundary 	= false;
 	private boolean isAppositive		= false;
-	
+	private Long senseId = (long) 0;
 	
 	public Word()
 	{
@@ -231,6 +231,16 @@ public class Word {
 
 	public void setAppositive(boolean isAppositive) {
 		this.isAppositive = isAppositive;
+	}
+
+	public void setSenseId(Long valueOf) {
+		// TODO Auto-generated method stub
+		this.senseId = valueOf;
+	}
+
+	public int getSenseId() {
+		// TODO Auto-generated method stub
+		return this.senseId.intValue();
 	}
 	
 }
