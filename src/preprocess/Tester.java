@@ -131,7 +131,8 @@ public class Tester {
 		
 		coreMap = nlp.generateSentenceCoreMapList(getSampleLegalText());
 		ps = nlp.generatePreSentences(coreMap);
-		ls.generateSynId(ps);
+		ls.candidateSelection(ps);
+		//ls.generateSynId(ps);
 	}
 	
 	/*

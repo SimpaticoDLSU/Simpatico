@@ -34,6 +34,7 @@ import language.Word;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import preprocess.Nlp;
 import edu.mit.jwi.item.ISynset;
 import rita.RiWordNet;
 import rita.wordnet.jwnl.JWNLException;
@@ -186,8 +187,8 @@ public class LexSubmodules
 	 */
 	public ArrayList<PreSentence> candidateSelection(ArrayList<PreSentence> sentences)
 	{
-		RiWordNet wordnet = new RiWordNet("src/lexical/Resources/WordNet-3.0");
-		jig = new JIGSAW(configFile);
+		RiWordNet wordnet = new RiWordNet("WordNet-3.0");
+		//jig = new JIGSAW(configFile);
 		wordnet.ignoreUpperCaseWords(true);
 		wordnet.randomizeResults(false);
 		
@@ -456,29 +457,49 @@ public class LexSubmodules
 	
 	public ArrayList<PreSentence> generateSynId(ArrayList<PreSentence> sentences) throws Exception
     {	
+		// Nlp nlp = new Nlp();
+		// String[] stopWords = nlp.LoadStopWordList();
+		
 		ArrayList<String> sentenceList 	= new ArrayList<String>();
 		ArrayList<String> posList 		= new ArrayList<String>();
 		ArrayList<String> tokenList  	= new ArrayList<String>();
 		
-		ArrayList<PreSentence> updatedSentenceList = new ArrayList<PreSentence>();
+		ArrayList<PreSentence> condSentenceList 	= new ArrayList<PreSentence>();
+		ArrayList<PreSentence> updatedSentenceList 	= new ArrayList<PreSentence>();
 		
 		p.println("Running generateSynId");
 		
 		for ( PreSentence sentence : sentences)
 		{
+			PreSentence conditionedSentence 	= new PreSentence(); // contains sentence without any stopwords
+			ArrayList<Word> conditionedWords 	= new ArrayList<Word>(); // words that are not stopwords
+			
 			for ( Word w : sentence.getWordList())
 			{
+				
+				p.println("orgw: " + w.getWord());
+				// Check if the word is a not a stopword etc.
 				if ( checkConditionsForComplexity(w) ) 
 				{
 					String pos = null;
 					pos = getMainPOS(w).toString();
 					posList.add(pos);
+					p.println("condWord: " + w.getWord());
+					conditionedWords.add(w); // add if the word is not complex and not a stopword
+				}
+			}
+			conditionedSentence.setWordList(conditionedWords); // set words list to trimmed sentnece
+			condSentenceList.add(conditionedSentence); // add to list of sentences without any stopwords in it
+			
+			for ( PreSentence tempsent : condSentenceList) {
+				for ( Word w : tempsent.getWordList()) {
+					p.println("wts : " + w.getWord());
 				}
 			}
 		}
 		
 		// Insert Babelfy API Code for disambiguation below this comment.
-		for( PreSentence line : sentences )
+		for( PreSentence line : condSentenceList )
 		{
 			PreSentence babelSentence 	= new PreSentence();
 			PreSentence updatedSentence = new PreSentence();
@@ -492,8 +513,8 @@ public class LexSubmodules
 		}
 		sentences = updatedSentenceList;
 		
-		for ( PreSentence tempSent : sentences) 
-		{
+		for ( PreSentence tempSent : condSentenceList) 
+		{		
 			for( Word tempWord : tempSent.getWordList())
 			{
 				p.println("tempWord: " + tempWord.getWord());
@@ -609,6 +630,8 @@ public class LexSubmodules
 		return temp;
 	}
 	
+	
+	
 	public void updatePreSentenceWithBabelfy()
 	{
 		
@@ -640,6 +663,8 @@ public class LexSubmodules
 		
 		if(w.isComplex() && !w.isStopWord() && w.getWordType() != Word.COMPOUND_WORD && !w.isIgnore())
 			result = true;
+		
+		p.println("bool: " + result);
 		return result;
 	}
 	

@@ -477,7 +477,7 @@ public class Nlp {
 		this.filePath = filePath;
 	}
 	
-	public void LoadStopWordList()
+	public String[] LoadStopWordList()
 	{
 		p.println("Loading Stop Words list from stopwords.txt");
 		
@@ -490,6 +490,7 @@ public class Nlp {
 		temp 			= rw.GetFileContent();
 		stopWords 		= temp.split(" ");
 		this.stopWords 	= stopWords;
+		return this.stopWords;
 	}
 	
 	/**
