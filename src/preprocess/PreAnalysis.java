@@ -174,6 +174,25 @@ public class PreAnalysis {
 		ArrayList<String> stopWords = objectArrayToArrayList(stopWordsObject);
 	}
 	
+	public PreSentence removeStopWords(PreSentence sentence, String[] stopWords)
+	{	
+		ArrayList<Word> words 		= new ArrayList<Word>();
+		ArrayList<Word> newWords	= new ArrayList<Word>();
+		
+		words = sentence.getWordList();
+		
+		for ( Word word : words )
+		{
+			for ( String stopWord : stopWords) 
+			{
+				if ( !word.getWord().equals(stopWord));
+					newWords.add(word);
+			}
+		}
+		sentence.setWordList(newWords);
+		return sentence;
+	}
+	
 	/**
 	 * A method for acquiring the list of English Common Words provided by Stanford.
 	 * Unfortunately, commonEngWords is null. The common eng word patterns file is missing.
