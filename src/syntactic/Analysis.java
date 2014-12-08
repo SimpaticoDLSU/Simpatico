@@ -26,16 +26,16 @@ import edu.stanford.nlp.util.CoreMap;
 public class Analysis {
 	
 	private Map<Integer, CorefChain> graph;
-	private SemanticGraph dependencies;
-	private Tree tree;
-	public void StartAnalysis(String text)
+	private ArrayList<SemanticGraph> dependencies;
+	private ArrayList<Tree> tree;
+
+	public void StartAnalysis(String text, StanfordCoreNLP pipeline)
 	{
 		
 		// creates a StanfordCoreNLP object, with POS tagging, lemmatization, NER, parsing, and coreference resolution 
-	    Properties props = new Properties();
-	    props.put("annotators", "parse, dcoref");
-	    StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 	    
+	    tree = new ArrayList<Tree>();
+	    dependencies = new ArrayList<SemanticGraph>();
 	    // read some text in the text variable
 	     // Add your text here!
 	    
@@ -52,10 +52,10 @@ public class Analysis {
 	    for(CoreMap sentence: sentences) {
 	      // traversing the words in the current sentence
 	      // this is the parse tree of the current sentence
-	      Tree tree = sentence.get(TreeAnnotation.class);
+	      tree.add(sentence.get(TreeAnnotation.class));
 
 	      // this is the Stanford dependency graph of the current sentence
-	      SemanticGraph dependencies = sentence.get(CollapsedCCProcessedDependenciesAnnotation.class);
+	     dependencies.add(sentence.get(CollapsedCCProcessedDependenciesAnnotation.class));
 	    }
 
 	    // This is the coreference link graph
@@ -65,15 +65,21 @@ public class Analysis {
 	   graph = document.get(CorefChainAnnotation.class);
 	}
 	
-	public  SemanticGraph getSemanticGraph(){
+	
+	
+	public  ArrayList<SemanticGraph> getSemanticGraph(){
 		return this.dependencies;
 	}
-	public  Tree getTree(){
+	public  ArrayList<Tree> getTree(){
 		return this.tree;
 	}
 	
 	public  Map<Integer, CorefChain> getCoreferenceLinkGraph(){
 		return this.graph;
+	}
+	
+	public void applyRule(){
+		
 	}
 	
 }

@@ -5,21 +5,11 @@
 package preprocess;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
 
 import language.PreSentence;
-import language.Text;
 import language.Word;
-import edu.stanford.nlp.ling.DocumentReader;
-import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
-import edu.stanford.nlp.pipeline.Annotation;
-import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.util.CoreMap;
-import shortcuts.*;
-import edu.stanford.nlp.patterns.*;
-import edu.stanford.nlp.patterns.surface.ConstantsAndVariables;
+import shortcuts.Print;
+import shortcuts.Scan;
 
 public class PreAnalysis {
 	
@@ -163,80 +153,6 @@ public class PreAnalysis {
 		return wordList; 
 	}
 	
-	/**
-	 * Removes or does some magic when seeing stopwords in the text.
-	 */
-	public void eliminateStopWords(Text text)
-	{
-		ConstantsAndVariables cav 	= new ConstantsAndVariables();
-		Set<String> stopWordsSet	= cav.getStopWords();
-		Object[] stopWordsObject	= stopWordsSet.toArray();
-		ArrayList<String> stopWords = objectArrayToArrayList(stopWordsObject);
-	}
-	
-	public PreSentence removeStopWords(PreSentence sentence, String[] stopWords)
-	{	
-		ArrayList<Word> words 		= new ArrayList<Word>();
-		ArrayList<Word> newWords	= new ArrayList<Word>();
-		
-		words = sentence.getWordList();
-		
-		for ( Word word : words )
-		{
-			for ( String stopWord : stopWords) 
-			{
-				if ( !word.getWord().equals(stopWord));
-					newWords.add(word);
-			}
-		}
-		sentence.setWordList(newWords);
-		return sentence;
-	}
-	
-	/**
-	 * A method for acquiring the list of English Common Words provided by Stanford.
-	 * Unfortunately, commonEngWords is null. The common eng word patterns file is missing.
-	 * @return
-	 * ArrayList of String that contains common English words per index.
-	 */
-	public ArrayList<String> getCommonWords()
-	{
-		ConstantsAndVariables cav 	= new ConstantsAndVariables();
-		
-		Set<String> commonWordSet 	= cav.getCommonEngWords();
-		Set<String> stopWordsSet	= cav.getStopWords();
-		Object ob = cav.getCommonEngWords();
-		
-		p.println("cav getCommon isEmpty: " + cav.getCommonEngWords().add("test"));
-		p.println("commonWordSet isEmpty: " + commonWordSet.isEmpty());
-		if (stopWordsSet == null ) p.println("stopwordset is null");
-		ArrayList<String> commonEng = new ArrayList<String>();
-		
-		p.println("commonwordset: " + commonWordSet.toString());
-		
-		if( commonWordSet != null ) {
-			Object[] commonWordObject	= commonWordSet.toArray();
-			commonEng = objectArrayToArrayList(commonWordObject);
-		} else {
-			p.println("COMMONWORDSET IS NULL");
-			commonEng.add("None");
-		}
-		
-		return commonEng;
-	}
-	
-	public ArrayList<String> objectArrayToArrayList( Object[] array)
-	{
-		ArrayList<String> output = new ArrayList<String>();
-		
-		for ( Object o : array )
-		{
-			output.add(o.toString());
-		}
-		
-		return output;
-	}
-	
 	public void samplePutSequence()
 	{
 		String noun = "I";
@@ -263,7 +179,6 @@ public class PreAnalysis {
 	}
 	
 	/**
-	 * DEPRECATED. TO BE REPLACED SOMETIME
 	 * Put a Noun Phrase markup inside the original XML file.
 	 * Automatically generates <nounphrase> & </nounphrase> mark-ups when writing.
 	 * @param text

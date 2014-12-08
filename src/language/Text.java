@@ -1,8 +1,5 @@
 package language;
-
 import java.util.ArrayList;
-
-import edu.stanford.nlp.trees.Tree;
 
 /**
  * The Text class represents the sentences, phrases, and words in the document as well as the tree structure for each sentence. 
@@ -14,44 +11,28 @@ import edu.stanford.nlp.trees.Tree;
  */
 public class Text {
 	
-	private ArrayList<Tree> sentenceTrees;
+	private ArrayList<String> sentenceTrees;
 	private ArrayList<PreSentence> preSentences;
 	private ArrayList<Phrase> phrases;
-	private ArrayList<Word> words;	
+	private ArrayList<Word> words;
 	
-	public Text() 
-	{
-		
-	}
-	
-	public Text(ArrayList<Tree> sentenceTrees,
-			ArrayList<PreSentence> preSentences, ArrayList<Phrase> phrases,
-			ArrayList<Word> words) {
-		super();
-		this.sentenceTrees = sentenceTrees;
-		this.preSentences = preSentences;
-		this.phrases = phrases;
-		this.words = words;
-	}
-	
-	/**   
+	/**
 	 * Gets the sentenceTrees in the Text class.
 	 * sentenceTrees are in the format of (ROOT (S ( ... ) ) )
 	 * @return
-	 * ArrayList of Tree with each index containing the format (ROOT (S ( ... ) ) ) of each sentence
+	 * ArrayList of String with each index containing the format (ROOT (S ( ... ) ) ) of each sentence
 	 */
-	public ArrayList<Tree> getSentenceTrees() {
+	public ArrayList<String> getSentenceTrees() {
 		return sentenceTrees;
 	}
 	/**
 	 * Sets the sentence tree 
 	 * @param sentenceTrees 
-	 * must be ArrayList of Tree following the format (ROOT (S ( ... ) ) )
+	 * must be ArrayList of strings following the format (ROOT (S ( ... ) ) )
 	 */
-	public void setSentenceTrees(ArrayList<Tree> sentenceTrees) {
+	public void setSentenceTrees(ArrayList<String> sentenceTrees) {
 		this.sentenceTrees = sentenceTrees;
 	}
-
 	/**
 	 * @return 
 	 * an ArrayList of the PreSentence class.

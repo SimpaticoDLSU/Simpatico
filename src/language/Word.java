@@ -28,7 +28,7 @@ public class Word {
 	
 	public Word()
 	{
-		// None
+		this.substitute = new ArrayList<String>();
 	}
 	
 	public Word(String word)

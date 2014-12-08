@@ -1,0 +1,3 @@
+S CC S > S . S .
+S ( SBAR ) > S . SBAR
+S ( NP VP ( SBAR ) ) > S ( NP VP ) . SBAR

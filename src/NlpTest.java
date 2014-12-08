@@ -1,25 +1,32 @@
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
+import syntactic.SyntacticSubmodules;
 import edu.stanford.nlp.ling.CoreAnnotations.LemmaAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.stanford.nlp.semgraph.SemanticGraph;
+import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.CollapsedCCProcessedDependenciesAnnotation;
+import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
+import edu.stanford.nlp.trees.TreeGraphNode;
 import edu.stanford.nlp.util.CoreMap;
 
 public class NlpTest {
 
     protected StanfordCoreNLP pipeline;
-
+    private ArrayList<ArrayList<Tree>> treeList;
     public NlpTest() {
         // Create StanfordCoreNLP object properties, with POS tagging
         // (required for lemmatization), and lemmatization
         Properties props;
         props = new Properties();
-        props.put("annotators", "tokenize, ssplit, pos, lemma");
+        props.put("annotators", "tokenize, ssplit, pos,  lemma, ner, parse, dcoref");
 
         // StanfordCoreNLP loads a lot of models, so you probably
         // only want to do this once per execution
@@ -44,14 +51,76 @@ public class NlpTest {
                 // Retrieve and add the lemma for each word into the list of lemmas
                 lemmas.add(token.get(LemmaAnnotation.class));
             }
-        }
+            treeList = new ArrayList<ArrayList<Tree>>();
+            // get the corenlp parse tree
+            Tree tree = sentence.get(TreeAnnotation.class);
+            
+            //instantiate syntactic module
+            SyntacticSubmodules submods = new SyntacticSubmodules();
+            //read the rules
+            submods.readRules();
+                       
+    	}
 
         return lemmas;
     }
     
+  
+	
+    public void traverseTree(Tree tree) {
+        Tree[] children = tree.children();
+       
+        for(Tree child : children) {
+            traverseTree(child);
+            System.out.println("Depth:"+child.depth());
+            System.out.println("Value:"+child.label());
+           
+            System.out.println("Children No.: "+child.numChildren());
+            System.out.println("Children List: "+child.getChildrenAsList());
+            System.out.println("LEAVES: "+child.getLeaves());
+            
+            
+        }
+        
+        //if(head.depth(tree) == [val]) { add }
+        
+        
+    }
+    
+    
+    
+    public void getDepthInfo(Tree tree) {
+    	
+    	for(Tree child : tree.children()) {
+    		treeList.get(child.depth()).add(child);
+    		System.out.println("Depth: "+child.depth()+" "+"LABEL: "+child.label().value());
+    		for(Tree subchild:child.children()){
+    			System.out.println("CHILD LABEL: "+subchild.label().value()+" "+"LEAVES: "+subchild.getLeaves());
+    			if(subchild.parent() != null)
+    				System.out.println("DADDY I FOUND YOU <3");
+    		}
+    		getDepthInfo(child);
+           /*
+            System.out.println("Depth:"+child.depth());
+            System.out.println("Value:"+child.label());
+           
+            System.out.println("Children No.: "+child.numChildren());
+            System.out.println("Children List: "+child.getChildrenAsList());
+            System.out.println("LEAVES: "+child.getLeaves());
+            */
+            
+        }
+        
+      
+        
+        
+    }
+    
+    
+    
     public static void main(String[] args){
     	NlpTest n = new NlpTest();
-    	n.lemmatize("");
+    	n.lemmatize("The dog ate the cat and the cat ate the mouse.");
     	
     }
 }

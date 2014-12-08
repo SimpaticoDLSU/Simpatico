@@ -15,7 +15,8 @@ import shortcuts.Print;
 import edu.mit.jmwe.data.IMWE;
 import edu.mit.jmwe.data.IToken;
 import edu.mit.jmwe.data.Token;
-import edu.mit.jmwe.detect.*;
+import edu.mit.jmwe.detect.Consecutive;
+import edu.mit.jmwe.detect.IMWEDetector;
 import edu.mit.jmwe.index.IMWEIndex;
 import edu.mit.jmwe.index.MWEIndex;
 

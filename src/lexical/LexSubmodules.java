@@ -14,7 +14,6 @@ import it.uniroma1.lcl.babelnet.BabelSynset;
 import it.uniroma1.lcl.jlt.util.Language;
 import it.uniroma1.lcl.jlt.wordnet.WordNet;
 
-import java.util.List;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -22,37 +21,32 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
 
-import jigsaw.data.Token;
-import jigsaw.data.TokenGroup;
 import language.PreSentence;
 import language.Word;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import preprocess.Nlp;
-import edu.mit.jwi.item.ISynset;
 import rita.RiWordNet;
 import rita.wordnet.jwnl.JWNLException;
 import rita.wordnet.jwnl.wndata.POS;
 import rita.wordnet.jwnl.wndata.Synset;
-import shortcuts.*;
+import shortcuts.Print;
+
+
 
 public class LexSubmodules 
 {
 	private Map<String, Double> map;
 	private static File configFile = new File("resources/jigsaw.properties");
-	private static JIGSAW jig;
 	private Print p = new Print();
-	
+	private RiWordNet wordnet;
 	public static void main(String args[])
-	{	
-		Locale.setDefault(Locale.ENGLISH);
-		
+	{	Locale.setDefault(Locale.ENGLISH);
 		/*
 		LexSubmodules s= new LexSubmodules();
 		
@@ -146,29 +140,7 @@ public class LexSubmodules
 	{	
 		if(map == null)
 		{
-			map = new HashMap<String, Double>();
-			File lemmacorpus = new File("src/lexical/Resources/lemmacorpus.txt");
-			double sum = 0;
-			try (BufferedReader reader = new BufferedReader(new FileReader(lemmacorpus.getAbsolutePath()))) 
-			{
-			    String line = null;
-			    while ((line = reader.readLine()) != null) 
-			    {
-			        
-			        Scanner s = new Scanner(line.trim());
-		        	String s1 = s.next();
-		        	double freq = s.nextDouble();
-		        	sum+=freq;
-		        	map.put(s1, freq);
-				        
-			    }
-			    
-			    
-			   
-			} catch (IOException x) 
-			{
-			    System.err.format("IOException: %s%n", x);
-			} 
+			loadWordList();
 		}
 		Iterator iterator = map.entrySet().iterator();
 	    while(iterator.hasNext()){
@@ -180,6 +152,107 @@ public class LexSubmodules
 		
 	} 
 	
+	public void loadWordList(){
+		map = new HashMap<String, Double>();
+		File lemmacorpus = new File("src/lexical/Resources/lemmacorpus.txt");
+		
+		try (BufferedReader reader = new BufferedReader(new FileReader(lemmacorpus.getAbsolutePath()))) 
+		{
+		    String line = null;
+		    int sum = 0;
+		    while ((line = reader.readLine()) != null) 
+		    {
+		        
+		        Scanner s = new Scanner(line.trim());
+	        	String s1 = s.next();
+	        	double freq = s.nextDouble();
+	        	sum+=freq;
+	        	map.put(s1, freq);
+			        
+		    }
+		    
+		    
+		   
+		} catch (IOException x) 
+		{
+		    System.err.format("IOException: %s%n", x);
+		} 
+	}
+	
+	/*
+	public ArrayList<PreSentence> candidateSelection(ArrayList<PreSentence> sentences)
+	{	
+	 
+		RiWordNet wordnet = new RiWordNet("src/lexical/Resources/WordNet-3.0");
+		jig = new JIGSAW(configFile);
+		wordnet.ignoreUpperCaseWords(true);
+		wordnet.randomizeResults(false);
+		
+		
+			try {
+				sentences = generateSynId(sentences);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
+		System.out.println("Now performing candidate selection: ");
+		for(PreSentence sentence: sentences)
+		{				
+			for(Word w: sentence.getWordList())
+			{
+				if(w.isComplex() && !w.isStopWord() && w.getWordType() != Word.COMPOUND_WORD && !w.isIgnore() && w.getSenseId() != 0){
+					
+					
+		
+					Synset tmp = null;
+				    String lemma = w.getLemma();
+				    
+				    w.setSubstitute(new ArrayList<String>());
+				    POS pos = null;
+				    switch(w.getPartOfSpeech().toUpperCase().charAt(0)){
+					    case 'J': pos = POS.ADJECTIVE; 
+					    	break;
+					    case 'V': pos = POS.VERB;  
+					    	break;
+					    case 'N': pos = POS.NOUN; 
+					    	break;
+					    case 'R': pos = POS.ADVERB;
+					    	break;
+					    default: pos = null;
+				    }
+				    
+				  
+				 
+				    System.out.println(w.getLemma()+" "+w.getPartOfSpeech().toUpperCase().charAt(0)+" "+w.getWord()+ " " + pos +" " +w.getSenseId());
+				    if(pos == null)
+				    	continue;
+					else
+						try {
+							tmp =  wordnet.getDictionary().getSynsetAt(pos,w.getSenseId());
+						} catch (JWNLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+				    
+				    
+				    if(tmp.getWordsSize() > 0)
+					    for(rita.wordnet.jwnl.wndata.Word word:tmp.getWords()){
+					    	System.out.println("Subs: "+word.getLemma());
+					    	if(word.getLemma().equalsIgnoreCase(w.getLemma()))
+					    		continue;
+					    	else
+					    		w.getSubstitute().add(word.getLemma().replace('_', ' '));
+					    }
+				}// end if
+			}// end for
+		}// end for
+		
+		
+		return sentences;
+ 		
+	}*/
+	
 	/**
 	 * gets the appropriate synonyms of each complex word in the text
 	 * @param sentences list of sentences with complex words
@@ -187,7 +260,8 @@ public class LexSubmodules
 	 */
 	public ArrayList<PreSentence> candidateSelection(ArrayList<PreSentence> sentences)
 	{
-		RiWordNet wordnet = new RiWordNet("WordNet-3.0");
+		if(wordnet == null)
+			wordnet = new RiWordNet("src/lexical/Resources/WordNet-3.0");
 		//jig = new JIGSAW(configFile);
 		wordnet.ignoreUpperCaseWords(true);
 		wordnet.randomizeResults(false);
@@ -224,18 +298,18 @@ public class LexSubmodules
 								e.printStackTrace();
 							}
 						}
-
-						if(tmp.getWordsSize() > 0) 
-						{
-							for(rita.wordnet.jwnl.wndata.Word word:tmp.getWords())
+						if(tmp != null)
+							if(tmp.getWordsSize() > 0) 
 							{
-					    		System.out.println("Subs: "+word.getLemma());
-					    		if(word.getLemma().equalsIgnoreCase(w.getLemma()))
-						    		continue;
-						    	else
-						    		w.getSubstitute().add(word.getLemma().replace('_', ' '));
-					    	}
-						}
+								for(rita.wordnet.jwnl.wndata.Word word:tmp.getWords())
+								{
+						    		System.out.println("Subs: "+word.getLemma());
+						    		if(word.getLemma().equalsIgnoreCase(w.getLemma())){
+						    			w.getSubstitute().add(w.getWord());
+						    		}else
+						    			w.getSubstitute().add(word.getLemma().replace('_', ' '));
+						    	}
+							}
 
 					}
 				}// end for
@@ -243,6 +317,7 @@ public class LexSubmodules
 			
 		return sentences;
 	}	
+	
 	
 	public POS getMainPOS(Word w)
 	{
@@ -260,6 +335,8 @@ public class LexSubmodules
 		    default: return pos = null;
 	    }
 	}
+	
+	
 	
 	public String toString(ArrayList<PreSentence> sentences){
 		String lexicalOutput="";
@@ -455,6 +532,93 @@ public class LexSubmodules
 		return sentences;
 	}
 	
+	/**
+	 * 
+	 * @param word
+	 * A string that requires a SynSet id to be retrieved.
+	 * Requires configFile and JIGSAW to be set up as static variables.
+	 * Please do make sure that the resource folder is set as src and in the build path and import the necessary JIGSAW libraries.
+	 * @return
+	 * 8 digit integer containing the wordnet id
+	 * @throws Exception
+	 */
+	
+	/*
+	public ArrayList<PreSentence> generateSynId(ArrayList<PreSentence> sentences) throws Exception
+    {	
+        TokenGroup tg = null;
+        ArrayList<String> posList = new ArrayList<String>();
+        ArrayList<String> tokenList = new ArrayList<String>();
+        
+        for(PreSentence sentence: sentences)
+		{				
+			for(Word w: sentence.getWordList())
+			{
+				if(w.isComplex() && !w.isStopWord() && w.getWordType() != Word.COMPOUND_WORD && !w.isIgnore()){
+					
+					
+				    
+				    tokenList.add(w.getWord());
+				    String pos = null;
+				    switch(w.getPartOfSpeech().toUpperCase().charAt(0)){
+					    case 'J': pos = "a"; 
+					    	break;
+					    case 'V': pos = "v";  
+					    	break;
+					    case 'N': pos = "n"; 
+					    	break;
+					    case 'R': pos = "r";
+					    	break;
+					    default : pos = "U";
+				    }
+				    posList.add(pos);
+
+				}// end if
+			}// end for
+		}// end for
+        
+        tg = jig.mapText(tokenList.toArray(new String[tokenList.size()]), posList.toArray(new String[posList.size()]));
+        if (tg != null) {
+            System.out.println();
+            
+            for (int i = 0; i < tg.size(); i++) {
+            	System.out.print(tg.get(i).getToken());
+                System.out.print(" ");
+                System.out.print(tg.get(i).getStem());
+                System.out.print(" ");
+                System.out.print(tg.get(i).getPosTag());
+                System.out.print(" ");
+                System.out.print(tg.get(i).getLemma());
+                System.out.print(" ");
+                System.out.print(tg.get(i).getSyn());
+                System.out.println();
+            	
+            }            
+        }
+        
+        int lastK = 0;
+        int lastI = 0;
+        point:
+        for(Token token : tg.getTokens()){
+	        for(int i = lastI; i < sentences.size(); i++){
+	        	ArrayList<Word> sentence = sentences.get(i).getWordList();
+	        	
+	        	for(int k = lastK; k < sentence.size(); k++ ){
+	        		if(token.getSyn().equalsIgnoreCase("U"))
+	        			continue point;
+	        		if(token.getToken().equalsIgnoreCase(sentence.get(k).getWord())){
+	        			sentence.get(k).setSenseId(Long.valueOf(token.getSyn().substring(1)));
+	        			if((lastK+1) < sentence.size())
+	        				lastK = k++;
+	        			lastI = i;
+	        			continue point;
+	        		}
+	        	}
+	        }
+        }
+       return sentences;
+    }*/
+	
 	public ArrayList<PreSentence> generateSynId(ArrayList<PreSentence> sentences) throws Exception
     {	
 		// Nlp nlp = new Nlp();
@@ -466,6 +630,7 @@ public class LexSubmodules
 		
 		ArrayList<PreSentence> condSentenceList 	= new ArrayList<PreSentence>();
 		ArrayList<PreSentence> updatedSentenceList 	= new ArrayList<PreSentence>();
+		ArrayList<PreSentence> tempSentList 		= new ArrayList<PreSentence>();
 		
 		p.println("Running generateSynId");
 		
@@ -482,7 +647,8 @@ public class LexSubmodules
 				if ( checkConditionsForComplexity(w) ) 
 				{
 					String pos = null;
-					pos = getMainPOS(w).toString();
+					if(getMainPOS(w) != null)
+						pos = getMainPOS(w).toString();
 					posList.add(pos);
 					p.println("condWord: " + w.getWord());
 					conditionedWords.add(w); // add if the word is not complex and not a stopword
@@ -511,7 +677,19 @@ public class LexSubmodules
 			updatedSentence = compareBabelToOriginalSentence(line, babelSentence);
 			updatedSentenceList.add(updatedSentence);
 		}
-		sentences = updatedSentenceList;
+		tempSentList = updatedSentenceList;
+		
+		ArrayList<PreSentence> converted = new ArrayList<PreSentence>();
+		for(PreSentence orig : sentences){
+			PreSentence temps = new PreSentence();
+			for(PreSentence temp: tempSentList ){
+				temps = compareBabelToOriginalSentence(orig, temp);
+				converted.add(temps);
+			}
+			
+		}
+				
+		sentences = converted;
 		
 		for ( PreSentence tempSent : condSentenceList) 
 		{		
@@ -523,8 +701,12 @@ public class LexSubmodules
 			}
 		}
 		
+		
+		
 		return sentences;
     }
+	
+	
 	
 	/**
 	 * For performing Word Sense Disambiguation
@@ -616,6 +798,8 @@ public class LexSubmodules
 		return original;
 	}
 	
+	
+	
 	public String removeExtraOffsets(String input)
 	{
 		String temp = input;
@@ -629,8 +813,6 @@ public class LexSubmodules
 		temp = temp.trim();
 		return temp;
 	}
-	
-	
 	
 	public void updatePreSentenceWithBabelfy()
 	{
@@ -663,14 +845,11 @@ public class LexSubmodules
 		
 		if(w.isComplex() && !w.isStopWord() && w.getWordType() != Word.COMPOUND_WORD && !w.isIgnore())
 			result = true;
-		
-		p.println("bool: " + result);
 		return result;
 	}
 	
+	
+	
+	    
+	
 }
-
-
-
-
-

@@ -81,7 +81,7 @@ public class Main
 		Adapter adapter = new Adapter();
 		@SuppressWarnings("static-access")
 		Nlp nlp = new Nlp(rw.testPathComplete);
-		// nlp.TestNlp();
+		nlp.TestNlp();
 		try {
 			adapter.NLPtoJMWE("NlpOutput.txt");
 		} catch (IOException e) {

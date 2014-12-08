@@ -1,25 +1,51 @@
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-
-import language.PreSentence;
-import language.Word;
-
-import lexical.LexSubmodules;
-import lexical.RankingChooser;
-import lexical.SimplexAdapter;
-
-import preprocess.Adapter;
-import preprocess.Extractor;
-import preprocess.Nlp;
-import preprocess.ReaderWrite;
-import syntactic.Analysis;
-
-
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 public class Main {
 	public static void main(String[] args)
-	{	ReaderWrite rw = new ReaderWrite();
+	{	
+	
+		
+		java.awt.EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                
+                        try {
+                            String laf = UIManager.getSystemLookAndFeelClassName();
+                            UIManager.setLookAndFeel(laf);
+                            
+                            View v = new View();
+                            Model m = new Model();
+                    		
+                    		Controller c = new Controller(m,v);
+                            
+                            
+                           
+                            
+
+                        
+                        } catch (ClassNotFoundException ex) {
+                            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (InstantiationException ex) {
+                            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (IllegalAccessException ex) {
+                            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (UnsupportedLookAndFeelException ex) {
+                            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        
+                        
+                }
+            
+        });
+		/*
+		ReaderWrite rw = new ReaderWrite();
 		Adapter ad = new Adapter();
 		Nlp nlp = new Nlp(rw.testPathComplete);
 		Extractor ex	= new Extractor();
@@ -28,10 +54,8 @@ public class Main {
 		RankingChooser rankingChooser = new RankingChooser();
 		ArrayList<PreSentence> sentenceList = new ArrayList<PreSentence>();
 		
-
 		Analysis synanalysis = new Analysis();
-		nlp.TestNlpFileGenerate();
-
+		//nlp.TestNlpFileGenerate();
 		try {
 			sentenceList = ad.NLPtoJMWE("NlpOutput.txt");
 		} catch (IOException e) {

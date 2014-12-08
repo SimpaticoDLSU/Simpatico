@@ -11,20 +11,7 @@ public class Phrase {
 	private ArrayList<Word> wordList = new ArrayList<Word>();
 	private String phraseType;
 	private int id;
-	private Boolean hasAppositive;
 	
-	public String getPhraseType() {
-		return phraseType;
-	}
-	public void setPhraseType(String phraseType) {
-		this.phraseType = phraseType;
-	}
-	public Boolean getHasAppositive() {
-		return hasAppositive;
-	}
-	public void setHasAppositive(Boolean hasAppositive) {
-		this.hasAppositive = hasAppositive;
-	}
 	public ArrayList<Word> getWordList() {
 		return wordList;
 	}

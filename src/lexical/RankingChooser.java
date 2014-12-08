@@ -13,7 +13,6 @@ import java.util.Scanner;
 
 import language.PreSentence;
 import language.Word;
-import edu.stanford.nlp.ling.Sentence;
 
 public class RankingChooser {
 

@@ -3,12 +3,10 @@
  */
 package preprocess;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import language.PreSentence;
 import language.Word;
-import edu.stanford.nlp.trees.Tree;
 import shortcuts.Print;
 import shortcuts.Scan;
 
@@ -64,7 +62,7 @@ public class Extractor {
 			Word wordTemp = new Word(split[0]); 
 			wordTemp.setPartOfSpeech(split[1]); 
 			wordTemp.setLemma(split[2]);
-			//wordTemp.setStopWord(nlp.isStopWord(wordTemp.getWord()));
+			wordTemp.setStopWord(nlp.isStopWord(wordTemp.getWord()));
 		
 			//p.println(splittedText[i]);
 			word.add(wordTemp);
@@ -72,11 +70,9 @@ public class Extractor {
 		}
 
 		return word;
-	}
-	
-	public void FileToTree(String filePath)
-	{
-		ArrayList<Tree> tree = new ArrayList<Tree>(); 
+		
+		
+		
 	}
 	
 	public ArrayList<PreSentence> WordListToSentenceList(ArrayList<Word> wordList)

@@ -6,7 +6,6 @@ package lexical;
  * Translates the sentence and word objects to a structure that is readable by simplex
  */
 
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,9 +15,9 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 import language.PreSentence;
 import language.Word;
+
 
 
 public class SimplexAdapter {

@@ -1,3 +1,6 @@
+/WordNet-3.0/*
+/config/*
+/Imports/*
 bin/
 /src/lexical/Resources/Simplex/*
 /src/lexical/Resources/WordNet-3.1/*
