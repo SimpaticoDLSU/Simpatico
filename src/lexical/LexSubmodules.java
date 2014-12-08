@@ -488,6 +488,7 @@ public class LexSubmodules
 					conditionedWords.add(w); // add if the word is not complex and not a stopword
 				}
 			}
+			
 			conditionedSentence.setWordList(conditionedWords); // set words list to trimmed sentnece
 			condSentenceList.add(conditionedSentence); // add to list of sentences without any stopwords in it
 			
@@ -511,6 +512,7 @@ public class LexSubmodules
 			updatedSentence = compareBabelToOriginalSentence(line, babelSentence);
 			updatedSentenceList.add(updatedSentence);
 		}
+		
 		sentences = updatedSentenceList;
 		
 		for ( PreSentence tempSent : condSentenceList) 
@@ -615,6 +617,7 @@ public class LexSubmodules
 		original.setWordList(oWords);
 		return original;
 	}
+	
 	
 	public String removeExtraOffsets(String input)
 	{
