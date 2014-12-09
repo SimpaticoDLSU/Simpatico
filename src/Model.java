@@ -186,7 +186,7 @@ public class Model {
 		  File file = listOfFiles[i];
 		  TestCase testcase = new TestCase();
 		  if (file.isFile() && file.getName().endsWith(".txt")) {
-		    try {
+		    try {		    	
 				String content = FileUtils.readFileToString(file);
 				testcase.setFileName(file.getName());
 				testcase.setId(i);

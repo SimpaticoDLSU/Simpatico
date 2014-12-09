@@ -132,7 +132,7 @@ public class Adapter {
 		p.println("filePath = " + this.filePath);
 		//ReaderWrite rw = new ReaderWrite(nlp.GetDefaultFilePath());
 		p.println("Running TestNlp() at the Bridge.");
-		nlp.TestNlp();
+		//nlp.TestNlp();
 		
 
 		//Run Converter

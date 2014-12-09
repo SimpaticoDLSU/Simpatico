@@ -40,6 +40,7 @@ public class Tester {
 	/**
 	 * Not working.
 	 * ConstantsAndVariables is not available in Stanford CoreNLP (missing files).
+	 * You may delete this method.
 	 */
 	public void CommonWordImplementor()
 	{
@@ -51,7 +52,7 @@ public class Tester {
 		example.add("Agency");
 		example.add("was");
 		example.add("there");
-		commonEng = pa.getCommonWords();
+		//commonEng = pa.getCommonWords();
 		
 		for ( String word : example) 
 		{
