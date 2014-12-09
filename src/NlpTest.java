@@ -10,17 +10,14 @@ import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.semgraph.SemanticGraph;
-import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.CollapsedCCProcessedDependenciesAnnotation;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
-import edu.stanford.nlp.trees.TreeGraphNode;
 import edu.stanford.nlp.util.CoreMap;
 
 public class NlpTest {
 
     protected StanfordCoreNLP pipeline;
-    private ArrayList<ArrayList<Tree>> treeList;
+    private ArrayList<Tree> treeList;
     public NlpTest() {
         // Create StanfordCoreNLP object properties, with POS tagging
         // (required for lemmatization), and lemmatization
@@ -51,21 +48,39 @@ public class NlpTest {
                 // Retrieve and add the lemma for each word into the list of lemmas
                 lemmas.add(token.get(LemmaAnnotation.class));
             }
-            treeList = new ArrayList<ArrayList<Tree>>();
+           
             // get the corenlp parse tree
             Tree tree = sentence.get(TreeAnnotation.class);
             
-            //instantiate syntactic module
-            SyntacticSubmodules submods = new SyntacticSubmodules();
-            //read the rules
-            submods.readRules();
+            treeList.add(tree);
+           
                        
     	}
 
         return lemmas;
     }
     
-  
+    public void test(){
+    	treeList = new ArrayList<Tree>();
+    	lemmatize("The winds of Typhoon Ruby are so strong and the rain is very vicious.");
+    	
+    	 //instantiate syntactic module
+        SyntacticSubmodules submods = new SyntacticSubmodules();
+        
+        //read the rules
+        submods.readRules();
+        
+        for(Tree sentenceTree : treeList){
+        	List<Tree> list = sentenceTree.subTreeList();
+        	for(Tree tree : list){
+        		System.out.println("Tree: "+tree.value()+" "+" LEAVES: "+tree.getLeaves());
+        	}
+        	//submods.applyRule();
+        	
+        }
+        
+        
+    }
 	
     public void traverseTree(Tree tree) {
         Tree[] children = tree.children();
@@ -120,7 +135,8 @@ public class NlpTest {
     
     public static void main(String[] args){
     	NlpTest n = new NlpTest();
-    	n.lemmatize("The dog ate the cat and the cat ate the mouse.");
+    
+    	n.test();
     	
     }
 }

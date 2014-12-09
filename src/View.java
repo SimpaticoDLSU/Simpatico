@@ -216,9 +216,13 @@ public class View {
 		for(PreSentence s: sentences){
 			for(Word w: s.getWordList()){
 				try{
-					if(w.getBestSubstitute() != null && !w.getBestSubstitute().equalsIgnoreCase(w.getWord()))
-						doc.insertString(doc.getLength(),w.getBestSubstitute()+" ",highlightCyan);
-					else if(w.isComplex() && w.getBestSubstitute() == null || w.getBestSubstitute().equalsIgnoreCase(w.getWord()))
+					if(w.getBestSubstitute() != null ){
+						if(!w.getBestSubstitute().equalsIgnoreCase(w.getWord()))
+							doc.insertString(doc.getLength(),w.getBestSubstitute()+" ",highlightCyan);
+						else
+							doc.insertString(doc.getLength(),w.getWord()+" ",highlightYellow);
+					}
+					else if(w.isComplex() && w.getBestSubstitute() == null )
 						doc.insertString(doc.getLength(),w.getWord()+" ",highlightYellow);
 					else if(w.getWord().equalsIgnoreCase("-LSB-"))
 						doc.insertString(doc.getLength(),"["+" ", regular);

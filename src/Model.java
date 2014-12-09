@@ -135,9 +135,9 @@ public class Model {
 		System.out.print(lexicalOutput);
 		result = sentenceList;
 		
-		synanalysis.StartAnalysis(lexicalOutput, nlp.getPipeline());
-		ArrayList<Tree> trees = synanalysis.getTree();
-		SyntacticSubmodules syntacticSubmodules = new SyntacticSubmodules();
+		//synanalysis.StartAnalysis(lexicalOutput, nlp.getPipeline());
+		//ArrayList<Tree> trees = synanalysis.getTree();
+		//SyntacticSubmodules syntacticSubmodules = new SyntacticSubmodules();
 		
 		
 		
