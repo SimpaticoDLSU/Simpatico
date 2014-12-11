@@ -20,6 +20,10 @@ public class PreAnalysis {
 	// Global variables
 	String xmlContent = "";
 	
+	/**
+	 * Consists of Analysis methods.
+	 * Also includes methods that were never really going to be used in the future.
+	 */
 	public PreAnalysis()
 	{
 		
@@ -39,6 +43,11 @@ public class PreAnalysis {
 		/* Start applying markers */
 		
 		/*  */
+		
+	}
+	
+	public void checkForCompoundSentences()
+	{
 		
 	}
 	

@@ -667,6 +667,10 @@ public class LexSubmodules
 		// Insert Babelfy API Code for disambiguation below this comment.
 		for( PreSentence line : condSentenceList )
 		{
+			if(condSentenceList.size() == 0) {
+				p.println("condSentenceList is 0 or null");
+				System.exit(0);
+			}
 			PreSentence babelSentence 	= new PreSentence();
 			PreSentence updatedSentence = new PreSentence();
 			p.println("linePrint: " + line.toString());

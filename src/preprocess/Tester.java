@@ -23,18 +23,11 @@ public class Tester {
 	
 	public Tester() {}
 	
-	public static void main(String[] args)
+	public static void main(String[] args) throws Exception
 	{
-		Tester test = new Tester();
-		try {
-			test.testLexSub();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//test.sentenceIdentifier();
-		//Nlp nlp = new Nlp();
-		//nlp.StartNlp(GetSampleLegalText());
+		Tester t = new Tester();
+		t.sentenceIdentifier();
+		//t.testLexSub();
 	}
 	
 	/**
@@ -73,10 +66,41 @@ public class Tester {
 		Nlp nlp = new Nlp();
 		ArrayList<Tree> tree = nlp.convertToSentenceTrees(getSampleLegalText());
 		temp = tree.toArray();
-		p.println(tree.toString());
+		for ( Tree singleTree : tree )
+		{
+			// singleTree is S 
+			List<Tree> tempTrees = singleTree.getChildrenAsList();
+			p.println("singleTree: " + singleTree.firstChild().toString() ); // still a main tree
+			
+			// tempTrees is also an S
+			for( Tree tmpTree : tempTrees ) // you must split it into more trees 
+			{
+				//p.println("-" + tmpTree.toString());
+				//for ( int i = 0; i < tmpTree.size(); i++)
+				//p.println("___" + tmpTree.getChild(i).toString());
+				
+				p.println("first Child (1) : " + tmpTree.getChild(0).firstChild().toString());
+				p.println("label: " + tmpTree.getChild(0).firstChild().label().toString());
+				
+				if ( tmpTree.getChild(0).firstChild().label().toString().equals("NP") ) {
+					
+					for ( Tree depth2 : tmpTree ) {
+						p.println("first Child (2) : " + depth2.getChild(0).firstChild().toString());
+						p.println("value (2) : " + depth2.getChild(0).firstChild().value());
+						p.println("label (2) : " + depth2.getChild(0).firstChild().label());
+					}
+				}
+				
+				// tmpTree.indentedListPrint(); // prints the indented fancy food. A very long print
+				
+			} 
+		}
 		
-		p.println("printing single part: ");
-		p.println("" + tree.get(0).toString());
+		
+	}
+	
+	public void isCompoundSentence()
+	{
 		
 	}
 	
@@ -130,8 +154,9 @@ public class Tester {
 		List<CoreMap> coreMap;
 		Nlp nlp 					= new Nlp();
 		
-		coreMap = nlp.generateSentenceCoreMapList(getSampleLegalText());
-		ps = nlp.generatePreSentences(coreMap);
+		// coreMap = nlp.generateSentenceCoreMapList(getSampleLegalText());
+		// ps = nlp.generatePreSentences(coreMap);
+		ps = nlp.preprocessText(getSampleLegalText());
 		ls.generateSynId(ps);
 	}
 	
