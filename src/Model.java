@@ -214,6 +214,10 @@ public class Model {
 		return list;
 	}
 	
+	/*if()
+		if()
+			Arraylist<Tree> splitNodes = splitTree(sentence, node.getSolution());
+	*/
 	public ArrayList<TestCase> getTestCases(){
 		return this.testcases;
 	}
