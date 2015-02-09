@@ -131,7 +131,9 @@ public class NlpTest {
     	//lemmatize("The Secretary shall furnish the Secretary of Finance with a summary of the essential facts of the petition, "
     	//		+ "and the secretary shall request the latter to immediately inform the Commissioner of Customs.");
     	//lemmatize("The woman is my wife and she suddenly disappeared."); 
-    	lemmatize("There shall be an officer to be known as the secretary to the Governor-General, who shall be charged with the performance of such secretarial and administrative duties relating to the office of Governor-General, or the Executive Bureau, as shall be required of him by law or direction of the Governor-General."); 
+    	//lemmatize("There shall be an officer to be known as the secretary to the Governor-General, who shall be charged with the performance of such secretarial and administrative duties relating to the office of Governor-General, or the Executive Bureau, as shall be required of him by law or direction of the Governor-General."); 
+    	lemmatize("The woman, who is my wife, suddenly disappeared."); 
+    	
     	//instantiate syntactic module
         SyntacticSubmodules submods = new SyntacticSubmodules();
         

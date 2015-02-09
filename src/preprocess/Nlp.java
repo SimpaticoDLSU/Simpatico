@@ -37,7 +37,7 @@ public class Nlp {
 	
 	static Print p = new Print();
 	//FilePath here includes already the file name
-	private final String generalProperties 	= "tokenize, ssplit, pos, lemma, ner, parse, dcoref";
+	private final String generalProperties 	= "tokenize, ssplit, pos, lemma, parse, dcoref";
 	private final String defaultFile		= "src/documents/NlpOutput.txt";
 	String fileName						   	= "";			
 	private String filePath					= "";
@@ -161,9 +161,9 @@ public class Nlp {
 				// Get token annotations
 				String word 	= token.get(TextAnnotation.class);
 				String pos 		= token.get(PartOfSpeechAnnotation.class);
-				String ne 		= token.get(NamedEntityTagAnnotation.class);
+				//String ne 		= token.get(NamedEntityTagAnnotation.class);
 				String lemma 	= token.get(LemmaAnnotation.class);
-				String common	= token.get(CommonWordsAnnotation.class);
+				//String common	= token.get(CommonWordsAnnotation.class);
 				//p.println("word: " + word);
 				// add tokens to Word()   
 				preWord.setWord(word);

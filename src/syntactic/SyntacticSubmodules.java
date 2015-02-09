@@ -245,7 +245,31 @@ public class SyntacticSubmodules {
             children.add(node);
         }
         
-        
+        /**
+         * determines if one Node is a subset of the other
+         * @param subset 
+         * Node that could be a subset
+         * @param node
+         * Node which the other subset node is compared to
+         * @return
+         * true if 'subset' is a subset or equal to 'node', otherwise false.
+         */
+        public boolean isSubsetOfNode(Node subset, Node node){
+        	List<Node> subsetChildren = subset.getChildren();
+        	List<Node> nodeChildren = node.getChildren();
+        	Node child;
+        	int indexLeftOff = 0;
+            for (int i = 0; i < nodeChildren.size(); i++) {
+                child = nodeChildren.get(i);
+                if(child.getValue().equalsIgnoreCase(subsetChildren.get(indexLeftOff).getValue())){
+                	indexLeftOff++;
+                	if(indexLeftOff == subset.getChildren().size())
+                		return true;
+                }
+            }
+            
+            return false;
+        }
         
         public Tree getCoreNlpTree(){
         	return this.leaves;
@@ -327,6 +351,7 @@ public class SyntacticSubmodules {
         //Read the ruleList
         FileReader fileReader;
         BufferedReader bufferedReader;
+        List<String> nodeList = new ArrayList<String>();
         try {
             for (SentenceType sentenceType : SentenceType.values()) {
                 System.out.println(sentenceType.toString());
@@ -338,10 +363,14 @@ public class SyntacticSubmodules {
                 while ((line = bufferedReader.readLine()) != null) {
                     RuleItem rule = new RuleItem();
                     String[] splittedRule = line.split(">");
+                    nodeList.add(splittedRule[0]);
+                    splittedRule = splittedRule[1].split("|");
+                    nodeList.add(splittedRule[0]);
+                    nodeList.add(splittedRule[1]);
                     Node rootNode;
-                    for (int i = 0; i < splittedRule.length; i++) {
+                    for (int i = 0; i < nodeList.size(); i++) {
                         depth = 0;
-                        scanner = new Scanner(splittedRule[i].trim());
+                        scanner = new Scanner(nodeList.get(i).trim());
                         rootNode = new Node();
                         rootNode.setValue("ROOT");
                         rootNode.setDepth(depth);
@@ -351,18 +380,21 @@ public class SyntacticSubmodules {
                         if (i == 0) {
                             rule.setLeftHandSide(rootNode);
                         } else if (i == 1) {
-                            rule.setRightHandSide(rootNode);
+                            rule.setRightHandSideOrigin(rootNode);
+                        } else if (i == 2) {
+                            rule.setRightHandSideSplit(rootNode);
                         }
 
                     }
-                    String string = sentenceType.toString();
-                    if (COMPOUND.equals(string)) {
+                   
+                    rule.setType(sentenceType.toString());
+                    if (COMPOUND.equals(rule.getType())) {
                         compoundRuleList.add(rule);
-                    } else if (COMPOUND_COMPLEX.equals(string)) {
+                    } else if (COMPOUND_COMPLEX.equals(rule.getType())) {
                         compoundComplexRuleList.add(rule);
-                    } else if (RELATIVE_CLAUSE.equals(string)) {
+                    } else if (RELATIVE_CLAUSE.equals(rule.getType())) {
                         relativeRuleList.add(rule);
-                    } else if (PASSIVE_ACTIVE.equals(string)) {
+                    } else if (PASSIVE_ACTIVE.equals(rule.getType())) {
                         passiveActiveRuleList.add(rule);
                     }
 
@@ -375,11 +407,37 @@ public class SyntacticSubmodules {
     }
 
     //represents one rule
-    class RuleItem {
-
+    private class RuleItem {
+    	private String type;
         private Node leftHandSide;
-        private Node rightHandSide;
+        private Node rightHandSideOrigin;
+        private Node rightHandSideSplit;
+        
+        public Node getRightHandSideOrigin() {
+			return rightHandSideOrigin;
+		}
 
+		public void setRightHandSideOrigin(Node rightHandSideOrigin) {
+			this.rightHandSideOrigin = rightHandSideOrigin;
+		}
+
+		public Node getRightHandSideSplit() {
+			return rightHandSideSplit;
+		}
+
+		public void setRightHandSideSplit(Node rightHandSideSplit) {
+			this.rightHandSideSplit = rightHandSideSplit;
+		}
+
+		
+        public void setType(String type){
+        	this.type = type;
+        }
+        
+        public String getType(){
+        	return this.type;
+        }
+        
         public Node getLeftHandSide() {
             return leftHandSide;
         }
@@ -388,13 +446,7 @@ public class SyntacticSubmodules {
             this.leftHandSide = leftHandSide;
         }
 
-        public Node getRightHandSide() {
-            return rightHandSide;
-        }
-
-        public void setRightHandSide(Node rightHandSide) {
-            this.rightHandSide = rightHandSide;
-        }
+        
 
     }
 
@@ -407,8 +459,8 @@ public class SyntacticSubmodules {
 
             f.traverse(n.getLeftHandSide());
 
-            f.traverse(n.getRightHandSide());
-
+            f.traverse(n.getRightHandSideOrigin());
+            f.traverse(n.getRightHandSideSplit());
         }
 
     }
@@ -460,6 +512,9 @@ public class SyntacticSubmodules {
                             System.out.println("inside with sentence: "+nlpNode);
                             System.out.println("duplicateNode: " +duplicateNode.print());
                             applyRule(duplicateNode,rule);
+                            // put regeneration module here
+                            System.out.println("Simplification done.");
+                            break;
                             //applyRule(rule, nlpNode.deepCopy());
                             //System.out.println(rule.getLeftHandSide().print()+"FUCKING EQUAL TO :"+nlpNode.getLeaves() + " "+nlpNode.value());
                         }
@@ -478,6 +533,9 @@ public class SyntacticSubmodules {
     	ArrayList<Node> sentences = getSplitSentence(node, null);
     	Node removedNodes = removeMarkedNodes(node);
     	
+    	if(rule.getType().equals(RELATIVE_CLAUSE)){
+    		
+    	}
     	
     	System.out.println("Nodes removed: "+removedNodes.print());
     	for(Node child : removedNodes.getChildren()){
@@ -489,6 +547,9 @@ public class SyntacticSubmodules {
     	for(Node child : sentences){
     	System.out.println(child.print() + " Tree: " +child.getCoreNlpTree().getLeaves() );
     	}
+    	System.out.println("Final Output:");
+    	printLeaves(removedNodes);
+    	printLeaves(sentences.get(0));
     	
     	System.out.println("\n\n\n");
     }
@@ -510,6 +571,13 @@ public class SyntacticSubmodules {
     	}
     }
     
+    /**
+     * gets the Node with 't' (transfer) as an action
+     * @param node 
+     * Node to be searched
+     * @return
+     * returns Node if found, otherwise null.
+     */
     public ArrayList<Node> getSplitSentence(Node node, ArrayList<Node> list) {
     	
 	    	if(list == null)
@@ -539,7 +607,7 @@ public class SyntacticSubmodules {
 	    	System.out.println("temp val: "+temp.getValue());
 	    	
 	    	
-		    	if(node.isLastNode() || node.getChildren().isEmpty()){
+		    	if(node.isLastNode() || node.getChildren().isEmpty() ){
 		    		return node;
 		    	}else{
 			        for (Node child : node.getChildren()) {
@@ -694,7 +762,21 @@ public class SyntacticSubmodules {
         }
 
     }
-
+    
+    
+    
+    
+    public void mergeNodes(Node node1, Node node2){
+    	
+    	
+    	for(Node node2child : node2.getChildren()){
+    		
+    		if(node2child.getValue().equalsIgnoreCase(node1.getValue())){
+    			
+    		}
+    	}
+    }
+    
     public void traverseTree(Tree tree) {
         Tree[] children = tree.children();
 
