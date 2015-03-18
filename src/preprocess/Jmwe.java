@@ -52,17 +52,36 @@ public class Jmwe {
 		}
 		*/
 	}
-
+	/**
+	 * utilizes jMWE to mark multiword expressions and merges them in one Word object.
+	 * algorithm:
+	 * for each PreSentence in ArrayList
+	 * 		create a new IToken for each Word in PreSentence
+	 * 		execute jMWE with the list of ITokens
+	 * 		for each MWE in List<IMWE<IToken>> returned by jMWE
+	 * 			get the first token of the current MWE
+	 * 			for each Word object in PreSentence
+	 * 				if token is equal to current Word object 
+	 * 					check if the rest of the tokens in the MWE is equal to the succeeding Word objects
+	 * 						change the type of the current Word 
+	 * 						change PoS of the current Word to 'MWE'
+	 * 			 			append succeeding words to the first Word object identified as equal to the token (merge them to the first Word)
+	 * 						remove the Word objects that have been merged to the first token
+	 * 					start off with the next unvisited Word object
+	 * 								
+	 * @param sentences list of sentences
+	 * @return either modified or unchanged list of sentences where detected MWEs are merged
+	 * @throws IOException
+	 */
 	public ArrayList<PreSentence> ApplyMweDetector(ArrayList<PreSentence> sentences) throws IOException
 	{
-		String mwesFound 	= "";			
+				
 		File idxData 		= getMWEIndexDataFile();
 		IMWEIndex index 	= new MWEIndex(idxData);
 		index.open();
 		
 		// make a basic detectors
 		IMWEDetector detector = new Consecutive(index);
-		List<List<IToken>> MWESentences = new ArrayList<List<IToken>>();
 		List<IToken> sentence = null; 
 		// add the words to the sentence
 		for(int sentenceIndex = 0; sentenceIndex < sentences.size(); sentenceIndex++){

@@ -1,0 +1,1 @@
+S ( NP ( ,-0-d SBAR ,-0-d ) ADVP-0-t VP-0-t . ) > S ( NP SBAR . ) | S ( ADVP-0-t VP-0-t .-0-a )

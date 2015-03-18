@@ -2,21 +2,17 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
- 
-import org.apache.commons.io.FileUtils;
- 
+
 import language.PreSentence;
 import language.TestCase;
 import language.Word;
 import lexical.LexSubmodules;
-import lexical.RankingChooser;
-import lexical.SimplexAdapter;
+
+import org.apache.commons.io.FileUtils;
+
 import preprocess.Jmwe;
 import preprocess.Nlp;
 import preprocess.ReaderWrite;
-import syntactic.Analysis;
-import syntactic.SyntacticSubmodules;
-import edu.stanford.nlp.trees.Tree;
 import simplenlg.features.Feature;
 import simplenlg.features.Form;
 import simplenlg.features.Tense;
@@ -25,23 +21,31 @@ import simplenlg.framework.LexicalCategory;
 import simplenlg.framework.WordElement;
 import simplenlg.lexicon.XMLLexicon;
 import simplenlg.realiser.english.Realiser;
+import syntactic.Analysis;
+import syntactic.SyntacticSubmodules;
+import edu.stanford.nlp.semgraph.SemanticGraph;
+import edu.stanford.nlp.trees.Tree;
  
 public class Model {
  
     private ArrayList<TestCase> testcases;
     private ArrayList<PreSentence> result;
-    private final ReaderWrite rw;
-    private final Nlp nlp;
-    private final Jmwe jmwe;
-    private final LexSubmodules lexSubmodules;
-    private final Analysis synanalysis;
- 
+    private ReaderWrite rw;
+    private Nlp nlp;
+    private Jmwe jmwe;
+    private LexSubmodules lexSubmodules;
+    private Analysis synanalysis;
+    private SyntacticSubmodules syntacticSubmodules;
     public Model() {
         this.rw = new ReaderWrite();
         this.jmwe = new Jmwe();
         this.nlp = new Nlp(ReaderWrite.testPathComplete);
         this.lexSubmodules = new LexSubmodules();
         this.synanalysis = new Analysis();
+        
+    }
+    
+    public void initialize() {
         nlp.loadAnnotators();
     }
  
@@ -74,8 +78,8 @@ public class Model {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
- 
-        sentenceList = lexSubmodules.directSubstitution(sentenceList);
+        File compoundTextCorpus = new File("src/Documents/compoundprep.txt");
+        sentenceList = lexSubmodules.directSubstitution(sentenceList,compoundTextCorpus);
         sentenceList = lexSubmodules.identifyIgnorables(sentenceList);
         //perform preprocessing. If returned list is empty then abort.
         if (!sentenceList.isEmpty()) {
@@ -95,13 +99,20 @@ public class Model {
             for (PreSentence sentence : sentenceList) {
                 for (Word word : sentence.getWordList()) {
                     if (lexSubmodules.checkConditionsForComplexity(word)) {
+                    	
                         if (word.getSubstitute() != null && !word.getSubstitute().isEmpty()) {
-                            word.setBestSubstitute(word.getSubstitute().get(0));
+                        	
+                        	if(word.hasTense())
+                        		word.setBestSubstitute(changeTense(word.getSubstitute().get(0), word.getPartOfSpeech()));
+                        	else
+                        		word.setBestSubstitute(word.getSubstitute().get(0));
                         }
+                        System.out.println(word.getBestSubstitute()+" "+word.getPartOfSpeech());
                     }
                 }
             }
- 
+            File latinTextCorpus = new File("src/Documents/latin.txt");
+            sentenceList = lexSubmodules.directSubstitution(sentenceList,latinTextCorpus);
             //adapter = new SimplexAdapter(sentenceList);
             //run simplex
             //adapter.start();
@@ -112,10 +123,7 @@ public class Model {
         for (PreSentence s : sentenceList) {
             for (Word w : s.getWordList()) {
                 if (w.getBestSubstitute() != null) {
-                    System.out.println(w.getBestSubstitute() + " " + w.getPartOfSpeech());
-                    if (w.hasTense()) {
-                        w.setBestSubstitute(changeTense(w.getBestSubstitute(), w.getPartOfSpeech()));
-                    }
+                                       
                     lexicalOutput += (w.getBestSubstitute() + " ");
  
                 } else if (w.getWord().equalsIgnoreCase("-LSB-")) {
@@ -140,10 +148,20 @@ public class Model {
         System.out.println("Output:");
         System.out.print(lexicalOutput);
         result = sentenceList;
- 
-        //synanalysis.StartAnalysis(lexicalOutput, nlp.getPipeline());
-        //ArrayList<Tree> trees = synanalysis.getTree();
-        //SyntacticSubmodules syntacticSubmodules = new SyntacticSubmodules();
+        
+        syntacticSubmodules = new SyntacticSubmodules(nlp.getPipeline());
+        synanalysis.StartAnalysis(lexicalOutput, nlp.getPipeline());
+        ArrayList<Tree> trees = synanalysis.getTree();
+        ArrayList<SemanticGraph> graphs = synanalysis.getSemanticGraph();
+        syntacticSubmodules.readRules();
+        for(int i = 0; i < trees.size(); i++){
+        	Tree tree = trees.get(i);
+        	SemanticGraph graph = graphs.get(i);
+        	syntacticSubmodules.checkRules(tree);
+        	tree = syntacticSubmodules.toPassive(graph, tree);
+        	System.out.println(tree);
+        }
+        
         //for each sentence
         //check rules
         //after: check matching

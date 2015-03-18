@@ -1,6 +1,1 @@
-S ( S CC-0-d S-1-t . ) > S ( S ( S . ) S ( S-1-t .-0-a ) )
-S ( SBAR-0-t ) > S . SBAR-0-t .
-S-0-x ( NP VP ( SBAR-0-t ) . ) > S ( S ( NP VP . ) S ( SBAR-0-t .-0-a ) )
-S ( NP ( SBAR-0-t ) VP . ) > S ( NP VP . ) SBAR-0-t .
-S ( NP VP ( SBAR-0-t ) . ) > S ( NP VP . ) SBAR-0-t .
-S ( NP ADVP-0-t VP ( NP ) . ) > S ( NP VP ( S ) . ) . ADVP-0-t .
+S ( S CC-0-d S-1-t . ) > S ( S .  ) | S ( S-1-t .-0-a )

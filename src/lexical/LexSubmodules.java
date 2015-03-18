@@ -310,7 +310,7 @@ public class LexSubmodules
 						    			w.getSubstitute().add(word.getLemma().replace('_', ' '));
 						    	}
 							}
-
+							System.out.println(w.getSubstitute());
 					}
 				}// end for
 		}// end for
@@ -373,9 +373,9 @@ public class LexSubmodules
 	 * @param sentences list of sentences
 	 * @return updated list of sentences wherein direct substitution has been applied
 	 */
-	public ArrayList<PreSentence> directSubstitution(ArrayList<PreSentence> sentences)
+	public ArrayList<PreSentence> directSubstitution(ArrayList<PreSentence> sentences, File corpus)
 	{
-		File corpus = new File("src/Documents/compoundprep.txt");
+		
 		try (BufferedReader reader = new BufferedReader(new FileReader(corpus.getAbsolutePath()))) 
 		{
 		    String line = null;
@@ -392,6 +392,7 @@ public class LexSubmodules
 		    	
 		    	while(scanner.hasNext())
 		    		listOfSubstitutes.add(scanner.next());
+		    	
 		    	
 		    	for(PreSentence sentence: sentences)
 		    	{	
@@ -433,6 +434,8 @@ public class LexSubmodules
 		{
 		    System.err.format("IOException: %s%n", x);
 		} 
+		
+		
 		
 		return sentences;
 	}
@@ -481,7 +484,7 @@ public class LexSubmodules
 			for(Word word : sentence.getWordList())
 			{	
 				if(StringUtils.isNumeric(word.getWord()) || word.getPartOfSpeech().equalsIgnoreCase("NNP") 
-				|| word.getPartOfSpeech().equalsIgnoreCase("NNPS") || StringUtils.isAllUpperCase(word.getWord()))
+				|| word.getPartOfSpeech().equalsIgnoreCase("NNPS"))
 				{
 					word.isIgnore(true);
 					continue;

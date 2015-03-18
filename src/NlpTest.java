@@ -1,11 +1,24 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
+import java.util.Scanner;
 
+import language.PreSentence;
+import language.Word;
+import simplenlg.features.Feature;
+import simplenlg.features.Form;
+import simplenlg.features.Tense;
+import simplenlg.framework.InflectedWordElement;
+import simplenlg.framework.LexicalCategory;
+import simplenlg.framework.WordElement;
+import simplenlg.lexicon.XMLLexicon;
+import simplenlg.realiser.english.Realiser;
 import syntactic.SyntacticSubmodules;
 import edu.stanford.nlp.dcoref.CorefChain;
 import edu.stanford.nlp.dcoref.CorefChain.CorefMention;
@@ -25,7 +38,10 @@ import edu.stanford.nlp.semgraph.SemanticGraphFactory;
 import edu.stanford.nlp.trees.GrammaticalRelation;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
+import edu.stanford.nlp.trees.TreeLemmatizer;
+import edu.stanford.nlp.trees.TypedDependency;
 import edu.stanford.nlp.util.CoreMap;
+import edu.stanford.nlp.util.Filter;
 
 public class NlpTest {
 
@@ -34,15 +50,14 @@ public class NlpTest {
     public NlpTest() {
         // Create StanfordCoreNLP object properties, with POS tagging
         // (required for lemmatization), and lemmatization
-        Properties props;
-        props = new Properties();
-        props.put("annotators", "tokenize, ssplit, pos,  lemma, ner, parse, dcoref");
+       // Properties props;
+        //props = new Properties();
+        //props.put("annotators", "tokenize, ssplit, pos,  lemma, ner, parse, dcoref");
 
         // StanfordCoreNLP loads a lot of models, so you probably
         // only want to do this once per execution
-        this.pipeline = new StanfordCoreNLP(props);
+        //this.pipeline = new StanfordCoreNLP(props);
     }
-
     public List<String> lemmatize(String documentText)
     {
         List<String> lemmas = new LinkedList<String>();
@@ -125,6 +140,30 @@ public class NlpTest {
         return lemmas;
     }
     
+    public List<String> lemmatizeWord(String word)
+    {
+        List<String> lemmas = new LinkedList<String>();
+
+        // create an empty Annotation just with the given text
+        Annotation document = new Annotation(word);
+
+        // run all Annotators on this text
+        this.pipeline.annotate(document);
+
+        // Iterate over all of the sentences found
+        List<CoreMap> sentences = document.get(SentencesAnnotation.class);
+        for(CoreMap sentence: sentences) {
+            // Iterate over all tokens in a sentence
+            for (CoreLabel token: sentence.get(TokensAnnotation.class)) {
+                // Retrieve and add the lemma for each word into the list of lemmas
+                lemmas.add(token.get(LemmaAnnotation.class));
+            }
+        
+    	}
+     
+        return lemmas;
+    }
+    
     public void test(){
     	treeList = new ArrayList<Tree>();
     	//lemmatize("The winds of Typhoon Ruby are so strong and the rain is very vicious.");
@@ -133,7 +172,7 @@ public class NlpTest {
     	//lemmatize("The woman is my wife and she suddenly disappeared."); 
     	//lemmatize("There shall be an officer to be known as the secretary to the Governor-General, who shall be charged with the performance of such secretarial and administrative duties relating to the office of Governor-General, or the Executive Bureau, as shall be required of him by law or direction of the Governor-General."); 
     	lemmatize("The woman, who is my wife, suddenly disappeared."); 
-    	
+    	/*
     	//instantiate syntactic module
         SyntacticSubmodules submods = new SyntacticSubmodules();
         
@@ -143,7 +182,7 @@ public class NlpTest {
         for(Tree sentenceTree : treeList){
         	submods.checkRules(sentenceTree);
         	
-        }
+        }*/
         
         
     }
@@ -196,13 +235,346 @@ public class NlpTest {
         
         
     }
-    
+    static ArrayList<SemanticGraph> dependencies;
+	ArrayList<Tree> tree;
+    public List<String> coref(String documentText)
+    {
+        List<String> lemmas = new LinkedList<String>();
+
+        // create an empty Annotation just with the given text
+        Annotation document = new Annotation(documentText);
+
+        // run all Annotators on this text
+        this.pipeline.annotate(document);
+        tree = new ArrayList<Tree>();
+	    dependencies = new ArrayList<SemanticGraph>();
+        List<CoreMap> sentences = document.get(SentencesAnnotation.class);
+	    
+	    for(CoreMap sentence: sentences) {
+	      // traversing the words in the current sentence
+	      // this is the parse tree of the current sentence
+	      tree.add(sentence.get(TreeAnnotation.class));
+
+	      // this is the Stanford dependency graph of the current sentence
+	      dependencies.add(sentence.get(CollapsedDependenciesAnnotation.class));
+	    }
+
+	    // This is the coreference link graph
+	    // Each chain stores a set of mentions that link to each other,
+	    // along with a method for getting the most representative mention
+	    // Both sentence and token offsets start at 1!
+	   document.get(CorefChainAnnotation.class);
+
+        return lemmas;
+    }
     
     
     public static void main(String[] args){
     	NlpTest n = new NlpTest();
+    	n.scan(new File("src/lexical/Resources/lemmacorpus2.txt"));
+    }
     
-    	n.test();
+    public void scan(File corpus)
+	{
+		
+		try (BufferedReader reader = new BufferedReader(new FileReader(corpus.getAbsolutePath()))) 
+		{
+		    String line = null;
+		    String[] splitted;
+		    ArrayList<Word> words;
+		    Scanner scanner = null;
+		    int curr = 0;
+		    int count = 1;
+		    int freq;
+		    while ((line = reader.readLine()) != null) 
+		    {	
+		    	splitted = line.split(" ");
+		    	freq = Integer.parseInt(splitted[1]);
+		    	if(curr != freq){
+		    		curr = freq;
+		    		System.out.println("Frequency: "+curr+" Count: "+count);
+		    		count = 1;
+		    		
+		    	}else
+		    		count++;
+		    }
+		   
+		} catch (IOException x) 
+		{
+		    System.err.format("IOException: %s%n", x);
+		} 
+		
+		
+		
+		
+	}
+    
+    public void execute(){
+    	
+        
+    	coref("A Certificate of Registration shall be issued to those who are registered after the payment of fees are prescribed by the Commission.");
+    	System.out.println(dependencies);
+    	
+    	for(SemanticGraph g : dependencies){
+    			if(isPassiveVoice(g)){
+    				System.out.println("is passive");
+    			}else
+    				System.out.println("not passive");
+    			
+    			System.out.println(g.getChildList(g.getFirstRoot()));
+    			System.out.println(g.getChildList(g.getFirstRoot()).get(0).tag());
+    			System.out.println(g.getChildList(g.getFirstRoot()).get(0).index());
+    			System.out.println(g.getChildList(g.getFirstRoot()).get(0).word());
+    			System.out.println("toposlist: "+g.toPOSList());
+    			Tree  t = tree.get(0);
+    			System.out.println(t.getLeaves().get(0).label());
+    			Tree res = toPassive(g,t);
+    
+    				System.out.println(res.getLeaves());
+    			
+    	
+    	}
     	
     }
-}
+    
+    
+    public boolean isPassiveVoice(SemanticGraph g){
+    	String relation;
+    	String relation2;
+    	for(TypedDependency d : g.typedDependencies()){
+    		relation = d.reln().toString();
+			
+			if(relation.equals("agent")){
+				//System.out.println("Agent found: gov - "+d.gov() +" dep - "+d.dep());
+				for(TypedDependency d2: g.typedDependencies()){
+					relation2 = d2.reln().toString();
+					if(relation2.equals("nsubjpass") && d2.gov().toString().equals(d.gov().toString())){
+						//System.out.println("equal gov: "+d2.gov());
+						return true;
+					}
+				}
+			}
+				
+		}
+    	return false;
+    }
+    public boolean hasEqualLeaves(Tree t1, Tree t2){
+    	if(t1.value().equals(t2.value())){
+    		List<Tree> t1Leaves = t1.getLeaves();
+    		List<Tree> t2Leaves = t2.getLeaves();
+    		
+    		if(t1Leaves.size() == t2Leaves.size())
+    			for(int i = 0; i < t1Leaves.size(); i++){
+    				if(!t1Leaves.get(i).value().equals(t2Leaves.get(i).value())){
+    					//System.out.println("nottrue "+ t1Children+" "+t2Children);
+    					return false;
+    				}
+    				
+    			}
+    		else
+    			return false;
+    	}else
+    		return false;
+    	
+    	return true;
+    	
+    }
+    
+    
+    
+    public Tree replaceNodeEqualTo(Tree mainTree, Tree delTree, Tree root, Tree replacement) {
+        Tree[] children = mainTree.children();
+        Tree returnNode = null;
+        
+	        for (Tree child : children) {
+	        	//System.out.println("child: "+ child);
+	        	//System.out.println("delTree: "+ delTree);
+	        	if(hasEqualLeaves(child, delTree)){
+	        		System.out.println("found "+ child);
+	        		int index = mainTree.objectIndexOf(child);
+	        		if(replacement != null)
+	        			mainTree.setChild(index, replacement);
+	        		else
+	        			mainTree.removeChild(index);
+	        		//System.out.println("deleted result "+ mainTree);
+	        		//System.out.println("deleted result "+ root);
+	        		return root;
+	        		
+	        	}else{
+	        		Tree temp;
+	        		if((temp=replaceNodeEqualTo(child, delTree, root, replacement)) == null)
+	        			continue;
+	        		else
+	        			return temp;
+	        	}
+	         
+	        }
+        
+        //System.out.println("return node: " + returnNode);
+        return returnNode;
+        
+    }
+    
+    public String changeTense(String word, String POS) {
+    	 
+        XMLLexicon lexicon = new XMLLexicon("Imports/SimpleNLGResources/default-lexicon.xml");
+        WordElement wordElement = lexicon.getWord(word, LexicalCategory.VERB);
+        InflectedWordElement infl = new InflectedWordElement(wordElement);
+ 
+        switch (POS) {
+            //Past Tense
+            case "VBD":
+                infl.setFeature(Feature.TENSE, Tense.PAST);
+                break;
+            //Gerund / Present Participle
+            case "VBG":
+                infl.setFeature(Feature.FORM, Form.PRESENT_PARTICIPLE);
+                break;
+            //Past Participle
+            case "VBN":
+                infl.setFeature(Feature.FORM, Form.PAST_PARTICIPLE);
+                break;
+            //Present
+            case "VBP":
+                infl.setFeature(Feature.TENSE, Tense.PRESENT);
+                break;
+            //Present 3rd Person
+            case "VBZ":
+                infl.setFeature(Feature.FORM, Form.GERUND);
+ 
+        }
+ 
+        Realiser realiser = new Realiser(lexicon);
+        return realiser.realise(infl).getRealisation();
+    }
+    
+    public boolean treeHasLabel(Tree tree, String label){
+    	for(Tree subtree: tree.subTreeList()){
+    		if(label.equals(subtree.label().toString()))
+    			return true;
+    	}
+    	return false;
+    }
+    
+    @SuppressWarnings("serial")
+	public Tree toPassive(SemanticGraph graph, Tree tree){
+    	for(Tree subtree: tree.subTreeList()){
+    		if(subtree.value().equals("S")){
+    			boolean found = false;
+    			
+    			Tree verbPhrase = null;
+    			Tree nounPhrase = null;
+    			
+    			//check if a both nounphrase and verbphrase next to each other exist in the subtree
+    			List<Tree> children =  subtree.getChildrenAsList();
+    			Tree child;
+    			for(int i = 0; i < children.size(); i++ ){
+    				child = children.get(i);
+    				if(child.value().equals("NP")){
+    					if((i+1) <= children.size())
+    						if(children.get(i+1).value().equals("VP")){
+    							nounPhrase = child;
+    							verbPhrase = children.get(i+1);
+    							found = true;
+    						}
+    				}
+    			}
+    			
+    			System.out.println(nounPhrase);
+    			System.out.println(verbPhrase);
+    			if(found == true){
+    				String relation;
+    			
+    				String agentGov = "";
+    				String agentDep = "";
+    				String passGov = "";
+    				String passDep = "";
+    				String auxDep = "";
+    				//check if certain dependencies exist
+    				for(TypedDependency d : graph.typedDependencies()){
+    		    		relation = d.reln().toString();
+    					
+    					if(relation.equals("agent")){
+    						System.out.println("Agent found: gov - "+d.gov().toString() +" dep - "+d.dep());
+    						agentGov = d.gov().toString();
+							agentDep = d.dep().toString();
+							for(TypedDependency d2: graph.typedDependencies()){
+								relation = d2.reln().toString();
+								if(relation.equals("nsubjpass") && d2.gov().toString().equals(agentGov)){
+									System.out.println("equal gov: "+d2.gov());
+									passGov = d2.gov().toString();
+									passDep = d2.dep().toString();
+									continue;
+								}
+								
+								if(relation.equals("auxpass") && d2.gov().toString().equals(agentGov)){
+									System.out.println("equal auxDep: "+d2.dep());
+									auxDep = d2.dep().toString();
+									continue;
+								}
+								
+								
+							}
+    					}	
+    				}
+    				
+    				//if all these dependencies exist in the sentence, then proceed
+    				if(!agentGov.isEmpty() && !agentDep.isEmpty() && !passGov.isEmpty() && !auxDep.isEmpty() && treeHasLabel(nounPhrase, passDep)){
+	    				Tree ppNode;
+	    				Tree auxNode;
+    					for(Tree leaf:tree.getLeaves()){
+    						
+	    					if(leaf.label().toString().equals(agentDep)){
+	    						ppNode = leaf;
+	    						//get nearest ancestor with PP value
+	    						while(!ppNode.value().equals("PP")){
+	    							System.out.println(ppNode.value());
+	    							ppNode = ppNode.parent(tree);
+	    						}
+	    						
+	    							//delete "by"
+	    							subtree = replaceNodeEqualTo(subtree, ppNode.firstChild(), tree, null);
+	    							//replace noun phrase with the prepositional phrase minus "by"
+	    							subtree = replaceNodeEqualTo(subtree, nounPhrase, tree, ppNode.firstChild());
+	    							//replace the prepositional phrase with the old noun phrase
+	    							subtree = replaceNodeEqualTo(subtree, ppNode, tree, nounPhrase);
+	    							
+	    						}
+	    						//System.out.println("is equal?: "+leaf.label()+" "+auxDep);
+	    						//delete the auxiliary verb
+	    						if(leaf.label().toString().equals(auxDep)){
+	    							auxNode = leaf;
+	    							
+	    							//get nearest VP ancestor
+		    						while(!auxNode.value().equals("VP")){
+		    							System.out.println(auxNode.value());
+		    							auxNode = auxNode.parent(tree);
+		    						}
+		    						//delete node
+		    						subtree = replaceNodeEqualTo(subtree, auxNode.firstChild(), tree, null);
+	    						}
+	    						
+	    						//Change tense of past participle to simple past tense
+	    						if(leaf.label().toString().equals(passGov)){
+	    							if(!leaf.parent(tree).value().equals("VBD")){
+	    								leaf.parent(tree).setValue("VBD");
+	    								
+	    								//lemmatize the word
+	    								leaf.setValue(changeTense(lemmatizeWord(leaf.value()).get(0), "VBD"));
+		    						
+	    							}
+	    						}
+	    							
+	    						
+	    					}
+	    				}
+    				}else
+    					continue;
+    			}
+    		}
+    		
+    		return tree;
+    			
+    	}
+    	
+    }

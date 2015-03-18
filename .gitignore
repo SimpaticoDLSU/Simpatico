@@ -3,7 +3,8 @@
 /Imports/*
 bin/
 /src/lexical/Resources/Simplex/*
-/src/lexical/Resources/WordNet-3.1/*
+/src/lexical/Resources/WordNet-3.0/*
+/BabelNet-API-2.5.1/*
 *.classpath
 *.project
 /edu.mit.jmwe_1.0.1_all/*

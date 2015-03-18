@@ -7,7 +7,7 @@ for the reason that:because
 from the point of view of:from
 in accordance with:under
 inasmuch as:since
-in connection with:concerning
+in connection with:
 in favor of:for
 in order to:to
 in relation to:concerning
@@ -21,3 +21,27 @@ with a view to:to
 with reference to:concerning
 with regard to:concerning
 with respect to:about
+despite the fact that:even though
+because of the fact that:because
+in some instances:sometimes
+in many cases:often
+that was an instance in which:there
+than was formerly the case:now
+in the majority of instances:usually
+during the time that:while
+for the period of:for
+the question as to whether:the question whether
+this is a topic that:this topic
+until such time as:until
+alter or change:change
+cease and desist:cease
+confessed and acknowledged:admitted
+confess and acknowledge:admit
+convey, transfer, and set over:transfer
+full and complete:full
+good and sufficient:good
+true and correct:true
+order and direct:order
+perform and discharge:perform
+made and entered into:made
+agree and undertake:agree
