@@ -1,3 +1,4 @@
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 
@@ -13,36 +14,55 @@ public class Worker extends SwingWorker<Void, Void>{
 	}
 	 //Process (Simplify) while thread is running
     protected Void doInBackground() throws InterruptedException {
-        switch (type) {
+        try{
+        	switch (type) {
             case INPUT_TEXT:
                 model.simplifyText(view.getInputText());
                 break;
             case TEST_CASE:
                 model.simplifyMultipleTexts(view.getSelectedItems());
                 break;
+        	}
+        	
+        	
+        }finally{
+        	//Show output and re-enable the interface after simplifying.
+        	SwingUtilities.invokeLater(new Runnable(){
+
+				@Override
+				public void run() {
+						if(!isCancelled()){
+							view.clearOutputArea();
+					        switch (type) {
+					            case INPUT_TEXT:
+					                view.setOutput(model.getResults());
+					                break;
+					            case TEST_CASE:
+					                view.setMultipleOutput(model.getTestCases());
+					                break;
+					        }
+					       
+					        
+					        view.refresh();
+						}
+				}
+        		
+        		
+        	});
         }
+    	
         return null;
     }
-
-    protected void process() {
+    
+  //Show output and re-enable the interface after simplifying.
+    protected void done() {
+        view.enableInterface(true);
+        view.hideDialog();
         
     }
 
-    //Show output and re-enable the interface after simplifying.
-    protected void done() {
-        view.clearOutputArea();
-        switch (type) {
-            case INPUT_TEXT:
-                view.setOutput(model.getResults());
-                break;
-            case TEST_CASE:
-                view.setMultipleOutput(model.getTestCases());
-                break;
-        }
-       
-        view.enableInterface(true);
-        view.hideDialog();
-        view.refresh();
-    }
+    
+
+    
 
 }

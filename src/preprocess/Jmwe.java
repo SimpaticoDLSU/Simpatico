@@ -80,7 +80,7 @@ public class Jmwe {
 		IMWEIndex index 	= new MWEIndex(idxData);
 		index.open();
 		
-		// make a basic detectors
+		// make a basic detector
 		IMWEDetector detector = new Consecutive(index);
 		List<IToken> sentence = null; 
 		// add the words to the sentence

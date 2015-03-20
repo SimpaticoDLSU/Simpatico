@@ -1,15 +1,18 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Scanner;
 
-import language.PreSentence;
+
 import language.Word;
 import simplenlg.features.Feature;
 import simplenlg.features.Form;
@@ -19,7 +22,6 @@ import simplenlg.framework.LexicalCategory;
 import simplenlg.framework.WordElement;
 import simplenlg.lexicon.XMLLexicon;
 import simplenlg.realiser.english.Realiser;
-import syntactic.SyntacticSubmodules;
 import edu.stanford.nlp.dcoref.CorefChain;
 import edu.stanford.nlp.dcoref.CorefChain.CorefMention;
 import edu.stanford.nlp.dcoref.CorefCoreAnnotations.CorefChainAnnotation;
@@ -38,10 +40,8 @@ import edu.stanford.nlp.semgraph.SemanticGraphFactory;
 import edu.stanford.nlp.trees.GrammaticalRelation;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
-import edu.stanford.nlp.trees.TreeLemmatizer;
 import edu.stanford.nlp.trees.TypedDependency;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.Filter;
 
 public class NlpTest {
 
@@ -273,10 +273,63 @@ public class NlpTest {
     	NlpTest n = new NlpTest();
     	n.scan(new File("src/lexical/Resources/lemmacorpus2.txt"));
     }
+    Map<String, String> map;
+    public String getZipfValue(String word){
+    	if(map == null){
+    		map = new HashMap<String, String>();
+    		File lemmacorpus = new File("C:/Users/juanito/OneDrive/Documents/zipf.csv");
+    		String[] split;
+    		try (BufferedReader reader = new BufferedReader(new FileReader(lemmacorpus.getAbsolutePath()))) 
+    		{
+    		    String line = null;
+    		    int sum = 0;
+    		    while ((line = reader.readLine()) != null) 
+    		    {
+    		        
+    		       
+    		        split  = line.split(",");
+    		        
+    	        	String w = split[0];
+    	        	String zipf = split[1];
+    	        	
+    	        	map.put(w, zipf);
+    			        
+    		    }
+    		    
+    		    
+    		   
+    		} catch (IOException x) 
+    		{
+    		    System.err.format("IOException: %s%n", x);
+    		} 
+    	}else{
+    		Iterator iterator = map.entrySet().iterator();
+    		String s  =map.get(word);
+    		if(s != null)
+    			return s;
+    		else
+    			return null;
+    	    /*while(iterator.hasNext()){
+    	    	Map.Entry<String, String> pairs =(Map.Entry<String, String>)iterator.next();
+    	    	if(pairs.getKey().equalsIgnoreCase(word))
+    	    		return pairs.getValue();
+    	    	
+    	    		
+    	    }*/
+    		
+    	}
+    	return null;
+    }
     
     public void scan(File corpus)
 	{
-		
+		BufferedWriter writer=null;
+		try {
+			writer = new BufferedWriter(new FileWriter(new File("zipfresult2.csv")));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		try (BufferedReader reader = new BufferedReader(new FileReader(corpus.getAbsolutePath()))) 
 		{
 		    String line = null;
@@ -290,14 +343,26 @@ public class NlpTest {
 		    {	
 		    	splitted = line.split(" ");
 		    	freq = Integer.parseInt(splitted[1]);
+		    	/*
 		    	if(curr != freq){
 		    		curr = freq;
-		    		System.out.println("Frequency: "+curr+" Count: "+count);
+		    		//System.out.println("Frequency: "+curr+" Count: "+count);
+		    		writer.write(curr+","+count+"\n");
 		    		count = 1;
 		    		
 		    	}else
 		    		count++;
+		    		
+		    	
+		    	*/
+	           
+	           	 //writer.write("Word: "+splitted[0]+" Count: "+splitted[1]+" Zipf: "+getZipfValue(splitted[0])+"\n");
+	           	writer.write(splitted[0]+","+splitted[1]+","+getZipfValue(splitted[0])+"\n");
+	           	//writer.write(splitted[0]+","+splitted[1]+"\n");
+		    	
+		    	//System.out.println("Word: "+splitted[0]+" Count: "+splitted[1]+" Zipf: "+getZipfValue(splitted[0]));
 		    }
+		    writer.close();
 		   
 		} catch (IOException x) 
 		{

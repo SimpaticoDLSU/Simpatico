@@ -42,6 +42,7 @@ import shortcuts.Print;
 public class LexSubmodules 
 {
 	private Map<String, Double> map;
+	private Map<String, String> zipfMap;
 	private static File configFile = new File("resources/jigsaw.properties");
 	private Print p = new Print();
 	private RiWordNet wordnet;
@@ -137,7 +138,7 @@ public class LexSubmodules
 	 * @return true if complex, false otherwise
 	 */
 	public boolean isComplex(String word)
-	{	
+	{	/*
 		if(map == null)
 		{
 			loadWordList();
@@ -149,8 +150,67 @@ public class LexSubmodules
 	    		return false;
 	    }
 		return true;
+		*/
+		
+		String zipfString;
+		double zipfVal = 0;
+		if((zipfString = getZipfValue(word)) != null)
+			zipfVal = Double.parseDouble(zipfString);
+		
+		if(zipfVal >= 4.0){
+			return false;
+		}else
+			return true;
+		
 		
 	} 
+	
+	public String getZipfValue(String word){
+    	if(zipfMap == null){
+    		zipfMap = new HashMap<String, String>();
+    		File lemmacorpus = new File("src/lexical/Resources/zipf.csv");
+    		String[] split;
+    		try (BufferedReader reader = new BufferedReader(new FileReader(lemmacorpus.getAbsolutePath()))) 
+    		{
+    		    String line = null;
+    		    int sum = 0;
+    		    while ((line = reader.readLine()) != null) 
+    		    {
+    		        
+    		       
+    		        split  = line.split(",");
+    		        
+    	        	String w = split[0];
+    	        	String zipf = split[1];
+    	        	
+    	        	zipfMap.put(w, zipf);
+    			        
+    		    }
+    		    
+    		    
+    		   
+    		} catch (IOException x) 
+    		{
+    		    System.err.format("IOException: %s%n", x);
+    		} 
+    	}else{
+    		
+    		String s  =zipfMap.get(word);
+    		if(s != null)
+    			return s;
+    		else
+    			return null;
+    	    /*while(iterator.hasNext()){
+    	    	Map.Entry<String, String> pairs =(Map.Entry<String, String>)iterator.next();
+    	    	if(pairs.getKey().equalsIgnoreCase(word))
+    	    		return pairs.getValue();
+    	    	
+    	    		
+    	    }*/
+    		
+    	}
+    	return null;
+    }
 	
 	public void loadWordList(){
 		map = new HashMap<String, Double>();
@@ -306,6 +366,7 @@ public class LexSubmodules
 						    		System.out.println("Subs: "+word.getLemma());
 						    		if(word.getLemma().equalsIgnoreCase(w.getLemma())){
 						    			w.getSubstitute().add(w.getWord());
+						    			w.setBestSubstitute(w.getWord());
 						    		}else
 						    			w.getSubstitute().add(word.getLemma().replace('_', ' '));
 						    	}
@@ -400,26 +461,37 @@ public class LexSubmodules
 		    		for(int i = 0; i < words.size(); i++)
 		    		{	Word word = words.get(i);
 		    			
-		    			if(word.getWord().equalsIgnoreCase(firstToken) && isSubstitutableAtIndex(words,i,listOfSubstitutes))
-		    			{	
-		    				int addIndex = 1;
-		    				//set the substitute
-		    				words.get(i).setBestSubstitute(splitted[1]);
-		    				
-		    				//set wordType of the word
-		    				words.get(i).setWordType(Word.COMPOUND_WORD);
-		    				
-		    				//append the succeeding words to the first token
-							for(int substituteNum = 0 ; substituteNum < listOfSubstitutes.size()-1; substituteNum++){
-								words.get(i).appendWord(words.get(i+addIndex).getWord());
-								addIndex++;
-							}
-							
-							//remove the words that have already been merged to the first token
-							for(int d = i+1; d <= i+(listOfSubstitutes.size()-1); d++){
-								words.remove(i+1);
-							}
+		    			if(word.getWordType() != Word.MULTI_WORD  && !word.isIgnore() ){
+			    			if(word.getWord().equalsIgnoreCase(firstToken) && isSubstitutableAtIndex(words,i,listOfSubstitutes))
+			    			{	
+			    				
+			    				
+			    				int addIndex = 1;
+			    				//set the substitute
+			    				words.get(i).setBestSubstitute(splitted[1]);
+			    				
+			    				//set wordType of the word
+			    				words.get(i).setWordType(Word.COMPOUND_WORD);
+			    				
+			    				//append the succeeding words to the first token
+								for(int substituteNum = 0 ; substituteNum < listOfSubstitutes.size()-1; substituteNum++){
+									words.get(i).appendWord(words.get(i+addIndex).getWord());
+									addIndex++;
+								}
+								
+								//remove the words that have already been merged to the first token
+								for(int d = i+1; d <= i+(listOfSubstitutes.size()-1); d++){
+									words.remove(i+1);
+								}
+			    			}
+		    			}else{
+		    				if(word.getWord().equalsIgnoreCase(splitted[0]) && !word.isIgnore() ){
+			    				
+			    				//set the substitute
+			    				words.get(i).setBestSubstitute(splitted[1]);
+		    				}
 		    			}
+		    				
 		    		}
 		    		
 		    		sentence.setWordList(words);
@@ -451,9 +523,11 @@ public class LexSubmodules
 		for(int i = index; i < (index + subs.size()); i++){
 			System.out.println("isSubstitutableAtIndex: "+ words.get(i).getWord()+" "+subs.get(i-index));
 			if(!words.get(i).getWord().equalsIgnoreCase(subs.get(i-index))){
+				
 				return false;
 			}
 		}
+		
 		return true;
 	}
 	

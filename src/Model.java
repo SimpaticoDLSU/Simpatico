@@ -102,10 +102,13 @@ public class Model {
                     	
                         if (word.getSubstitute() != null && !word.getSubstitute().isEmpty()) {
                         	
-                        	if(word.hasTense())
+                        	if(!word.getBestSubstitute().isEmpty())	
+                        		break;
+                        	else if(word.hasTense())
                         		word.setBestSubstitute(changeTense(word.getSubstitute().get(0), word.getPartOfSpeech()));
-                        	else
+                        	else if(word.getBestSubstitute().isEmpty())
                         		word.setBestSubstitute(word.getSubstitute().get(0));
+                        	
                         }
                         System.out.println(word.getBestSubstitute()+" "+word.getPartOfSpeech());
                     }
@@ -149,7 +152,7 @@ public class Model {
         System.out.print(lexicalOutput);
         result = sentenceList;
         
-        syntacticSubmodules = new SyntacticSubmodules(nlp.getPipeline());
+       /* syntacticSubmodules = new SyntacticSubmodules(nlp.getPipeline());
         synanalysis.StartAnalysis(lexicalOutput, nlp.getPipeline());
         ArrayList<Tree> trees = synanalysis.getTree();
         ArrayList<SemanticGraph> graphs = synanalysis.getSemanticGraph();
@@ -160,7 +163,7 @@ public class Model {
         	syntacticSubmodules.checkRules(tree);
         	tree = syntacticSubmodules.toPassive(graph, tree);
         	System.out.println(tree);
-        }
+        }*/
         
         //for each sentence
         //check rules

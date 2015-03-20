@@ -5,15 +5,18 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
+
 import language.PreSentence;
 import language.TestCase;
 import language.Word;
@@ -62,15 +65,18 @@ public class SimpaticoView extends javax.swing.JFrame {
         testCasePreview.setRows(5);
         testCasePreview.setWrapStyleWord(true);
         jScrollPane1.setViewportView(testCasePreview);
-
+        inputTextArea.setWrapStyleWord(true);
         inputPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Input"));
 
         inputTextArea.setColumns(20);
         inputTextArea.setRows(5);
         jScrollPane2.setViewportView(inputTextArea);
+        jScrollPane2.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+      
 
         javax.swing.GroupLayout inputPanelLayout = new javax.swing.GroupLayout(inputPanel);
         inputPanel.setLayout(inputPanelLayout);
+        
         inputPanelLayout.setHorizontalGroup(
             inputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane2)
