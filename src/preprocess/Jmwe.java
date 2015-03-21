@@ -73,7 +73,7 @@ public class Jmwe {
 	 * @return either modified or unchanged list of sentences where detected MWEs are merged
 	 * @throws IOException
 	 */
-	public ArrayList<PreSentence> ApplyMweDetector(ArrayList<PreSentence> sentences) throws IOException
+	public ArrayList<PreSentence> ApplyMweDetector(ArrayList<PreSentence> sentences) throws IOException 
 	{
 				
 		File idxData 		= getMWEIndexDataFile();
@@ -84,10 +84,14 @@ public class Jmwe {
 		IMWEDetector detector = new Consecutive(index);
 		List<IToken> sentence = null; 
 		// add the words to the sentence
+		
+		
+		
 		for(int sentenceIndex = 0; sentenceIndex < sentences.size(); sentenceIndex++){
 			PreSentence presentence = sentences.get(sentenceIndex);
 			sentence = new ArrayList<IToken>();
 			for(Word word : presentence.getWordList()) {
+				
 				sentence.add( new Token (word.getWord(), word.getPartOfSpeech()));
 			}
 			List<IMWE<IToken>> mwes = detector.detect(sentence);
@@ -112,6 +116,10 @@ public class Jmwe {
 							
 							int addIndex = 1;
 							if(isTokensEqualToIndex(tempSentence,tokens, i)){
+								
+								
+								tempSentence.get(i).isIgnore(false);
+								tempSentence.get(i).setStopWord(false);
 								
 								//change wordType of the word
 								tempSentence.get(i).setWordType(Word.MULTI_WORD);

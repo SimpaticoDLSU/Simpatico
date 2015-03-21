@@ -20,7 +20,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -32,10 +31,18 @@ import language.Word;
 import org.apache.commons.lang3.StringUtils;
 
 import rita.RiWordNet;
-import rita.wordnet.jwnl.JWNLException;
 import rita.wordnet.jwnl.wndata.POS;
 import rita.wordnet.jwnl.wndata.Synset;
 import shortcuts.Print;
+import simplenlg.features.Feature;
+import simplenlg.features.Form;
+import simplenlg.features.NumberAgreement;
+import simplenlg.features.Tense;
+import simplenlg.framework.InflectedWordElement;
+import simplenlg.framework.LexicalCategory;
+import simplenlg.framework.WordElement;
+import simplenlg.lexicon.XMLLexicon;
+import simplenlg.realiser.english.Realiser;
 
 
 
@@ -43,7 +50,6 @@ public class LexSubmodules
 {
 	private Map<String, Double> map;
 	private Map<String, String> zipfMap;
-	private static File configFile = new File("resources/jigsaw.properties");
 	private Print p = new Print();
 	private RiWordNet wordnet;
 	public static void main(String args[])
@@ -152,10 +158,10 @@ public class LexSubmodules
 		return true;
 		*/
 		
-		String zipfString;
+		
 		double zipfVal = 0;
-		if((zipfString = getZipfValue(word)) != null)
-			zipfVal = Double.parseDouble(zipfString);
+		
+		zipfVal = getZipfValue(word);
 		
 		if(zipfVal >= 4.0){
 			return false;
@@ -165,7 +171,7 @@ public class LexSubmodules
 		
 	} 
 	
-	public String getZipfValue(String word){
+	public double getZipfValue(String word){
     	if(zipfMap == null){
     		zipfMap = new HashMap<String, String>();
     		File lemmacorpus = new File("src/lexical/Resources/zipf.csv");
@@ -176,30 +182,47 @@ public class LexSubmodules
     		    int sum = 0;
     		    while ((line = reader.readLine()) != null) 
     		    {
-    		        
-    		       
-    		        split  = line.split(",");
-    		        
+
+    		        split  = line.split(",");   		        
     	        	String w = split[0];
     	        	String zipf = split[1];
-    	        	
-    	        	zipfMap.put(w, zipf);
+    	        	zipfMap.put(w.toLowerCase(), zipf);
     			        
     		    }
-    		    
-    		    
-    		   
+
     		} catch (IOException x) 
     		{
     		    System.err.format("IOException: %s%n", x);
     		} 
     	}else{
+    		//if word in synset is compound, split then get the lowest zipf value of each word
+    		String[] split = word.split("_");
+    		String valString;
+    		double valDouble;
+    		double minZipfVal = 7.0;
+    		if(split.length > 1){
+	    		for(String s : split){
+	    			valString = zipfMap.get(s.toLowerCase());
+	    			if(valString != null){
+	    				valDouble = Double.parseDouble(valString);
+	    				if(valDouble < minZipfVal )
+	    					minZipfVal = valDouble;
+	    			}
+	    				
+	    		}
+	    		return minZipfVal;
+    		}else{
+    		//if it is only one word then return that word's zipf value, if it is not in the list then return 0.0 zipf value
+    			valString = zipfMap.get(split[0].toLowerCase());
+    			double zipfVal = 0.0;
+    			if(valString != null)
+    				zipfVal = Double.parseDouble(valString);
+    			
+    			return zipfVal;
+    		}
+    			
     		
-    		String s  =zipfMap.get(word);
-    		if(s != null)
-    			return s;
-    		else
-    			return null;
+    		
     	    /*while(iterator.hasNext()){
     	    	Map.Entry<String, String> pairs =(Map.Entry<String, String>)iterator.next();
     	    	if(pairs.getKey().equalsIgnoreCase(word))
@@ -209,7 +232,7 @@ public class LexSubmodules
     	    }*/
     		
     	}
-    	return null;
+    	return 0.0;
     }
 	
 	public void loadWordList(){
@@ -324,11 +347,14 @@ public class LexSubmodules
 			wordnet = new RiWordNet("src/lexical/Resources/WordNet-3.0");
 		//jig = new JIGSAW(configFile);
 		wordnet.ignoreUpperCaseWords(true);
+		wordnet.ignoreCompoundWords(false);
 		wordnet.randomizeResults(false);
 		
 		
+		
+		
 			try {
-				sentences = generateSynId(sentences); // method sa baba
+				sentences = generateSynId(sentences); 
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -346,32 +372,70 @@ public class LexSubmodules
 						w.setSubstitute(new ArrayList<String>());
 						pos = getMainPOS(w); // check if it's a J,V,N,R
 
-						System.out.println(w.getLemma()+" "+w.getPartOfSpeech().toUpperCase().charAt(0)+" "+w.getWord()+ " " + pos +" " +w.getSenseId());
+						System.out.println(w.getLemma()+" "+w.getPartOfSpeech().toUpperCase()+" "+w.getWord()+ " " + pos +" " +w.getSenseId());
 						
 						if(pos == null) {
 							continue;
 						} else {
 							try {
+								System.out.println(pos+" "+w.getSenseId());
 								tmp =  wordnet.getDictionary().getSynsetAt(pos,w.getSenseId()); // hanapin yung SenseID
-							} catch (JWNLException e) {
+							} catch (Exception e) {
 							// TODO Auto-generated catch block
 								e.printStackTrace();
+								
 							}
 						}
+						
+						
 						if(tmp != null)
 							if(tmp.getWordsSize() > 0) 
-							{
-								for(rita.wordnet.jwnl.wndata.Word word:tmp.getWords())
-								{
-						    		System.out.println("Subs: "+word.getLemma());
-						    		if(word.getLemma().equalsIgnoreCase(w.getLemma())){
-						    			w.getSubstitute().add(w.getWord());
-						    			w.setBestSubstitute(w.getWord());
-						    		}else
-						    			w.getSubstitute().add(word.getLemma().replace('_', ' '));
-						    	}
+							{	
+								//include original word as candidate
+								String[] substitutes;
+								if(!tmp.containsWord(w.getLemma().replace(' ', '_'))){
+									
+									substitutes = new String[tmp.getWordsSize()+1];
+									
+									for(int i = 0; i < substitutes.length-1; i++){
+										substitutes[i] = tmp.getWords()[i].getLemma();
+									}
+									substitutes[substitutes.length-1] = w.getLemma();
+								}else{
+									
+									substitutes = new String[tmp.getWordsSize()];
+									
+									for(int i = 0; i < substitutes.length; i++){
+										substitutes[i] = tmp.getWords()[i].getLemma();
+									}
+									
+								}
+									
+									
+								String bestCandidate = getBestCandidate(substitutes);
+					    		if(bestCandidate.equalsIgnoreCase(w.getLemma())){
+					    			w.setBestSubstitute(w.getWord());
+					    		}else{
+					    			if(w.hasTense()){
+					    				//if verb has more than one word (phrasal verb), split each word, convert tense of first word, then append the rest of the phrasal
+					    				String[] split = bestCandidate.split("_");
+					    				if(split.length > 1){
+					    					String append = changeTense(split[0],w.getPartOfSpeech());
+					    					for(int i = 1; i < split.length;i++){
+					    						append+=(" "+split[i]);
+					    					}
+					    					w.setBestSubstitute(append);
+					    				}else
+					    					w.setBestSubstitute(changeTense(bestCandidate.replace('_', ' '),w.getPartOfSpeech()));
+					    			}else if(w.hasNumberAgreement())
+					    				w.setBestSubstitute(changeNumberAgreement(bestCandidate.replace('_', ' '),w.getPartOfSpeech()));
+					    			else
+					    				w.setBestSubstitute(bestCandidate.replace('_', ' '));
+					    		}
+					    		
+					    		
 							}
-							System.out.println(w.getSubstitute());
+							
 					}
 				}// end for
 		}// end for
@@ -379,6 +443,95 @@ public class LexSubmodules
 		return sentences;
 	}	
 	
+	public String getBestCandidate(String[] words){
+		int size = words.length;
+		
+		System.out.println("Getting best candidate: "+size);
+		double maxZipfScore = 0;
+		int maxIndex = 0;
+		double tempScore = 0;
+		
+		for(int i = 0; i < size; i++){
+			//get zipf value
+			tempScore = getZipfValue(words[i]);
+			System.out.println(words[i]+" "+tempScore);
+			
+			//remember the index of the word with the highest zipf score
+			if(tempScore > maxZipfScore){
+				maxZipfScore = tempScore;
+				maxIndex = i;
+			}
+			
+			
+		}
+
+		return words[maxIndex];
+		
+		
+	}
+	
+	 public String changeTense(String word, String POS) {
+		 
+	        XMLLexicon lexicon = new XMLLexicon("Imports/SimpleNLGResources/default-lexicon.xml");
+	        WordElement wordElement = lexicon.getWord(word, LexicalCategory.VERB);
+	        InflectedWordElement infl = new InflectedWordElement(wordElement);
+	 
+	        switch (POS) {
+	            //Past Tense
+	            case "VBD":
+	                infl.setFeature(Feature.TENSE, Tense.PAST);
+	                break;
+	            //Gerund / Present Participle
+	            case "VBG": 
+	                infl.setFeature(Feature.FORM, Form.PRESENT_PARTICIPLE);
+	                break;
+	            //Past Participle
+	            case "VBN":
+	                infl.setFeature(Feature.FORM, Form.PAST_PARTICIPLE);
+	                break;
+	            //Present
+	            case "VBP":
+	                infl.setFeature(Feature.TENSE, Tense.PRESENT);
+	                break;
+	            //Present 3rd Person
+	            case "VBZ":
+	                infl.setFeature(Feature.FORM, Form.GERUND);
+	 
+	        }
+	 
+	        Realiser realiser = new Realiser(lexicon);
+	        return realiser.realise(infl).getRealisation();
+	    }
+	 
+	 public String changeNumberAgreement(String word, String POS) {
+		 
+	        XMLLexicon lexicon = new XMLLexicon("Imports/SimpleNLGResources/default-lexicon.xml");
+	        WordElement wordElement = lexicon.getWord(word, LexicalCategory.NOUN);
+	        InflectedWordElement infl = new InflectedWordElement(wordElement);
+	 
+	        switch (POS) {
+	            //Noun singular/mass
+	            case "NN":
+	                infl.setFeature(Feature.NUMBER, NumberAgreement.SINGULAR);
+	                break;
+	            //Noun Plural
+	            case "NNS": 
+	                infl.setFeature(Feature.NUMBER, NumberAgreement.PLURAL);
+	                break;
+	            //Proper noun singular
+	            case "NNP":
+	                infl.setFeature(Feature.NUMBER, NumberAgreement.SINGULAR);
+	                break;
+	            //Proper noun Plural
+	            case "NNPS":
+	                infl.setFeature(Feature.NUMBER, NumberAgreement.PLURAL);
+	                break;
+	            
+	        }
+	 
+	        Realiser realiser = new Realiser(lexicon);
+	        return realiser.realise(infl).getRealisation();
+	    }
 	
 	public POS getMainPOS(Word w)
 	{
@@ -609,92 +762,6 @@ public class LexSubmodules
 		return sentences;
 	}
 	
-	/**
-	 * 
-	 * @param word
-	 * A string that requires a SynSet id to be retrieved.
-	 * Requires configFile and JIGSAW to be set up as static variables.
-	 * Please do make sure that the resource folder is set as src and in the build path and import the necessary JIGSAW libraries.
-	 * @return
-	 * 8 digit integer containing the wordnet id
-	 * @throws Exception
-	 */
-	
-	/*
-	public ArrayList<PreSentence> generateSynId(ArrayList<PreSentence> sentences) throws Exception
-    {	
-        TokenGroup tg = null;
-        ArrayList<String> posList = new ArrayList<String>();
-        ArrayList<String> tokenList = new ArrayList<String>();
-        
-        for(PreSentence sentence: sentences)
-		{				
-			for(Word w: sentence.getWordList())
-			{
-				if(w.isComplex() && !w.isStopWord() && w.getWordType() != Word.COMPOUND_WORD && !w.isIgnore()){
-					
-					
-				    
-				    tokenList.add(w.getWord());
-				    String pos = null;
-				    switch(w.getPartOfSpeech().toUpperCase().charAt(0)){
-					    case 'J': pos = "a"; 
-					    	break;
-					    case 'V': pos = "v";  
-					    	break;
-					    case 'N': pos = "n"; 
-					    	break;
-					    case 'R': pos = "r";
-					    	break;
-					    default : pos = "U";
-				    }
-				    posList.add(pos);
-
-				}// end if
-			}// end for
-		}// end for
-        
-        tg = jig.mapText(tokenList.toArray(new String[tokenList.size()]), posList.toArray(new String[posList.size()]));
-        if (tg != null) {
-            System.out.println();
-            
-            for (int i = 0; i < tg.size(); i++) {
-            	System.out.print(tg.get(i).getToken());
-                System.out.print(" ");
-                System.out.print(tg.get(i).getStem());
-                System.out.print(" ");
-                System.out.print(tg.get(i).getPosTag());
-                System.out.print(" ");
-                System.out.print(tg.get(i).getLemma());
-                System.out.print(" ");
-                System.out.print(tg.get(i).getSyn());
-                System.out.println();
-            	
-            }            
-        }
-        
-        int lastK = 0;
-        int lastI = 0;
-        point:
-        for(Token token : tg.getTokens()){
-	        for(int i = lastI; i < sentences.size(); i++){
-	        	ArrayList<Word> sentence = sentences.get(i).getWordList();
-	        	
-	        	for(int k = lastK; k < sentence.size(); k++ ){
-	        		if(token.getSyn().equalsIgnoreCase("U"))
-	        			continue point;
-	        		if(token.getToken().equalsIgnoreCase(sentence.get(k).getWord())){
-	        			sentence.get(k).setSenseId(Long.valueOf(token.getSyn().substring(1)));
-	        			if((lastK+1) < sentence.size())
-	        				lastK = k++;
-	        			lastI = i;
-	        			continue point;
-	        		}
-	        	}
-	        }
-        }
-       return sentences;
-    }*/
 	
 	public ArrayList<PreSentence> generateSynId(ArrayList<PreSentence> sentences) throws Exception
     {	
@@ -806,6 +873,7 @@ public class LexSubmodules
 		WordNet wn 					= WordNet.getInstance();
 		Babelfy bfy 				= Babelfy.getInstance(AccessType.ONLINE);
 		
+		
 		Annotation annotations = bfy.babelfy("", inputText, Matching.EXACT, Language.EN);
 		
 		for ( BabelSynsetAnchor annotation : annotations.getAnnotations() )
@@ -869,7 +937,7 @@ public class LexSubmodules
 		{
 			for ( Word babel : bWords ) 
 			{
-				if(word.getWord().equals(babel.getWord())) {
+				if(word.getWord().equalsIgnoreCase(babel.getWord())) {
 					word.setSenseId(Long.parseLong("" + babel.getSenseId()));
 				}
 			}
