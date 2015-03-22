@@ -70,6 +70,7 @@ public class SimpaticoView extends javax.swing.JFrame {
 
         inputTextArea.setColumns(20);
         inputTextArea.setRows(5);
+        inputTextArea.setLineWrap(true);
         jScrollPane2.setViewportView(inputTextArea);
         jScrollPane2.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
       

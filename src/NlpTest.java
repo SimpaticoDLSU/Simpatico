@@ -10,7 +10,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Scanner;
+
+
 
 
 import language.Word;
@@ -22,6 +25,7 @@ import simplenlg.framework.LexicalCategory;
 import simplenlg.framework.WordElement;
 import simplenlg.lexicon.XMLLexicon;
 import simplenlg.realiser.english.Realiser;
+import syntactic.SyntacticSubmodules;
 import edu.stanford.nlp.dcoref.CorefChain;
 import edu.stanford.nlp.dcoref.CorefChain.CorefMention;
 import edu.stanford.nlp.dcoref.CorefCoreAnnotations.CorefChainAnnotation;
@@ -50,13 +54,13 @@ public class NlpTest {
     public NlpTest() {
         // Create StanfordCoreNLP object properties, with POS tagging
         // (required for lemmatization), and lemmatization
-       // Properties props;
-        //props = new Properties();
-        //props.put("annotators", "tokenize, ssplit, pos,  lemma, ner, parse, dcoref");
+          Properties props;
+          props = new Properties();
+          props.put("annotators", "tokenize, ssplit, pos,  lemma, ner, parse, dcoref");
 
         // StanfordCoreNLP loads a lot of models, so you probably
         // only want to do this once per execution
-        //this.pipeline = new StanfordCoreNLP(props);
+        this.pipeline = new StanfordCoreNLP(props);
     }
     public List<String> lemmatize(String documentText)
     {
@@ -172,9 +176,9 @@ public class NlpTest {
     	//lemmatize("The woman is my wife and she suddenly disappeared."); 
     	//lemmatize("There shall be an officer to be known as the secretary to the Governor-General, who shall be charged with the performance of such secretarial and administrative duties relating to the office of Governor-General, or the Executive Bureau, as shall be required of him by law or direction of the Governor-General."); 
     	lemmatize("The woman, who is my wife, suddenly disappeared."); 
-    	/*
+    	
     	//instantiate syntactic module
-        SyntacticSubmodules submods = new SyntacticSubmodules();
+        SyntacticSubmodules submods = new SyntacticSubmodules(pipeline);
         
         //read the rules
         submods.readRules();
@@ -182,7 +186,7 @@ public class NlpTest {
         for(Tree sentenceTree : treeList){
         	submods.checkRules(sentenceTree);
         	
-        }*/
+        }
         
         
     }
@@ -271,7 +275,8 @@ public class NlpTest {
     
     public static void main(String[] args){
     	NlpTest n = new NlpTest();
-    	n.scan(new File("src/lexical/Resources/lemmacorpus2.txt"));
+    	//n.scan(new File("src/lexical/Resources/lemmacorpus2.txt"));
+    	n.test();
     }
     Map<String, String> map;
     public String getZipfValue(String word){

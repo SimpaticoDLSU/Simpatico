@@ -71,16 +71,24 @@ public class Model {
     public ArrayList<PreSentence> simplifyText(String text) {
  
         ArrayList<PreSentence> sentenceList = new ArrayList<PreSentence>();
+        
  
         try {
             sentenceList = jmwe.ApplyMweDetector(nlp.preprocessText(text));
-        } catch (IOException e) {
+            printSentenceList(sentenceList);
+            System.out.println("after jmwe");
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
         File compoundTextCorpus = new File("src/Documents/compoundprep.txt");
+        
         sentenceList = lexSubmodules.directSubstitution(sentenceList,compoundTextCorpus);
+        System.out.println("after direct subt");
+        printSentenceList(sentenceList);
         sentenceList = lexSubmodules.identifyIgnorables(sentenceList);
+        System.out.println("after ignorables");
+        printSentenceList(sentenceList);
         //perform preprocessing. If returned list is empty then abort.
         if (!sentenceList.isEmpty()) {
             for (PreSentence sentence : sentenceList) {
@@ -95,27 +103,13 @@ public class Model {
  
             //select candidates for each word
             sentenceList = lexSubmodules.candidateSelection(sentenceList);
+            System.out.println("after candidatesel");
+            printSentenceList(sentenceList);
             //sentenceList = lexSubmodules.candidateRanking(sentenceList);
-            for (PreSentence sentence : sentenceList) {
-                for (Word word : sentence.getWordList()) {
-                    if (lexSubmodules.checkConditionsForComplexity(word)) {
-                    	
-                        if (word.getSubstitute() != null && !word.getSubstitute().isEmpty()) {
-                        	
-                        	if(!word.getBestSubstitute().isEmpty())	
-                        		break;
-                        	else if(word.hasTense())
-                        		word.setBestSubstitute(changeTense(word.getSubstitute().get(0), word.getPartOfSpeech()));
-                        	else if(word.getBestSubstitute().isEmpty())
-                        		word.setBestSubstitute(word.getSubstitute().get(0));
-                        	
-                        }
-                        System.out.println(word.getBestSubstitute()+" "+word.getPartOfSpeech());
-                    }
-                }
-            }
             File latinTextCorpus = new File("src/Documents/latin.txt");
             sentenceList = lexSubmodules.directSubstitution(sentenceList,latinTextCorpus);
+            System.out.println("after latin corpus");
+            printSentenceList(sentenceList);
             //adapter = new SimplexAdapter(sentenceList);
             //run simplex
             //adapter.start();
@@ -174,38 +168,15 @@ public class Model {
  
     }
  
-    public String changeTense(String word, String POS) {
- 
-        XMLLexicon lexicon = new XMLLexicon("Imports/SimpleNLGResources/default-lexicon.xml");
-        WordElement wordElement = lexicon.getWord(word, LexicalCategory.VERB);
-        InflectedWordElement infl = new InflectedWordElement(wordElement);
- 
-        switch (POS) {
-            //Past Tense
-            case "VBD":
-                infl.setFeature(Feature.TENSE, Tense.PAST);
-                break;
-            //Gerund / Present Participle
-            case "VBG":
-                infl.setFeature(Feature.FORM, Form.PRESENT_PARTICIPLE);
-                break;
-            //Past Participle
-            case "VBN":
-                infl.setFeature(Feature.FORM, Form.PAST_PARTICIPLE);
-                break;
-            //Present
-            case "VBP":
-                infl.setFeature(Feature.TENSE, Tense.PRESENT);
-                break;
-            //Present 3rd Person
-            case "VBZ":
-                infl.setFeature(Feature.FORM, Form.GERUND);
- 
-        }
- 
-        Realiser realiser = new Realiser(lexicon);
-        return realiser.realise(infl).getRealisation();
-    }
+   public void printSentenceList(ArrayList<PreSentence> sentences){
+	   for(PreSentence sentence:sentences){
+		   for(Word w : sentence.getWordList()){
+			   System.out.print(w.getWord());
+			   
+		   }
+		   System.out.println();
+	   }
+   }
  
     public int getMaxDepth(Tree t) {
         int max = 0;

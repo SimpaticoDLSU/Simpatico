@@ -146,14 +146,14 @@ public class Nlp {
 	public ArrayList<PreSentence> generatePreSentences(List<CoreMap> sentences)
 	{
 		ArrayList<PreSentence> sentenceList = new ArrayList<PreSentence>();
-		ArrayList<Word> words = new ArrayList<Word>();
+		
 		LoadStopWordList();
 		
 		for ( CoreMap sentence : sentences )
 		{
 			
 			PreSentence pSentence = new PreSentence();
-			
+			ArrayList<Word> words = new ArrayList<Word>();
 			
 			for ( CoreLabel token : sentence.get(TokensAnnotation.class) )
 			{
