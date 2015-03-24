@@ -645,9 +645,9 @@ public class NlpTest {
     		
     		return tree;
     			
-    	}
-    	
     }
+    	
+    
 
 public Tree splitCompound(SemanticGraph graph, Tree tree){
 	String relation;
@@ -694,7 +694,7 @@ public Tree splitCompound(SemanticGraph graph, Tree tree){
 			System.out.println(nounPhrase);
 			System.out.println(verbPhrase);
 			if(found == true){
-				String relation;
+				
 			
 				String agentGov = "";
 				String agentDep = "";
