@@ -10,20 +10,12 @@ import lexical.LexSubmodules;
 
 import org.apache.commons.io.FileUtils;
 
+import postprocess.Cleaner;
 import preprocess.Jmwe;
 import preprocess.Nlp;
 import preprocess.ReaderWrite;
-import simplenlg.features.Feature;
-import simplenlg.features.Form;
-import simplenlg.features.Tense;
-import simplenlg.framework.InflectedWordElement;
-import simplenlg.framework.LexicalCategory;
-import simplenlg.framework.WordElement;
-import simplenlg.lexicon.XMLLexicon;
-import simplenlg.realiser.english.Realiser;
 import syntactic.Analysis;
 import syntactic.SyntacticSubmodules;
-import edu.stanford.nlp.semgraph.SemanticGraph;
 import edu.stanford.nlp.trees.Tree;
  
 public class Model {
@@ -117,6 +109,11 @@ public class Model {
             //sentenceList = rankingChooser.getWords(sentenceList);
         } //end if
         String lexicalOutput = "";
+       
+        Cleaner c = new Cleaner();
+        
+        result = c.cleanSentences(sentenceList);
+        
         for (PreSentence s : sentenceList) {
             for (Word w : s.getWordList()) {
                 if (w.getBestSubstitute() != null) {
@@ -144,7 +141,6 @@ public class Model {
  
         System.out.println("Output:");
         System.out.print(lexicalOutput);
-        result = sentenceList;
         
        /* syntacticSubmodules = new SyntacticSubmodules(nlp.getPipeline());
         synanalysis.StartAnalysis(lexicalOutput, nlp.getPipeline());

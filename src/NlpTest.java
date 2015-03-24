@@ -276,7 +276,7 @@ public class NlpTest {
     public static void main(String[] args){
     	NlpTest n = new NlpTest();
     	//n.scan(new File("src/lexical/Resources/lemmacorpus2.txt"));
-    	n.test();
+    	n.execute();
     }
     Map<String, String> map;
     public String getZipfValue(String word){
@@ -648,3 +648,144 @@ public class NlpTest {
     	}
     	
     }
+
+public Tree splitCompound(SemanticGraph graph, Tree tree){
+	String relation;
+	String rootDep;
+	ArrayList<TypedDependency> conjunctions = new ArrayList<TypedDependency>();
+	for(TypedDependency d : graph.typedDependencies()){
+		relation = d.reln().toString();
+		if(relation.equalsIgnoreCase("root")){
+			rootDep = d.dep().toString();
+		}
+		if(relation.equalsIgnoreCase("cc_and") || relation.equalsIgnoreCase("cc_or") || relation.equalsIgnoreCase("cc_but")){
+			conjunctions.add(d);
+		}
+		
+		
+		
+	}
+	
+	for(TypedDependency d: conjunctions){
+		
+	}
+	for(Tree subtree: tree.subTreeList()){
+		if(subtree.value().equals("S")){
+			boolean found = false;
+			
+			Tree verbPhrase = null;
+			Tree nounPhrase = null;
+			
+			//check if a both nounphrase and verbphrase next to each other exist in the subtree
+			List<Tree> children =  subtree.getChildrenAsList();
+			Tree child;
+			for(int i = 0; i < children.size(); i++ ){
+				child = children.get(i);
+				if(child.value().equals("NP")){
+					if((i+1) <= children.size())
+						if(children.get(i+1).value().equals("VP")){
+							nounPhrase = child;
+							verbPhrase = children.get(i+1);
+							found = true;
+						}
+				}
+			}
+			
+			System.out.println(nounPhrase);
+			System.out.println(verbPhrase);
+			if(found == true){
+				String relation;
+			
+				String agentGov = "";
+				String agentDep = "";
+				String passGov = "";
+				String passDep = "";
+				String auxDep = "";
+				//check if certain dependencies exist
+				for(TypedDependency d : graph.typedDependencies()){
+		    		relation = d.reln().toString();
+					
+					if(relation.equals("agent")){
+						System.out.println("Agent found: gov - "+d.gov().toString() +" dep - "+d.dep());
+						agentGov = d.gov().toString();
+						agentDep = d.dep().toString();
+						for(TypedDependency d2: graph.typedDependencies()){
+							relation = d2.reln().toString();
+							if(relation.equals("nsubjpass") && d2.gov().toString().equals(agentGov)){
+								System.out.println("equal gov: "+d2.gov());
+								passGov = d2.gov().toString();
+								passDep = d2.dep().toString();
+								continue;
+							}
+							
+							if(relation.equals("auxpass") && d2.gov().toString().equals(agentGov)){
+								System.out.println("equal auxDep: "+d2.dep());
+								auxDep = d2.dep().toString();
+								continue;
+							}
+							
+							
+						}
+					}	
+				}
+				
+				//if all these dependencies exist in the sentence, then proceed
+				if(!agentGov.isEmpty() && !agentDep.isEmpty() && !passGov.isEmpty() && !auxDep.isEmpty() && treeHasLabel(nounPhrase, passDep)){
+    				Tree ppNode;
+    				Tree auxNode;
+					for(Tree leaf:tree.getLeaves()){
+						
+    					if(leaf.label().toString().equals(agentDep)){
+    						ppNode = leaf;
+    						//get nearest ancestor with PP value
+    						while(!ppNode.value().equals("PP")){
+    							System.out.println(ppNode.value());
+    							ppNode = ppNode.parent(tree);
+    						}
+    						
+    							//delete "by"
+    							subtree = replaceNodeEqualTo(subtree, ppNode.firstChild(), tree, null);
+    							//replace noun phrase with the prepositional phrase minus "by"
+    							subtree = replaceNodeEqualTo(subtree, nounPhrase, tree, ppNode.firstChild());
+    							//replace the prepositional phrase with the old noun phrase
+    							subtree = replaceNodeEqualTo(subtree, ppNode, tree, nounPhrase);
+    							
+    						}
+    						//System.out.println("is equal?: "+leaf.label()+" "+auxDep);
+    						//delete the auxiliary verb
+    						if(leaf.label().toString().equals(auxDep)){
+    							auxNode = leaf;
+    							
+    							//get nearest VP ancestor
+	    						while(!auxNode.value().equals("VP")){
+	    							System.out.println(auxNode.value());
+	    							auxNode = auxNode.parent(tree);
+	    						}
+	    						//delete node
+	    						subtree = replaceNodeEqualTo(subtree, auxNode.firstChild(), tree, null);
+    						}
+    						
+    						//Change tense of past participle to simple past tense
+    						if(leaf.label().toString().equals(passGov)){
+    							if(!leaf.parent(tree).value().equals("VBD")){
+    								leaf.parent(tree).setValue("VBD");
+    								
+    								//lemmatize the word
+    								leaf.setValue(changeTense(lemmatizeWord(leaf.value()).get(0), "VBD"));
+	    						
+    							}
+    						}
+    							
+    						
+    					}
+    				}
+				}else
+					continue;
+			}
+		}
+		
+		return tree;
+			
+	}
+	
+}
