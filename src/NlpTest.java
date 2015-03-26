@@ -382,10 +382,11 @@ public class NlpTest {
     public void execute(){
     	
         
-    	coref("A Certificate of Registration shall be issued to those who are registered after the payment of fees are prescribed by the Commission.");
+    	//coref("A Certificate of Registration shall be issued to those who are registered after the payment of fees are prescribed by the Commission.");
+    	coref("The cat was blindly killed but the police didn't really care.");
     	System.out.println(dependencies);
     	
-    	for(SemanticGraph g : dependencies){
+    /*	for(SemanticGraph g : dependencies){
     			if(isPassiveVoice(g)){
     				System.out.println("is passive");
     			}else
@@ -398,11 +399,26 @@ public class NlpTest {
     			System.out.println("toposlist: "+g.toPOSList());
     			Tree  t = tree.get(0);
     			System.out.println(t.getLeaves().get(0).label());
-    			Tree res = toPassive(g,t);
+    			toPassiveTree res = toPassive(g,t);
     
     				System.out.println(res.getLeaves());
     			
     	
+    	}*/
+    	for(SemanticGraph g : dependencies){
+		
+			
+			System.out.println(g.getChildList(g.getFirstRoot()));
+			System.out.println(g.getChildList(g.getFirstRoot()).get(0).tag());
+			System.out.println(g.getChildList(g.getFirstRoot()).get(0).index());
+			System.out.println(g.getChildList(g.getFirstRoot()).get(0).word());
+			System.out.println("toposlist: "+g.toPOSList());
+			Tree  t = tree.get(0);
+			splitCompound(g, t);
+
+				
+			
+	
     	}
     	
     }
@@ -645,146 +661,81 @@ public class NlpTest {
     		
     		return tree;
     			
-    	}
+}
     	
-    }
+    
 
 public Tree splitCompound(SemanticGraph graph, Tree tree){
 	String relation;
-	String rootDep;
+	String rootDep = null;
 	ArrayList<TypedDependency> conjunctions = new ArrayList<TypedDependency>();
+	ArrayList<TypedDependency> nsubj = new ArrayList<TypedDependency>();
 	for(TypedDependency d : graph.typedDependencies()){
 		relation = d.reln().toString();
 		if(relation.equalsIgnoreCase("root")){
 			rootDep = d.dep().toString();
+			System.out.println("rootdep found: "+rootDep);
 		}
-		if(relation.equalsIgnoreCase("cc_and") || relation.equalsIgnoreCase("cc_or") || relation.equalsIgnoreCase("cc_but")){
+		if(relation.contains("conj_")){
+			System.out.println("conj_ found: "+d.reln());
 			conjunctions.add(d);
 		}
 		
 		
 		
+		
 	}
 	
-	for(TypedDependency d: conjunctions){
-		
+	String targetGov = "";
+	String targetDep = "";
+	String targetConj = "";
+	for(int i = 0; i < conjunctions.size(); i++){
+		TypedDependency d = conjunctions.get(i);
+		if(d.gov().toString().equalsIgnoreCase(rootDep)){
+			targetGov = d.gov().toString();
+			targetDep = d.dep().toString();
+			System.out.println("targets found: "+targetGov+" "+targetDep);
+		}
 	}
-	for(Tree subtree: tree.subTreeList()){
-		if(subtree.value().equals("S")){
-			boolean found = false;
+	Tree treeDep = null;
+	for(Tree subtree : tree.getLeaves()){
+		if(subtree.value().equals(targetDep)){
+			Tree parent;
 			
-			Tree verbPhrase = null;
-			Tree nounPhrase = null;
-			
-			//check if a both nounphrase and verbphrase next to each other exist in the subtree
-			List<Tree> children =  subtree.getChildrenAsList();
-			Tree child;
-			for(int i = 0; i < children.size(); i++ ){
-				child = children.get(i);
-				if(child.value().equals("NP")){
-					if((i+1) <= children.size())
-						if(children.get(i+1).value().equals("VP")){
-							nounPhrase = child;
-							verbPhrase = children.get(i+1);
-							found = true;
-						}
-				}
-			}
-			
-			System.out.println(nounPhrase);
-			System.out.println(verbPhrase);
-			if(found == true){
-				String relation;
-			
-				String agentGov = "";
-				String agentDep = "";
-				String passGov = "";
-				String passDep = "";
-				String auxDep = "";
-				//check if certain dependencies exist
-				for(TypedDependency d : graph.typedDependencies()){
-		    		relation = d.reln().toString();
+			while((parent=subtree.parent(tree)) != null){
+				if(parent.value().equals("S")){
+					System.out.println("dep found: "+parent);
+					//deep copy the S node and delete it in the original tree
+					treeDep = parent.deepCopy();					
+					subtree = replaceNodeEqualTo(subtree, parent, tree, null);
+					break;
 					
-					if(relation.equals("agent")){
-						System.out.println("Agent found: gov - "+d.gov().toString() +" dep - "+d.dep());
-						agentGov = d.gov().toString();
-						agentDep = d.dep().toString();
-						for(TypedDependency d2: graph.typedDependencies()){
-							relation = d2.reln().toString();
-							if(relation.equals("nsubjpass") && d2.gov().toString().equals(agentGov)){
-								System.out.println("equal gov: "+d2.gov());
-								passGov = d2.gov().toString();
-								passDep = d2.dep().toString();
-								continue;
-							}
-							
-							if(relation.equals("auxpass") && d2.gov().toString().equals(agentGov)){
-								System.out.println("equal auxDep: "+d2.dep());
-								auxDep = d2.dep().toString();
-								continue;
-							}
-							
-							
-						}
-					}	
 				}
-				
-				//if all these dependencies exist in the sentence, then proceed
-				if(!agentGov.isEmpty() && !agentDep.isEmpty() && !passGov.isEmpty() && !auxDep.isEmpty() && treeHasLabel(nounPhrase, passDep)){
-    				Tree ppNode;
-    				Tree auxNode;
-					for(Tree leaf:tree.getLeaves()){
-						
-    					if(leaf.label().toString().equals(agentDep)){
-    						ppNode = leaf;
-    						//get nearest ancestor with PP value
-    						while(!ppNode.value().equals("PP")){
-    							System.out.println(ppNode.value());
-    							ppNode = ppNode.parent(tree);
-    						}
-    						
-    							//delete "by"
-    							subtree = replaceNodeEqualTo(subtree, ppNode.firstChild(), tree, null);
-    							//replace noun phrase with the prepositional phrase minus "by"
-    							subtree = replaceNodeEqualTo(subtree, nounPhrase, tree, ppNode.firstChild());
-    							//replace the prepositional phrase with the old noun phrase
-    							subtree = replaceNodeEqualTo(subtree, ppNode, tree, nounPhrase);
-    							
-    						}
-    						//System.out.println("is equal?: "+leaf.label()+" "+auxDep);
-    						//delete the auxiliary verb
-    						if(leaf.label().toString().equals(auxDep)){
-    							auxNode = leaf;
-    							
-    							//get nearest VP ancestor
-	    						while(!auxNode.value().equals("VP")){
-	    							System.out.println(auxNode.value());
-	    							auxNode = auxNode.parent(tree);
-	    						}
-	    						//delete node
-	    						subtree = replaceNodeEqualTo(subtree, auxNode.firstChild(), tree, null);
-    						}
-    						
-    						//Change tense of past participle to simple past tense
-    						if(leaf.label().toString().equals(passGov)){
-    							if(!leaf.parent(tree).value().equals("VBD")){
-    								leaf.parent(tree).setValue("VBD");
-    								
-    								//lemmatize the word
-    								leaf.setValue(changeTense(lemmatizeWord(leaf.value()).get(0), "VBD"));
-	    						
-    							}
-    						}
-    							
-    						
-    					}
-    				}
-				}else
-					continue;
 			}
 		}
+	}
+	
+	Tree treeGov = null;
+	for(Tree subtree : tree.getLeaves()){
+		if(subtree.value().equals(targetGov)){
+			Tree parent;
 		
-		return tree;
+			while((parent=subtree.parent(tree)) != null){
+				if(parent.value().equals("S")){
+					System.out.println("gov found: "+parent);
+					//deep copy the S node and delete it in the original tree
+					treeGov = parent.deepCopy();					
+					subtree = replaceNodeEqualTo(subtree, parent, tree, null);
+					break;
+					
+				}
+			}
+		}
+	}
+	
+		System.out.println("Gov tree: "+treeGov);
+		System.out.println("Dep tree: "+treeDep);
+		return null;
 			
 	}
 	
