@@ -1,4 +1,8 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,12 +20,14 @@ import preprocess.Nlp;
 import preprocess.ReaderWrite;
 import syntactic.Analysis;
 import syntactic.SyntacticSubmodules;
+import edu.stanford.nlp.semgraph.SemanticGraph;
 import edu.stanford.nlp.trees.Tree;
  
 public class Model {
  
     private ArrayList<TestCase> testcases;
     private ArrayList<PreSentence> result;
+    private String syntacticOutput;
     private ReaderWrite rw;
     private Nlp nlp;
     private Jmwe jmwe;
@@ -32,7 +38,7 @@ public class Model {
         this.rw = new ReaderWrite();
         this.jmwe = new Jmwe();
         this.nlp = new Nlp(ReaderWrite.testPathComplete);
-        this.lexSubmodules = new LexSubmodules();
+       
         this.synanalysis = new Analysis();
         
     }
@@ -42,12 +48,13 @@ public class Model {
     }
  
     public void simplifyMultipleTexts(ArrayList<Integer> ids) {
- 
+
         for (int id : ids) {
             TestCase tc = getTestCase(id);
             tc.setResult(simplifyText(tc.getText()));
+            tc.setSyntacticResult(syntacticOutput);
         }
- 
+
     }
  
     public TestCase getTestCase(int id) {
@@ -61,7 +68,7 @@ public class Model {
     }
  
     public ArrayList<PreSentence> simplifyText(String text) {
- 
+    	 lexSubmodules = new LexSubmodules(nlp.getPipeline());
         ArrayList<PreSentence> sentenceList = new ArrayList<PreSentence>();
         
  
@@ -142,24 +149,113 @@ public class Model {
         System.out.println("Output:");
         System.out.print(lexicalOutput);
         
-       /* syntacticSubmodules = new SyntacticSubmodules(nlp.getPipeline());
+        syntacticSubmodules = new SyntacticSubmodules(nlp.getPipeline());
         synanalysis.StartAnalysis(lexicalOutput, nlp.getPipeline());
         ArrayList<Tree> trees = synanalysis.getTree();
         ArrayList<SemanticGraph> graphs = synanalysis.getSemanticGraph();
-        syntacticSubmodules.readRules();
-        for(int i = 0; i < trees.size(); i++){
-        	Tree tree = trees.get(i);
-        	SemanticGraph graph = graphs.get(i);
-        	syntacticSubmodules.checkRules(tree);
-        	tree = syntacticSubmodules.toPassive(graph, tree);
-        	System.out.println(tree);
-        }*/
         
-        //for each sentence
-        //check rules
-        //after: check matching
-        //transform
-        //traverseTree(tree);
+
+      
+
+        File input = new File("E:/Documents/GitHub/input.txt");
+    	BufferedWriter writer=null;
+		try {
+			 writer = new BufferedWriter(new FileWriter(new File("E:/Documents/GitHub/result.txt")));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try (BufferedReader reader = new BufferedReader(new FileReader(input.getAbsolutePath()))) 
+		{
+		    String line = null;
+		    
+		    while ((line = reader.readLine()) != null) 
+		    {
+		        
+		    	syntacticSubmodules.setCOMPOUND(0); 
+		    	syntacticSubmodules.setRELATIVE(0); 
+		    	syntacticSubmodules.setPASSIVE(0); 
+		    	syntacticSubmodules.setAPPOSITIVE(0); 
+		       
+		       synanalysis.StartAnalysis(lexicalOutput, nlp.getPipeline());
+		       Analysis analysis = new Analysis();
+		    	for(int i = 0; i < trees.size(); i++){
+		    		
+		    			SemanticGraph g = graphs.get(i);
+		    			String resultSentences = null;
+		    			ArrayList<SemanticGraph> resultDependencies = null;
+		    			ArrayList<Tree> resultTrees = null;
+		    			System.out.println("EXECUTING COMPOUND");
+		    			//split compound sentences
+		    			resultSentences = syntacticSubmodules.splitCompound(g, trees.get(i));
+		    			
+		    			System.out.println("EXECUTING RELATIVE");
+		    			System.out.println(resultSentences);
+		    			
+		    			//if sentence is compound and returned results
+		    			
+		    			
+		    				
+		    				//get the dependencies of the resulting sentences outputted by the splitting of compound sentences
+		    				analysis.StartAnalysis(resultSentences, nlp.getPipeline());
+	    					resultDependencies = analysis.getSemanticGraph();
+		    				resultTrees = analysis.getTree();
+		    				resultSentences = "";
+		    				//split each sentence in the compound results
+		    				for(int k = 0; k < resultTrees.size(); k++){
+		    					resultSentences+=syntacticSubmodules.splitRelative(resultDependencies.get(k), resultTrees.get(k));
+		    				}
+		    				
+
+		    			
+		    			
+		    			
+	    				
+		    			System.out.println("EXECUTING APPOSITIVE");
+		    			System.out.println(resultSentences);
+		    			
+		    			
+		    			
+		    				//get the dependencies of the resulting sentences outputted by the splitting of compound sentences
+			    			analysis.StartAnalysis(resultSentences, nlp.getPipeline());
+	    					resultDependencies = analysis.getSemanticGraph();
+		    				resultTrees = analysis.getTree();
+		    				resultSentences = "";
+		    				//split each sentence in the compound results
+		    				for(int k = 0; k < resultTrees.size(); k++){
+		    					resultSentences+=syntacticSubmodules.splitAppositive(resultDependencies.get(k), resultTrees.get(k));
+		    				}
+		    				
+	    				
+	    				
+		    			
+		    			
+		    			System.out.println("EXECUTING PASSIVE");
+		    			System.out.println(resultSentences);
+		    			
+		    				analysis.StartAnalysis(resultSentences, nlp.getPipeline());
+	    					resultDependencies = analysis.getSemanticGraph();
+		    				resultTrees = analysis.getTree();
+		    				resultSentences = "";
+		    				for(int k = 0; k < resultTrees.size(); k++){
+		    					resultSentences+=syntacticSubmodules.toPassive(resultDependencies.get(k), resultTrees.get(k));
+		    				}
+			    				
+		    				
+		    				
+		    				writer.write(syntacticSubmodules.getCOMPOUND()+","+syntacticSubmodules.getRELATIVE()+","+syntacticSubmodules.getAPPOSITIVE()+","+syntacticSubmodules.getPASSIVE()+","+resultSentences+"\n");
+		    				syntacticOutput = resultSentences;
+		    		
+		    	}
+			        
+		    }
+		    
+		    writer.close();
+		   
+		} catch (IOException x) 
+		{
+		    System.err.format("IOException: %s%n", x);
+		} 
         return sentenceList;
  
     }

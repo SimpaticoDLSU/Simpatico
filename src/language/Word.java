@@ -172,7 +172,7 @@ public class Word {
     }
  
     public boolean hasTense() {
-        return partOfSpeech.equals("VBD") || partOfSpeech.equals("VBG") || partOfSpeech.equals("VBN") || partOfSpeech.equals("VBP") || partOfSpeech.equals("VBZ");
+        return partOfSpeech.equals("VB") || partOfSpeech.equals("VBD") || partOfSpeech.equals("VBG") || partOfSpeech.equals("VBN") || partOfSpeech.equals("VBP") || partOfSpeech.equals("VBZ");
     }
     
     public boolean hasNumberAgreement() {

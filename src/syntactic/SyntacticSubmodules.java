@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import language.SentenceType;
 import simplenlg.features.Feature;
 import simplenlg.features.Form;
+import simplenlg.features.NumberAgreement;
 import simplenlg.features.Tense;
 import simplenlg.framework.InflectedWordElement;
 import simplenlg.framework.LexicalCategory;
@@ -28,883 +29,54 @@ import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.semgraph.SemanticGraph;
 import edu.stanford.nlp.semgraph.SemanticGraphEdge;
 import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.trees.TreeGraphNode;
 import edu.stanford.nlp.trees.TypedDependency;
 import edu.stanford.nlp.util.CoreMap;
+import edu.stanford.nlp.util.StringUtils;
 
 public class SyntacticSubmodules {
-	//Text format
-    //Properties File syntacticLabels.properties (ROOT OF PROJECT)
-    //Rules per sentence.
-    //[sentence type].txt (replace space with "_").
-    //Rule format
-    //1 rule per line
-    // label1 label2 label3 ..... n > outputlabel1 outputlabel2 ..... n
-
-    ///GET DEPTH
-    //head = tree
-    //for loop
-    // if(head.dephth(node) == [specified val]
-    // add
-    public static final String COMPOUND = SentenceType.COMPOUND.toString();
-    public static final String RELATIVE_CLAUSE = SentenceType.RELATIVE_CLAUSE.toString();
+	private static final int SIMPLIFICATION_THRESHOLD = 25;
+	private  int COMPOUND = 0;
+	private  int RELATIVE = 0;
+	private  int APPOSITIVE = 0;
+	private  int PASSIVE = 0;
     private StanfordCoreNLP pipeline;
 
     public SyntacticSubmodules(StanfordCoreNLP pipeline) {
-        compoundRuleList = new ArrayList<RuleItem>();
-        relativeRuleList = new ArrayList<RuleItem>();
+  
         this.pipeline = pipeline;
     }
-
-    private ArrayList<RuleItem> compoundRuleList;
-    private ArrayList<RuleItem> relativeRuleList;
-
-    //represets each symbol in the rule
-    class Node {
-
-        private int index;
-        private Node head;
-        private Node parent;
-        private String value;
-        private int depth;
-        private boolean isRootNode;
-        private boolean isLastNode;
-        private ArrayList<Node> children;
-        private int siblingIndex;
-        private Tree leaves;
-        private boolean isCoreNLP;
-        private String action;
-        
-      
-        
-        public boolean isCoreNLP() {
-			return isCoreNLP;
-		}
-
-		public void isCoreNLP(boolean isCoreNLP) {
-			this.isCoreNLP = isCoreNLP;
-		}
-
-		
-
-        public void setAction(String action) {
-            this.action = action;
-        }
-
-        public String getAction() {
-            return this.action;
-        }
-        
-        //duplicates everything except child and nlptree and parent
-        public Node duplicate(){
-        	Node duplicate = new Node();
-        	duplicate.setAction(this.action);
-        	duplicate.setSiblingIndex(this.siblingIndex);
-        	duplicate.setLastNode(this.isLastNode);
-        	duplicate.setRootNode(this.isRootNode);
-        	duplicate.setDepth(this.depth);
-        	duplicate.setValue(this.value);
-        	duplicate.setHead(this.head);
-        	duplicate.setIndex(this.index);
-        	return duplicate;
-        }
-        
-        public void setCoreNlpSubTree(Tree leaves) {
-            this.leaves = leaves;
-        }
-
-        public int getDepth() {
-            return depth;
-        }
-
-        public String print() {
-            StringBuilder string = new StringBuilder();
-            string.append(this.value + " ");
-            string = buildStringTraverse(this, string);
-            if (string != null) {
-                return string.toString();
-            } else {
-                return toString();
-            }
-
-        }
-
-        private StringBuilder buildStringTraverse(Node child, StringBuilder string) { // post order traversal
-            if (child.getChildren().isEmpty()) {
-                return null;
-            } else {
-                string.append(" ( ");
-            }
-            for (Node each : child.getChildren()) {
-                string.append(each.getValue() + " ");
-                buildStringTraverse(each, string);
-            }
-            string.append(" ) ");
-            return string;
-        }
-
-        public boolean isRootNode() {
-            return isRootNode;
-        }
-
-        public void setRootNode(boolean isRootNode) {
-            this.isRootNode = isRootNode;
-        }
-
-        public boolean isLastNode() {
-            return isLastNode;
-        }
-
-        public void setLastNode(boolean isLastNode) {
-            this.isLastNode = isLastNode;
-        }
-
-        public int getSiblingIndex() {
-            return siblingIndex;
-        }
-
-        public void setDepth(int depth) {
-            this.depth = depth;
-        }
-
-        public int getIndex() {
-            return index;
-        }
-
-        public void setIndex(int index) {
-            this.index = index;
-        }
-
-        public Node getHead() {
-            return head;
-        }
-
-        public void setHead(Node head) {
-            this.head = head;
-        }
-
-        public Node getParent() {
-            return parent;
-        }
-
-        public void setParent(Node parent) {
-            this.parent = parent;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        public ArrayList<Node> getChildren() {
-        	if(children == null)
-        		return children = new ArrayList<Node>();
-            return children;
-        }
-
-        public void setChildren(ArrayList<Node> children) {
-            this.children = children;
-        }
-
-        public Node skipRoot() {
-            if (value.equals("ROOT")) {
-                if (!children.isEmpty() || children != null) {
-                    return children.get(0);
-                } else {
-                    System.err.println("Method skipRoot() used on Root-only tree!");
-                    return null;
-                }
-            } else {
-                System.err.println("Method skipRoot() used on non-root Node!");
-                return null;
-            }
-        }
-        
-        public Node deleteChild(int index){
-        	return this.children.remove(index);
-        	
-        }
-
-        public void deleteChild(Node node){
-        	for(Node child : children){
-        		if(child.equals(node))
-        			children.remove(child);
-        	}
-        }
-        
-        public int getSibligIndex() {
-            return this.siblingIndex;
-        }
-
-        public void setSiblingIndex(int index) {
-            this.siblingIndex = index;
-        }
-
-        public int getNumSiblings() {
-            if (parent != null) {
-                return parent.getChildren().size();
-            } else {
-                return 0;
-            }
-        }
-
-        public Node getChild(int index) {
-            return children.get(index);
-        }
-
-        public void addChild(Node node) {
-            if (children == null) {
-                children = new ArrayList<Node>();
-            }
-            children.add(node);
-        }
-        
-        /**
-         * determines if one Node is a subset of the other
-         * @param subset 
-         * Node that could be a subset
-         * @param node
-         * Node which the other subset node is compared to
-         * @return
-         * true if 'subset' is a subset or equal to 'node', otherwise false.
-         */
-        public boolean isSubsetOfNode(Node subset, Node node){
-        	List<Node> subsetChildren = subset.getChildren();
-        	List<Node> nodeChildren = node.getChildren();
-        	Node child;
-        	int indexLeftOff = 0;
-            for (int i = 0; i < nodeChildren.size(); i++) {
-                child = nodeChildren.get(i);
-                if(child.getValue().equalsIgnoreCase(subsetChildren.get(indexLeftOff).getValue())){
-                	indexLeftOff++;
-                	if(indexLeftOff == subset.getChildren().size())
-                		return true;
-                }
-            }
-            
-            return false;
-        }
-        
-        public Tree getCoreNlpTree(){
-        	return this.leaves;
-        }
-        
-        @Override
-        public String toString() {
-
-            return this.value;
-
-        }
-    }
-
-    //gets the children of a particular node depending on the current position of the cursor of the scanner
-    public ArrayList<Node> getChildren(Scanner sc, Node head, Node parent, int depth) {
-        String label;
-        Node node = null;
-        Node prevNode = null;
-        int siblingIndex = 0;
-        int d = depth;
-        String[] split;
-        ArrayList<Node> childList = new ArrayList<Node>();
-        while (sc.hasNext()) {
-            label = sc.next();
-            if (node != null) {
-                prevNode = node;
-            }
-            node = new Node();
-
-            if (label.equals(")")) {
-                if (sc.hasNext() == false) {
-                    prevNode.setLastNode(true);
-                }
-
-                return childList;
-            }
-
-            if (label.equals("(")) {
-
-                prevNode.setChildren(getChildren(sc, head, prevNode, ++depth));
-
-            } else {
-                node.setChildren(new ArrayList<Node>());
-                node.setSiblingIndex(siblingIndex++);
-                node.setHead(head);
-                node.setDepth(d);
-                node.setParent(parent);
-                //System.out.println("Setting value: " + label + " Parent: " + parent.getValue() + " Depth: " + d + " SiblingIndex: " + (siblingIndex - 1));
-                split = label.split("-");
-                if (split.length == 3) {
-
-                    node.setValue(split[0]);
-                    node.setIndex(Integer.valueOf(split[1]));
-                    node.setAction(split[2]);
-                } else {
-                    node.setValue(split[0]);
-                    node.setIndex(0);
-                    node.setAction("x");
-                }
-                node.setRootNode(false);
-                if (sc.hasNext() == false) {
-                    node.setLastNode(true);
-                } else {
-                    node.setLastNode(false);
-                }
-
-                childList.add(node);
-
-            }
-
-        }
-
-        return childList;
-
-    }
-
-    //loads rules in their respective arraylists 
-    public void readRules() {
-        //Read the ruleList
-        FileReader fileReader;
-        BufferedReader bufferedReader;
-        List<String> nodeList;
-        try {
-            for (SentenceType sentenceType : SentenceType.values()) {
-                System.out.println(sentenceType.toString());
-                fileReader = new FileReader("src/documents/rules/" + sentenceType.toString() + ".txt");
-                bufferedReader = new BufferedReader(fileReader);
-                Scanner scanner;
-                String line;
-                int depth;
-                while ((line = bufferedReader.readLine()) != null) {
-                    System.out.println("Reading Rule: " + line);
-                    nodeList = new ArrayList();
-                    RuleItem rule = new RuleItem();
-                    String[] splittedRule = line.split(">");
-                    nodeList.add(splittedRule[0]);
-                    splittedRule = splittedRule[1].split("\\|");
-                    nodeList.add(splittedRule[0]);
-                    if (splittedRule.length == 2) {
-                        nodeList.add(splittedRule[1]);
-                    }
-                    Node rootNode;
-
-                    for (int i = 0; i < nodeList.size(); i++) {
-                        depth = 0;
-                        scanner = new Scanner(nodeList.get(i).trim());
-                        rootNode = new Node();
-                        rootNode.setValue("ROOT");
-                        rootNode.setDepth(depth);
-                        rootNode.setRootNode(true);
-                        rootNode.setParent(null);
-                        rootNode.setChildren(getChildren(scanner, rootNode, rootNode, ++depth));
-
-                        System.out.println("==");
-                        if (i == 0) {
-                            rule.setLeftHandSide(rootNode);
-                        } else if (i == 1) {
-                            rule.setRightHandSideOrigin(rootNode);
-                        } else if (i == 2) {
-                            rule.setRightHandSideSplit(rootNode);
-                        }
-                    }
-
-                    rule.setType(sentenceType.toString());
-                    System.out.println("Adding Rule: " + rule.getLeftHandSide().print());
-                    if (COMPOUND.equals(rule.getType())) {
-                        compoundRuleList.add(rule);
-                    } else if (RELATIVE_CLAUSE.equals(rule.getType())) {
-                        relativeRuleList.add(rule);
-                    } 
-                }
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(Framework.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-    }
-
-    //represents one rule
-    private class RuleItem {
-    	private String type;
-        private Node leftHandSide;
-        private Node rightHandSideOrigin;
-        private Node rightHandSideSplit;
-        
-        public Node getRightHandSideOrigin() {
-			return rightHandSideOrigin;
-		}
-
-		public void setRightHandSideOrigin(Node rightHandSideOrigin) {
-			this.rightHandSideOrigin = rightHandSideOrigin;
-		}
-
-		public Node getRightHandSideSplit() {
-			return rightHandSideSplit;
-		}
-
-		public void setRightHandSideSplit(Node rightHandSideSplit) {
-			this.rightHandSideSplit = rightHandSideSplit;
-		}
-
-		
-        public void setType(String type){
-        	this.type = type;
-        }
-        
-        public String getType(){
-        	return this.type;
-        }
-        
-        public Node getLeftHandSide() {
-            return leftHandSide;
-        }
-
-        public void setLeftHandSide(Node leftHandSide) {
-            this.leftHandSide = leftHandSide;
-        }
-
-        
-
-    }
-
-    public static void main(String[] args) {
-        /*SyntacticSubmodules f = new SyntacticSubmodules();
-        f.readRules();
-        System.out.print(f.compoundRuleList.size());
-        for (RuleItem n : f.compoundRuleList) {
-            System.out.print("||");
-
-            f.traverse(n.getLeftHandSide());
-
-            f.traverse(n.getRightHandSideOrigin());
-            f.traverse(n.getRightHandSideSplit());
-        }*/
-
-    }
-
-    public void traverse(Node child) { // post order traversal
-        if (child.getChildren().isEmpty()) {
-            return;
-        } else {
-            System.out.print(" (");
-            for (Node each : child.getChildren()) {
-                System.out.print(each.getValue() + " ");
-                traverse(each);
-            }
-            System.out.print(") ");
-        }
-
-    }
-
-    public void checkRules(Tree sentenceTree) {
-        for (SentenceType sentenceType : SentenceType.values()) {
-            ArrayList<RuleItem> sentenceRules;
-            String string = sentenceType.toString();
-            if (COMPOUND.equals(string)) {
-                sentenceRules = compoundRuleList;
-            }  else if (RELATIVE_CLAUSE.equals(string)) {
-                sentenceRules = relativeRuleList;
-            }  else {
-                sentenceRules = null;
-            }
-            
-            //System.out.println(sentenceTree.flatten());
-            for (RuleItem rule : sentenceRules) {
-                
-                System.out.println("Rule: " + rule.getLeftHandSide().print());
-                
-                List<Tree> subtrees = sentenceTree.subTreeList();
-                //for each subtree
-                for (Tree nlpNode : subtrees) {
-                   //System.out.println(rule.leftHandSide.skipRoot().getValue()+" is equal" + nlpNode.value());
-                    if (nlpNode.value().equalsIgnoreCase(rule.getLeftHandSide().skipRoot().getValue())) {
-                        //System.out.println("outcompare: "+nlpNode.value() +" is equals "+ rule.getLeftHandSide().skipRoot().getValue() + " "+ "nodechildren: "+rule.getLeftHandSide().skipRoot().getChildren()+"nlpChildren: "+nlpNode.getChildrenAsList());
-                        Node duplicateNode;
-                    	if ((duplicateNode=isTreeEqual(nlpNode, rule.getLeftHandSide().skipRoot()) )!= null) {
-                            System.out.println("inside with rule: " + rule.getLeftHandSide().print());
-                            System.out.println("inside with sentence: "+nlpNode);
-                            System.out.println("duplicateNode: " +duplicateNode.print());
-                            //Get generated sentences
-                            ArrayList<Node> output = applyRule(duplicateNode, rule);
-                            
-                            for (Node outputNode : output) {
-                                System.out.println("\nOutput Sentence: ");
-                                printLeaves(outputNode);
-                            }
-                            break;
-                            //applyRule(rule, nlpNode.deepCopy());
-                            //System.out.println(rule.getLeftHandSide().print()+"FUCKING EQUAL TO :"+nlpNode.getLeaves() + " "+nlpNode.value());
-                        }
-
-                    }
-                }
-
-            }
-
-        }
-
-    }
-
-    public ArrayList<Node> applyRule(Node node, RuleItem rule) {
-    	 System.out.println("initialNode: " + node.print());
-        ArrayList<Node> sentences = getSplitSentence(node, null);
-        Node removedNodes = removeMarkedNodes(node);
-
-        if (rule.getType().equals(RELATIVE_CLAUSE)) {
-
-        }
-
-        System.out.println("Nodes removed: " + removedNodes.print());
-        for (Node child : removedNodes.getChildren()) {
-            System.out.print("Tree of " + child.getValue() + " " + child.getCoreNlpTree());
-        }
-
-        System.out.println("\n\n\n");
-
-        System.out.println("Final Tree:");
-        printLeaves(removedNodes);
-        for (Node child : sentences) {
-            System.out.println(child.print() + " Tree: " + child.getCoreNlpTree().getLeaves());
-        }
-
-        //Set sentences to have "S" as a parent node and "." as the end of the tree
-        for (int i = 0; i < sentences.size(); i++) {
-            Node newParent = new Node();
-            newParent.setValue("S");
-            newParent.addChild(sentences.get(i));
-            Node periodNode = new Node();
-            periodNode.setValue(".");
-            newParent.addChild(periodNode);
-            sentences.set(i, newParent);
-        }
-
-        ArrayList<Node> outputTrees = new ArrayList();
-
-        Node output1 = transferTree(removedNodes, deepCopy(rule.getRightHandSideOrigin().skipRoot()));
-        if (output1 == null) {
-            output1 = transferTree(removedNodes, deepCopy(rule.getRightHandSideSplit().skipRoot()));
-        }
-        if (output1 != null) {
-            outputTrees.add(output1);
-        }
-        printLeaves(output1);
-        output1 = null;
-
-        for (Node child : sentences) {
-            System.out.println("\n======111======");
-            output1 = transferTree(child, deepCopy(rule.getRightHandSideOrigin().skipRoot()));
-            if (output1 == null) {
-                System.out.println("NULL");
-                if (rule.getRightHandSideSplit() != null) {
-                    output1 = transferTree(child, deepCopy(rule.getRightHandSideSplit().skipRoot()));
-                    if (output1 == null) {
-                        System.out.println("NULL");
-                    } else {
-                        printLeaves(output1);
-                    }
-                }
-            } else {
-                printLeaves(output1);
-            }
-
-            if (output1 != null) {
-                outputTrees.add(output1);
-            }
-        }
-
-        return outputTrees;
-    }
-    
-     /**
-     *
-     * @param in the node that will be used to copy elements from
-     * @param out the node that will be used to compare with in
-     * @return returns out with the copied elements from in returns null if at
-     * least one element from out is missing from in
-     */
-    public Node transferTree(Node in, Node out) {
-        System.out.println("Comparing: " + out.getValue());
-        if (in.getValue().equals(out.getValue())) {
-            System.out.println("Match found: " + out.getValue());
-            if (out.getChildren().isEmpty()) {
-                out.setChildren(in.getChildren());
-            } else {
-                ArrayList<Node> outChildren = out.getChildren();
-                for (int i = 0; i < outChildren.size(); i++) {
-                    boolean hasMatch = false;
-                    Node outChild = outChildren.get(i);
-                    for (Node inChild : in.getChildren()) {
-                        Node temp = transferTree(inChild, outChild);
-                        if (temp != null) {
-                            outChildren.set(i, temp);
-                            hasMatch = true;
-                            break;
-                        }
-                    }
-                    if (hasMatch) {
-                        out.setChildren(outChildren);
-                    } else {
-                        return null;
-                    }
-                }
-            }
-            out.setCoreNlpSubTree(in.getCoreNlpTree());
-        } else {
-            return null;
-        }
-        return out;
-    }
-
-    /**
-     *
-     * @param node - Node to be deep copied
-     * @return returns a 1 to 1 copy of the node
-     */
-    public Node deepCopy(Node node) {
-        Node duplicate = new Node();
-        duplicate.setAction(node.getAction());
-        duplicate.setSiblingIndex(node.getSiblingIndex());
-        duplicate.setLastNode(node.isLastNode());
-        duplicate.setRootNode(node.isRootNode());
-        duplicate.setDepth(node.getDepth());
-        duplicate.setValue(node.getValue());
-        duplicate.setHead(node.getHead());
-        duplicate.setIndex(node.getIndex());
-        duplicate.setCoreNlpSubTree(node.getCoreNlpTree());
-        if (!node.getChildren().isEmpty()) {
-            for (Node n : node.getChildren()) {
-                deepCopy(n);
-                duplicate.addChild(n);
-            }
-        }
-        return duplicate;
-    }
-    
-    /**
-     * prints the leaves of the Node parameter
-     * @param tree Node whose leaves are printed
-     */
-    public void printLeaves(Node tree){
-    	
-    	if(tree.getChildren().isEmpty()){
-    		System.out.print("Leaves: " +tree.getCoreNlpTree().getLeaves()+" ");
-    	}else{
-	        for (Node child : tree.getChildren()) {
-	        	printLeaves(child);
-	            
-	        }
-    	}
-    }
-    
-    /**
-     * gets the Node with 't' (transfer) as an action
-     * @param node 
-     * Node to be searched
-     * @return
-     * returns Node if found, otherwise null.
-     */
-    public ArrayList<Node> getSplitSentence(Node node, ArrayList<Node> list) {
-    	
-	    	if(list == null)
-	    		list = new ArrayList<Node>();
-	    	
-	    	if(node.isLastNode()){
-	    		
-	    		return list;
-	    	}else{
-		        for (Node child : node.getChildren()) {
-		            
-		        		list = getSplitSentence(child, list);
-		        		if(!child.isCoreNLP())
-			        		if(child.getAction().equals("t")){
-				            	list.add(child);
-				            } 
-		        }
-	    	}
-    	
-    	   return list;
-        
-    }
-	public Node removeMarkedNodes(Node node) {
-	    	Node temp = node.duplicate();
-	    	
-	    	System.out.println("temp val: "+temp.getValue());
-	    	
-	    	
-		    	if(node.isLastNode() || node.getChildren().isEmpty() ){
-		    		return node;
-		    	}else{
-			        for (Node child : node.getChildren()) {
-			        	
-		        		if(child.getAction().equals("x")){
-		        			System.out.println("adding "+child.getValue()+" as child of temp with val of "+temp.getValue());
-		        			child.setParent(temp);	
-		        			child = removeMarkedNodes(child);
-		        			temp.addChild(child);
-			            	
-			            } 
-		        		
-		        					        }
-		    	}
-		    	
-		    	System.out.println("Size of children: "+node.getChildren().size()+" "+ temp.getChildren());
-		    	if(node.getChildren().size() > 0 && temp.getChildren().isEmpty()){
-		    		temp.setCoreNlpSubTree(node.getCoreNlpTree());
-		    		System.out.println("war NA");
-		    		for (Node child : node.getChildren()) {
-
-		        		if(!child.isCoreNLP() && !child.getAction().equals("x")){
-		        			
-		        			for(int i = 0 ; i < temp.getCoreNlpTree().getChildrenAsList().size(); i++){
-		        				if(temp.getCoreNlpTree().getChild(i).value().equalsIgnoreCase(child.getValue())){
-		        					System.out.println("DELETED NA:"+temp.getCoreNlpTree().getChild(i).value());
-		        					temp.getCoreNlpTree().removeChild(i);
-		        					if(i > 0)	
-		        						i--;
-		        				}
-		       					
-		        			}
-		        		}     		
-		        		
-	
-			        }
-		    		temp.setChildren(new ArrayList<Node>());
-		    	}
-	    	
-	    	return temp;
-        
-    }
-	
-	
-	
-	public boolean hasNormalNodes(ArrayList<Node> nodes){
-		for(Node node : nodes){
-			if(node.getAction().equals("x"))
-				return true;
-		}
-		return false;
+    public int getCOMPOUND() {
+		return COMPOUND;
 	}
 
-	/**
-	 * checks if Node is a subtree of Tree and merges both
-	 * @param nlptree A CoreNLP Tree
-	 * @param node A Node object
-	 * @return A copy of Tree as Node
-	 */
-    public Node isTreeEqual(Tree nlptree, Node node) {
-    	
-    	int ctr = 0;
-    	List<Tree> nlpChildren = nlptree.getChildrenAsList();
-    	ArrayList<Tree> sameChildren = getSameChildren(nlpChildren, node.getChildren());
-        Node outputNode = node.duplicate();
-        if(node.isRootNode()){
-    		outputNode.setParent(null);
-    		outputNode.setRootNode(true);
-    	}
-       
-        if (sameChildren == null) {
-        	System.out.println("null children");
-            return null;
-        } else if (sameChildren.isEmpty()) {
-        	System.out.println("no same children");
-            return null;
-        } else {
-            for (int i = 0; i < node.getChildren().size(); i++) {
-            	while(!nlpChildren.get(ctr).equals(sameChildren.get(i))) {
-                    Node nonRuleNode = new Node();
-                    nonRuleNode.setCoreNlpSubTree(nlpChildren.get(ctr));
-                    nonRuleNode.setParent(outputNode);
-                    nonRuleNode.setValue(nlpChildren.get(ctr).value());
-                    nonRuleNode.isCoreNLP(true);
-                    nonRuleNode.setAction("x");
-                    outputNode.addChild(nonRuleNode);
-                    
-                    ++ctr;
-                }
-                ++ctr;
-                if (!(node.getChild(i).getChildren().isEmpty())) {
-                	
-                    Node child = isTreeEqual(sameChildren.get(i), node.getChild(i));
-                    
-                    if (child == null) {
-                        return null;
-                    } else {
-                    	System.out.println("added child: "+child.getValue());
-                    	System.out.println("where children are: "+child.getChildren());
-                    	child.setParent(outputNode);
-                    	child.isCoreNLP(false);
-                        outputNode.addChild(child);
-                        
-                    }
-                } else {
-                	System.out.println("Added new node to "+node.getValue());
-                	node.getChild(i).setParent(outputNode);
-                	node.getChild(i).isCoreNLP(false);
-                    outputNode.addChild(node.getChild(i));
-                }
-                System.out.println("added nlp: "+sameChildren.get(i).value() + " to " + outputNode.getChild(ctr-1).getValue());               
-                outputNode.getChild(ctr-1).setCoreNlpSubTree(sameChildren.get(i));
-            }
-        }
-        
-        for (int k = ctr; k  < nlpChildren.size(); k++) {
-        	 Node nonRuleNode = new Node();
-             nonRuleNode.setCoreNlpSubTree(nlpChildren.get(ctr));
-             nonRuleNode.setParent(outputNode);
-             nonRuleNode.setValue(nlpChildren.get(ctr).value());
-             nonRuleNode.setAction("x");
-             nonRuleNode.isCoreNLP(true);
-             outputNode.addChild(nonRuleNode);
-        }
-        return outputNode;
-    }
+	public void setCOMPOUND(int cOMPOUND) {
+		COMPOUND = cOMPOUND;
+	}
 
-    /**
-     * compares a List of Trees to an ArrayList of Nodes then returns children who are similar and are in order.
-     * @param childrenAsList List of Tree objects to be compared to the List of Nodes
-     * @param children List of Node objects
-     * @return ArrayList containing the similar children without altering the order in which they are found.
-     */
-    public ArrayList<Tree> getSameChildren(List<Tree> childrenAsList, ArrayList<Node> children) {
-        //System.out.println("getsamechildren: "+childrenAsList+" "+children);
-        ArrayList<Tree> listOfEqualNodes = new ArrayList<Tree>();
-        Node child;
-        Tree nlptree;
-        int indexLeftOff = 0;
-        for (int i = 0; i < children.size(); i++) {
-            child = children.get(i);
-            
-            for (int k = indexLeftOff; k < childrenAsList.size(); k++) {
-                nlptree = childrenAsList.get(k);
-                if (child.getValue().equalsIgnoreCase(nlptree.value())) {
-                    System.out.println("Equal: " + child.getValue() + " " + nlptree.value());
-                    listOfEqualNodes.add(nlptree);
-                    if (k < childrenAsList.size()) {
-                        indexLeftOff = k++;
-                    }
-                    break;
-                }
-            }
+	public int getRELATIVE() {
+		return RELATIVE;
+	}
 
-        }
-        //System.out.println("Size: "+listOfEqualNodes.size() +" node has: "+ children.size() + " " + (children.size() > 0?children.get(0).getValue():"" + " nlp has: "+childrenAsList.size()));
-        //System.out.println("children of nlp: "+childrenAsList + " children of node: "+children);
-        if (listOfEqualNodes.size() == children.size()) {
-            return listOfEqualNodes;
-        } else {
-            return null;
-        }
+	public void setRELATIVE(int rELATIVE) {
+		RELATIVE = rELATIVE;
+	}
 
-    }
-    
-    public void mergeNodes(Node node1, Node node2) {
+	public int getAPPOSITIVE() {
+		return APPOSITIVE;
+	}
 
-        for (Node node2child : node2.getChildren()) {
-            if (node2child.getValue().equalsIgnoreCase(node1.getValue())) {
-            }
-        }
-    }
+	public void setAPPOSITIVE(int aPPOSITIVE) {
+		APPOSITIVE = aPPOSITIVE;
+	}
+
+	public int getPASSIVE() {
+		return PASSIVE;
+	}
+
+	public void setPASSIVE(int pASSIVE) {
+		PASSIVE = pASSIVE;
+	}
     
     public Tree setDependencies(Tree in, SemanticGraph dependencies) {
         ArrayList<SemanticGraphEdge> RCMODList = new ArrayList();
@@ -968,6 +140,17 @@ public class SyntacticSubmodules {
         //if(head.depth(tree) == [val]) { add }
     }
     
+   
+    public String treeToString(Tree tree){
+		
+		String output = "";
+			
+			for(Tree leaf:tree.getLeaves()){
+				output+=(" "+leaf.value().toString());
+			}
+			System.out.println("treeToString output: "+output);
+		return output;
+    }
     public boolean isPassiveVoice(SemanticGraph g){
     	String relation;
     	String relation2;
@@ -1046,18 +229,21 @@ public class SyntacticSubmodules {
     }
     
     public String changeTense(String word, String POS) {
-    	 
+		 
         XMLLexicon lexicon = new XMLLexicon("Imports/SimpleNLGResources/default-lexicon.xml");
         WordElement wordElement = lexicon.getWord(word, LexicalCategory.VERB);
         InflectedWordElement infl = new InflectedWordElement(wordElement);
- 
+        System.out.println("POS IS: "+POS);
         switch (POS) {
+        	case "VB":
+        		infl.setFeature(Feature.FORM, Form.BARE_INFINITIVE);
+        		break;
             //Past Tense
             case "VBD":
                 infl.setFeature(Feature.TENSE, Tense.PAST);
                 break;
             //Gerund / Present Participle
-            case "VBG":
+            case "VBG": 
                 infl.setFeature(Feature.FORM, Form.PRESENT_PARTICIPLE);
                 break;
             //Past Participle
@@ -1087,7 +273,7 @@ public class SyntacticSubmodules {
     }
     
     @SuppressWarnings("serial")
-	public Tree toPassive(SemanticGraph graph, Tree tree){
+	public String toPassive(SemanticGraph graph, Tree tree){
     	for(Tree subtree: tree.subTreeList()){
     		if(subtree.value().equals("S")){
     			boolean found = false;
@@ -1110,8 +296,7 @@ public class SyntacticSubmodules {
     				}
     			}
     			
-    			System.out.println(nounPhrase);
-    			System.out.println(verbPhrase);
+    			
     			if(found == true){
     				String relation;
     			
@@ -1148,6 +333,7 @@ public class SyntacticSubmodules {
     					}	
     				}
     				
+    				
     				//if all these dependencies exist in the sentence, then proceed
     				if(!agentGov.isEmpty() && !agentDep.isEmpty() && !passGov.isEmpty() && !auxDep.isEmpty() && treeHasLabel(nounPhrase, passDep)){
 	    				Tree ppNode;
@@ -1169,71 +355,503 @@ public class SyntacticSubmodules {
 	    							//replace the prepositional phrase with the old noun phrase
 	    							subtree = replaceNodeEqualTo(subtree, ppNode, tree, nounPhrase);
 	    							
-	    						}
-	    						//System.out.println("is equal?: "+leaf.label()+" "+auxDep);
-	    						//delete the auxiliary verb
-	    						if(leaf.label().toString().equals(auxDep)){
-	    							auxNode = leaf;
-	    							
-	    							//get nearest VP ancestor
-		    						while(!auxNode.value().equals("VP")){
-		    							System.out.println(auxNode.value());
-		    							auxNode = auxNode.parent(tree);
-		    						}
-		    						//delete node
-		    						subtree = replaceNodeEqualTo(subtree, auxNode.firstChild(), tree, null);
-	    						}
-	    						
-	    						//Change tense of past participle to simple past tense
-	    						if(leaf.label().toString().equals(passGov)){
-	    							if(!leaf.parent(tree).value().equals("VBD")){
-	    								leaf.parent(tree).setValue("VBD");
-	    								
-	    								//lemmatize the word
-	    								leaf.setValue(changeTense(lemmatizeWord(leaf.value()).get(0), "VBD"));
-		    						
-	    							}
-	    						}
-	    							
-	    						
 	    					}
+	    						
+    						//System.out.println("is equal?: "+leaf.label()+" "+auxDep);
+    						//delete the auxiliary verb
+    						if(leaf.label().toString().equals(auxDep)){
+    							auxNode = leaf;
+    							
+    							//get nearest VP ancestor
+	    						while(!auxNode.value().equals("VP")){
+	    							System.out.println(auxNode.value());
+	    							auxNode = auxNode.parent(tree);
+	    						}
+	    						//delete node
+	    						subtree = replaceNodeEqualTo(subtree, auxNode.firstChild(), tree, null);
+	    						
+    						}
+    						
+    						//Change tense of past participle to simple past tense
+    						if(leaf.label().toString().equals(passGov)){
+    							if(!leaf.parent(tree).value().equals("VBD")){
+    								leaf.parent(tree).setValue("VBD");
+    								
+    								//lemmatize the word
+    								leaf.setValue(changeTense(lemmatizeWord(leaf.value()).get(0), "VBD"));
+    								
+    							}
+    						}
+    						
+	    						
+	    							
+	    						
 	    				}
-    				}else
-    					continue;
-    			}
-    		}
-    		
-    		return tree;
+    					String output = "";
+						ArrayList<Tree> list = new ArrayList<Tree>();
+						list.add(tree);
+						for(Tree cleanTree : cleanClauses(list)){
+							
+							for(Tree l:cleanTree.getLeaves()){
+								output+=(" "+l.value().toString());
+							}
+							
+						}
+						System.out.println("Passive output: "+output);
+						PASSIVE++;
+						return output;
+	    			}
+				}else
+					continue;
+			}
+		}//end for loop
+	
+	
+	
+		
+		String output = "";
+		System.out.println("Passive simplification not executed.");
+		for(Tree leaf:tree.getLeaves()){
+			output+=(" "+leaf.value().toString());
+		}
+		return output;
+		
     			
-    	}
-    
-	    public List<String> lemmatizeWord(String word)
-	    {
-	        List<String> lemmas = new LinkedList<String>();
-	
-	        // create an empty Annotation just with the given text
-	        Annotation document = new Annotation(word);
-	
-	        // run all Annotators on this text
-	        this.pipeline.annotate(document);
-	
-	        // Iterate over all of the sentences found
-	        List<CoreMap> sentences = document.get(SentencesAnnotation.class);
-	        for(CoreMap sentence: sentences) {
-	            // Iterate over all tokens in a sentence
-	            for (CoreLabel token: sentence.get(TokensAnnotation.class)) {
-	                // Retrieve and add the lemma for each word into the list of lemmas
-	                lemmas.add(token.get(LemmaAnnotation.class));
-	            }
-	        
-	    	}
-	     
-	        return lemmas;
-	    }
+}
+    	
+    public List<String> lemmatizeWord(String word)
+    {
+        List<String> lemmas = new LinkedList<String>();
 
-    //Get Tree from text
-    //Read all ruleList
-    //Traverse each sentence?
-    //Check each sentence for its type.
-    //Apply if needed
+        // create an empty Annotation just with the given text
+        Annotation document = new Annotation(word);
+
+        // run all Annotators on this text
+        this.pipeline.annotate(document);
+
+        // Iterate over all of the sentences found
+        List<CoreMap> sentences = document.get(SentencesAnnotation.class);
+        for(CoreMap sentence: sentences) {
+            // Iterate over all tokens in a sentence
+            for (CoreLabel token: sentence.get(TokensAnnotation.class)) {
+                // Retrieve and add the lemma for each word into the list of lemmas
+                lemmas.add(token.get(LemmaAnnotation.class));
+            }
+        
+    	}
+     
+        return lemmas;
+    }
+
+    public String splitCompound(SemanticGraph graph, Tree tree){
+		String relation;
+		String rootDep = null;
+		ArrayList<TypedDependency> conjunctions = new ArrayList<TypedDependency>();	
+		//find root and conj relations and add them in a list
+		for(TypedDependency d : graph.typedDependencies()){
+			relation = d.reln().toString();
+			//System.out.println(relation +" "+d.gov().toString()+" "+ d.dep().toString());
+			if(relation.equalsIgnoreCase("root")){
+				rootDep = d.dep().toString();
+				//System.out.println("rootdep found: "+rootDep);
+			}
+			if(relation.contains("conj")){
+				//System.out.println("conj found: "+d.reln());
+				conjunctions.add(d);
+			}
+			
+			
+			
+			
+		}
+		
+		String targetGov = "";
+		String targetDep = "";
+		//find a conjunction with a governor equal to the dependent of the root relation
+		for(int i = 0; i < conjunctions.size(); i++){
+			TypedDependency d = conjunctions.get(i);
+			if(d.gov().toString().equalsIgnoreCase(rootDep)){
+				targetGov = d.gov().toString();
+				targetDep = d.dep().toString();
+				
+				System.out.println("targets found: "+targetGov+" "+targetDep);
+			}
+		}
+		Tree treeDep = null;
+		Tree treeGov = null;
+		for(Tree subtree : tree.getLeaves()){
+			
+			
+			if(subtree.label().toString().equals(targetGov) ){
+				Tree parent = subtree.parent(tree);
+				System.out.println(subtree.value());
+				while(parent != null){
+					
+					if(parent.value().equals("S") && !parent.parent(tree).value().equalsIgnoreCase("ROOT")){
+						System.out.println("gov found: "+parent);
+						//deep copy the S node and delete it in the original tree
+						treeGov = parent.deepCopy();					
+						
+						break;
+						
+					}
+					parent=parent.parent(tree);
+				}
+			}
+			
+		}
+		
+		//starting from the leaf node, traverse up the tree until the first S node is found. Then deep copy that node then delete.
+		for(Tree subtree : tree.getLeaves()){
+			
+			if(subtree.label().toString().equals(targetDep)){
+				Tree parent = subtree.parent(tree);
+				System.out.println(subtree.value());
+				while(parent != null){
+					
+					if(parent.value().equals("S") && !parent.parent(tree).value().equalsIgnoreCase("ROOT")){
+						System.out.println("dep found: "+parent);
+						//deep copy the S node and delete it in the original tree
+						treeDep = parent.deepCopy();
+						subtree = replaceNodeEqualTo(tree, parent, tree, null);
+						
+						break;
+						
+						
+					}
+					parent=parent.parent(tree);
+				}
+			}
+			
+		
+	}
+	
+	
+	if(treeDep != null && treeGov != null )
+		for(TypedDependency d : graph.typedDependencies()){
+			relation = d.reln().toString();
+			if(relation.equalsIgnoreCase("neg")){
+				if(d.gov().toString().equalsIgnoreCase(targetDep)){
+					boolean isWithinS = false;
+					for(Tree child:treeDep.getLeaves()){
+						if(child.label().toString().equalsIgnoreCase(d.dep().toString()))
+							isWithinS = true;
+					}
+					if(!isWithinS){
+						Tree newTree = TreeGraphNode.factory().newLeaf(d.dep().toString().split("-")[0]);
+						treeDep.addChild(0, newTree);
+					}
+				}
+			}
+			
+		}
+	
+		ArrayList<Tree> trees  = new ArrayList<Tree>();
+		
+		String output = "";
+		
+		if(treeDep != null && treeGov != null){
+			
+			trees.add(tree);
+			trees.add(treeDep);
+			for(Tree cleanTree : cleanClauses(trees)){
+				
+				for(Tree leaf:cleanTree.getLeaves()){
+					output+=(" "+leaf.value().toString());
+				}
+				
+			}
+			System.out.println("Compound output: "+output);
+			COMPOUND++;
+			return output;
+			
+		}else{
+			System.out.println("Compound simplification not executed.");
+			for(Tree leaf:tree.getLeaves()){
+				output+=(" "+leaf.value().toString());
+			}
+			return output;
+		}
+	}
+	public ArrayList<Tree> cleanClauses(ArrayList<Tree> treeList){
+		List<Tree> leaves;
+		for(Tree tree : treeList){
+			leaves = tree.getLeaves();
+			//convert the start of sentence to uppercase
+			leaves.get(0).setValue(StringUtils.capitalize(leaves.get(0).value().toString()));
+			
+			
+			
+			
+			//loop for fixing the end of the sentence, removing wrong punctuation
+			String currLeafVal;
+			
+			int size = leaves.size()-1;
+			Tree parent;
+		/*	do{
+				
+				if((parent=leaves.get(i).parent(tree)) != null)
+					currLeafVal = parent.value();
+				else
+					continue;
+				System.out.println("currLeaf: "+currLeafVal);
+				//if value of current leaf is a period, CC, or comma then delete the parent of the parent of (this is not a typo) the leaf
+				if(currLeafVal.equalsIgnoreCase(".") || currLeafVal.equalsIgnoreCase("CC") || currLeafVal.equalsIgnoreCase(",")){
+					System.out.println("Deleting "+currLeafVal);
+					parent.parent(tree).removeChild(parent.parent(tree).objectIndexOf(parent));
+				}
+				i--;
+				
+				
+			}while(parent.value().equalsIgnoreCase(".") || parent.value().equalsIgnoreCase("CC") || parent.value().equalsIgnoreCase(","));*/
+			for(int i = size; i > 0; i--){
+				if((parent=leaves.get(i).parent(tree)) != null)
+					currLeafVal = parent.value();
+				else
+					continue;
+				if(parent.value().equalsIgnoreCase(".") || parent.value().equalsIgnoreCase("CC") || parent.value().equalsIgnoreCase(",") || parent.value().equalsIgnoreCase("RB")){
+					System.out.println("Deleting "+currLeafVal);
+					parent.parent(tree).removeChild(parent.parent(tree).objectIndexOf(parent));
+				}else
+					break;
+				
+			}
+			
+			System.out.println("Last leaf value: "+leaves.get(leaves.size()-1).value().toString());
+			//put a period in the end of the sentence 
+			if(!tree.getLeaves().get(tree.getLeaves().size()-1).value().toString().equals(".")){
+				Tree newTree = TreeGraphNode.factory().newLeaf(".");
+				tree.addChild(newTree);
+			}
+			
+			
+			//loop for removing consecutive commas
+			boolean prevLeafIsComma = false;
+			Tree prevLeaf = null;
+			for(Tree leaf : leaves){
+				if(!leaf.value().equals(",")){
+					prevLeafIsComma=false;
+				}
+				if(leaf.value().equals(",") && !prevLeafIsComma){
+					prevLeafIsComma = true;
+					prevLeaf = leaf;
+				}else if(leaf.value().equals(",") && prevLeafIsComma && prevLeaf != null){
+					Tree parentOfLeaf = leaf.parent(tree).parent(tree);
+					Tree parentOfPrevLeaf = prevLeaf.parent(tree).parent(tree);
+					try{
+						System.out.println("Deleting double comma");
+						parentOfPrevLeaf.removeChild(parentOfPrevLeaf.objectIndexOf(prevLeaf.parent(tree)));
+						parentOfLeaf.removeChild(parentOfLeaf.objectIndexOf(leaf.parent(tree)));
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+					
+				}
+			}
+		
+		}
+		
+		return treeList;
+	}
+	public Tree getTargetClause(String nodeValue, String targetNode, Tree tree, boolean delete){
+		Tree foundTree = null;
+		for(Tree subtree : tree.getLeaves()){
+			
+			if(subtree.label().toString().equals(nodeValue)){
+				Tree parent = subtree.parent(tree);
+				//System.out.println(subtree.value());
+				while(parent != null){
+					
+					if(parent.value().equals(targetNode)){
+						System.out.println("dep found: "+parent);
+						//deep copy the S node and delete it in the original tree
+						foundTree = parent;	
+						if(delete)
+							subtree = replaceNodeEqualTo(subtree, parent, tree, null);
+						break;
+						
+					}
+					parent=parent.parent(tree);
+				}
+			}
+		}
+		return foundTree;
+	}
+	
+	
+	public String splitRelative(SemanticGraph graph, Tree tree){
+		String relation;
+		String rootDep = null;
+		ArrayList<Tree> splitTrees = new ArrayList<Tree>();
+		
+		
+		for(TypedDependency d : graph.typedDependencies()){
+			relation = d.reln().toString();
+			Tree temp;
+			Tree nounPhrase;
+			
+			if(relation.equalsIgnoreCase("rcmod")){
+				rootDep = d.dep().toString();
+				System.out.println("rcmod found: "+rootDep);
+				temp = getTargetClause(d.dep().toString(), "SBAR", tree, false);
+				if(temp != null && temp.getLeaves().size() >= SIMPLIFICATION_THRESHOLD){
+					nounPhrase = getTargetClause(d.gov().toString(), "NP", tree, false);
+					for(Tree child : temp.getChildrenAsList()){
+						if(child.value().equals("WHNP")){
+							tree = replaceNodeEqualTo(tree, temp, tree, null);
+							temp.setChild(temp.objectIndexOf(child), nounPhrase);
+							
+							if(splitTrees.isEmpty())
+								splitTrees.add(tree);
+							splitTrees.add(temp);
+						}
+					}
+				}
+					
+			}
+		}
+	
+		
+		
+		
+		
+		String output="";
+		if(!splitTrees.isEmpty()){
+			
+			for(Tree t : cleanClauses(splitTrees)){
+				
+				//System.out.println(t.getLeaves());
+				for(Tree leaf:t.getLeaves()){
+					output+=(" "+leaf.value().toString());
+				}
+				
+			}
+			
+			System.out.println("Relative output: "+output);
+			RELATIVE++;
+			return output;
+		}else{
+			System.out.println("Relative simplification not executed.");
+			for(Tree leaf:tree.getLeaves()){
+				output+=(" "+leaf.value().toString());
+			}
+			return output;
+		}
+		
+			
+	}
+	
+	public String splitAppositive(SemanticGraph graph, Tree tree){
+		String relation;
+		String apposDep = null;
+		String apposGov = null;
+		ArrayList<Tree> splitTrees = new ArrayList<Tree>();
+		for(TypedDependency d : graph.typedDependencies()){
+			relation = d.reln().toString();
+
+			//find the appositive relation
+			if(relation.equalsIgnoreCase("appos")){
+				apposDep = d.dep().toString();
+				apposGov = d.gov().toString();
+				System.out.println("appos found: "+apposDep);
+				
+				for(TypedDependency g : graph.typedDependencies()){
+					//if a prepositional phrase or a relative clause modifies the dependent of the appositive then 
+					if((g.reln().toString().equalsIgnoreCase("prep") || g.reln().toString().equalsIgnoreCase("rcmod")) && g.gov().toString().equalsIgnoreCase(apposDep)){
+						//the nounphrase of the appositive
+						Tree nounPhrase1 = getTargetClause(apposDep, "NP", tree, false);
+						
+						//get the parent of the nounphrase that the dependent belongs to
+						Tree nounPhrase2 = nounPhrase1.parent(tree);
+						
+						if(nounPhrase2.getLeaves().size() >= SIMPLIFICATION_THRESHOLD){
+							tree = replaceNodeEqualTo(tree, nounPhrase2, tree, null);
+							String beVerb="";
+							
+							for(Tree leaf:tree.getLeaves()){
+								
+								if(apposGov.equalsIgnoreCase(leaf.label().toString())){
+									
+									beVerb = changeNumberAgreement("be", leaf.parent(tree).value().toString(), LexicalCategory.VERB);
+								}
+							}
+							
+							Tree nounPhraseSubj = getTargetClause(apposGov, "NP",tree,false);
+							treeToString(nounPhraseSubj);
+							Tree newTree = TreeGraphNode.factory().newLeaf(beVerb);
+							nounPhrase2.addChild(0,newTree);
+							newTree = TreeGraphNode.factory().newLeaf(treeToString(nounPhraseSubj));
+							nounPhrase2.addChild(0,newTree);
+							
+							if(splitTrees.isEmpty())
+								splitTrees.add(tree);
+							splitTrees.add(nounPhrase2);
+							break;
+						}
+					}
+					
+				}
+				
+					
+			}//end if
+			
+		}//end for
+		String output="";
+		if(!splitTrees.isEmpty()){
+			
+			for(Tree t : cleanClauses(splitTrees)){
+				
+				//System.out.println(t.getLeaves());
+				for(Tree leaf:t.getLeaves()){
+					output+=(" "+leaf.value().toString());
+				}
+				
+			}
+			System.out.println("Appositive output: "+output);
+			APPOSITIVE++;
+			return output;
+			
+		}else{
+			System.out.println("Appositive simplification not executed.");
+			
+				
+			//System.out.println(t.getLeaves());
+			for(Tree leaf:tree.getLeaves()){
+				output+=(" "+leaf.value().toString());
+			}
+			System.out.println("Appositive output: "+output);
+			return output;
+		}
+		
+	}
+	
+	 public String changeNumberAgreement(String word, String POS, LexicalCategory cat) {
+		 
+	        XMLLexicon lexicon = new XMLLexicon("Imports/SimpleNLGResources/default-lexicon.xml");
+	        WordElement wordElement = lexicon.getWord(word, cat);
+	        InflectedWordElement infl = new InflectedWordElement(wordElement);
+	 
+	        switch (POS) {
+	            //Noun singular/mass
+	            case "NN":
+	                infl.setFeature(Feature.NUMBER, NumberAgreement.SINGULAR);
+	                break;
+	            //Noun Plural
+	            case "NNS": 
+	                infl.setFeature(Feature.NUMBER, NumberAgreement.PLURAL);
+	                break;
+	            //Proper noun singular
+	            case "NNP":
+	                infl.setFeature(Feature.NUMBER, NumberAgreement.SINGULAR);
+	                break;
+	            //Proper noun Plural
+	            case "NNPS":
+	                infl.setFeature(Feature.NUMBER, NumberAgreement.PLURAL);
+	                break;
+	            
+	        }
+	 
+	        Realiser realiser = new Realiser(lexicon);
+	        return realiser.realise(infl).getRealisation();
+	   }
 }

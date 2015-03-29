@@ -42,6 +42,7 @@ public class Controller {
         Worker worker = new Worker(model, view, type) ;
         //Start Simplification and disable UI
         
+        
         view.enableInterface(false);
         view.showDialog("Simplifying. Please wait.");
         worker.execute();

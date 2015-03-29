@@ -13,6 +13,7 @@ import it.uniroma1.lcl.babelfy.data.BabelSynsetAnchor;
 import it.uniroma1.lcl.babelnet.BabelSynset;
 import it.uniroma1.lcl.jlt.util.Language;
 import it.uniroma1.lcl.jlt.wordnet.WordNet;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,6 +21,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -30,6 +32,17 @@ import language.Word;
 
 import org.apache.commons.lang3.StringUtils;
 
+
+
+
+
+
+import edu.stanford.nlp.ling.CoreAnnotations.LemmaAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.stanford.nlp.util.CoreMap;
 import rita.RiWordNet;
 import rita.wordnet.jwnl.wndata.POS;
 import rita.wordnet.jwnl.wndata.Synset;
@@ -52,6 +65,13 @@ public class LexSubmodules
 	private Map<String, String> zipfMap;
 	private Print p = new Print();
 	private RiWordNet wordnet;
+	private StanfordCoreNLP pipeline;
+	public LexSubmodules(StanfordCoreNLP pipeline) {
+		this.pipeline = pipeline;
+	}
+
+
+
 	public static void main(String args[])
 	{	Locale.setDefault(Locale.ENGLISH);
 		/*
@@ -475,8 +495,11 @@ public class LexSubmodules
 	        XMLLexicon lexicon = new XMLLexicon("Imports/SimpleNLGResources/default-lexicon.xml");
 	        WordElement wordElement = lexicon.getWord(word, LexicalCategory.VERB);
 	        InflectedWordElement infl = new InflectedWordElement(wordElement);
-	 
+	        System.out.println("POS IS: "+POS);
 	        switch (POS) {
+	        	case "VB":
+	        		infl.setFeature(Feature.FORM, Form.BARE_INFINITIVE);
+	        		break;
 	            //Past Tense
 	            case "VBD":
 	                infl.setFeature(Feature.TENSE, Tense.PAST);
@@ -532,7 +555,29 @@ public class LexSubmodules
 	        Realiser realiser = new Realiser(lexicon);
 	        return realiser.realise(infl).getRealisation();
 	    }
-	
+	 public List<String> lemmatizeWord(String word)
+	 {
+	        List<String> lemmas = new LinkedList<String>();
+
+	        // create an empty Annotation just with the given text
+	        edu.stanford.nlp.pipeline.Annotation document = new edu.stanford.nlp.pipeline.Annotation(word);
+
+	        // run all Annotators on this text
+	        this.pipeline.annotate(document);
+
+	        // Iterate over all of the sentences found
+	        List<CoreMap> sentences = document.get(SentencesAnnotation.class);
+	        for(CoreMap sentence: sentences) {
+	            // Iterate over all tokens in a sentence
+	            for (CoreLabel token: sentence.get(TokensAnnotation.class)) {
+	                // Retrieve and add the lemma for each word into the list of lemmas
+	                lemmas.add(token.get(LemmaAnnotation.class));
+	            }
+	        
+	    	}
+	     
+	        return lemmas;
+	}
 	public POS getMainPOS(Word w)
 	{
 		POS pos = null;

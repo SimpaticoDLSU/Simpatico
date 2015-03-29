@@ -1,3 +1,4 @@
+import edu.stanford.nlp.trees.Tree;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -5,6 +6,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -65,19 +68,18 @@ public class SimpaticoView extends javax.swing.JFrame {
         testCasePreview.setRows(5);
         testCasePreview.setWrapStyleWord(true);
         jScrollPane1.setViewportView(testCasePreview);
-        inputTextArea.setWrapStyleWord(true);
+        
+        
         inputPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Input"));
 
         inputTextArea.setColumns(20);
         inputTextArea.setRows(5);
-        inputTextArea.setLineWrap(true);
+        inputTextArea.setWrapStyleWord(true);
         jScrollPane2.setViewportView(inputTextArea);
         jScrollPane2.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-      
 
         javax.swing.GroupLayout inputPanelLayout = new javax.swing.GroupLayout(inputPanel);
         inputPanel.setLayout(inputPanelLayout);
-        
         inputPanelLayout.setHorizontalGroup(
             inputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane2)
@@ -251,9 +253,11 @@ public class SimpaticoView extends javax.swing.JFrame {
                         doc.insertString(doc.getLength(), "\n", regular);
                         doc.insertString(doc.getLength(), "File: " + tc.getFileName() + "\n", regular);
                         doc.insertString(doc.getLength(), "ID: " + tc.getId() + "\n", regular);
-                        doc.insertString(doc.getLength(), "Original Text: \n" + tc.getText() + "\n", regular);
-                        doc.insertString(doc.getLength(), "Simplified Text: \n", regular);
+                        doc.insertString(doc.getLength(), "Original Text: \n" + tc.getText() + "\n\n", regular);
+                        doc.insertString(doc.getLength(), "Lexical Simplification Text: \n", regular);
                         setOutput(tc.getResult());
+                        doc.insertString(doc.getLength(), "\n\nSyntactic Simplification Text: \n", regular);
+                        setSyntacticOutput(tc.getSyntacticResult());
                         doc.insertString(doc.getLength(), "\n\n", regular);
 
                     } catch (BadLocationException e) {
@@ -265,8 +269,18 @@ public class SimpaticoView extends javax.swing.JFrame {
         }
     }
 
-    public void setOutput(ArrayList<PreSentence> sentences) {
+    public void setSyntacticOutput(String syntacticOutput) {
+        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+        Style regular = doc.addStyle("regular", def);
 
+        try {
+            doc.insertString(doc.getLength(), syntacticOutput + "\n", regular);
+        } catch (BadLocationException ex) {
+            Logger.getLogger(SimpaticoView.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void setOutput(ArrayList<PreSentence> sentences) {
         // Load the default style and add it as the "regular" text
         Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
         Style regular = doc.addStyle("regular", def);
@@ -277,7 +291,7 @@ public class SimpaticoView extends javax.swing.JFrame {
 
         Style highlightYellow = doc.addStyle("highlight", regular);
         StyleConstants.setBackground(highlightYellow, new Color(255, 255, 180));
-        
+
         for (PreSentence s : sentences) {
             for (Word w : s.getWordList()) {
                 try {
@@ -309,7 +323,7 @@ public class SimpaticoView extends javax.swing.JFrame {
                 }
             }
         }
-    
+
         this.repaint();
         testCasePanel.repaint();
     }
@@ -346,7 +360,21 @@ public class SimpaticoView extends javax.swing.JFrame {
             }
         }
     }
-    
+
+    public void setOutputText(String text) {
+        try {
+            // Load the default style and add it as the "regular" text
+            Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+            Style regular = doc.addStyle("regular", def);
+            doc.insertString(doc.getLength(), text, regular);
+
+            this.repaint();
+            testCasePanel.repaint();
+        } catch (BadLocationException ex) {
+            Logger.getLogger(SimpaticoView.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public int getSelectedAction() {
         return comboBox.getSelectedIndex();
     }
