@@ -36,6 +36,7 @@ public class Worker extends SwingWorker<Void, Void>{
 					        switch (type) {
 					            case INPUT_TEXT:
 					                view.setOutput(model.getResults());
+					                view.setSyntacticOutput(model.getSyntacticOutput());
 					                break;
 					            case TEST_CASE:
 					                view.setMultipleOutput(model.getTestCases());

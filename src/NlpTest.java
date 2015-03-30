@@ -896,7 +896,7 @@ public String splitCompound(SemanticGraph graph, Tree tree){
 	}
 	Tree treeDep = null;
 	Tree treeGov = null;
-	Tree treeParent = null;
+	
 	for(Tree subtree : tree.getLeaves()){
 		
 		

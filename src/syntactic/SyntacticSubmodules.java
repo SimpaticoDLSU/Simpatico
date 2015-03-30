@@ -35,7 +35,7 @@ import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.StringUtils;
 
 public class SyntacticSubmodules {
-	private static final int SIMPLIFICATION_THRESHOLD = 25;
+	private static final int SIMPLIFICATION_THRESHOLD = 7;
 	private  int COMPOUND = 0;
 	private  int RELATIVE = 0;
 	private  int APPOSITIVE = 0;
@@ -524,26 +524,26 @@ public class SyntacticSubmodules {
 			}
 			
 		
-	}
+		}
 	
 	
-	if(treeDep != null && treeGov != null )
-		for(TypedDependency d : graph.typedDependencies()){
-			relation = d.reln().toString();
-			if(relation.equalsIgnoreCase("neg")){
-				if(d.gov().toString().equalsIgnoreCase(targetDep)){
-					boolean isWithinS = false;
-					for(Tree child:treeDep.getLeaves()){
-						if(child.label().toString().equalsIgnoreCase(d.dep().toString()))
-							isWithinS = true;
-					}
-					if(!isWithinS){
-						Tree newTree = TreeGraphNode.factory().newLeaf(d.dep().toString().split("-")[0]);
-						treeDep.addChild(0, newTree);
+		if(treeDep != null && treeGov != null )
+			for(TypedDependency d : graph.typedDependencies()){
+				relation = d.reln().toString();
+				if(relation.equalsIgnoreCase("neg")){
+					if(d.gov().toString().equalsIgnoreCase(targetDep)){
+						boolean isWithinS = false;
+						for(Tree child:treeDep.getLeaves()){
+							if(child.label().toString().equalsIgnoreCase(d.dep().toString()))
+								isWithinS = true;
+						}
+						if(!isWithinS){
+							Tree newTree = TreeGraphNode.factory().newLeaf(d.dep().toString().split("-")[0]);
+							treeDep.addChild(0, newTree);
+						}
 					}
 				}
-			}
-			
+				
 		}
 	
 		ArrayList<Tree> trees  = new ArrayList<Tree>();
@@ -763,7 +763,7 @@ public class SyntacticSubmodules {
 						
 						//get the parent of the nounphrase that the dependent belongs to
 						Tree nounPhrase2 = nounPhrase1.parent(tree);
-						
+						System.out.println(nounPhrase2);
 						if(nounPhrase2.getLeaves().size() >= SIMPLIFICATION_THRESHOLD){
 							tree = replaceNodeEqualTo(tree, nounPhrase2, tree, null);
 							String beVerb="";

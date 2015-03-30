@@ -1,4 +1,3 @@
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -16,16 +15,13 @@ public class Controller {
 
         //Thread for initializing assets.
         Process worker = new Process(model, view, this);
-        
-        
-        //Initialize Interface and disable interface items while initializing assets.
 
+        //Initialize Interface and disable interface items while initializing assets.
         view.initGUI();
         view.addTextPanel(model.loadTestCases());
         view.enableInterface(false);
         view.showDialog("Loading Assets");
-       
-        
+
         //Start Loading Assets
         worker.execute();
     }
@@ -39,13 +35,34 @@ public class Controller {
     //Type: INPUT_TEXT : simplify the text given in the input field
     //Type: TEST_CASE : simplify the selected test cases
     private void simplifyText(int type) {
-        Worker worker = new Worker(model, view, type) ;
-        //Start Simplification and disable UI
-        
-        
         view.enableInterface(false);
-        view.showDialog("Simplifying. Please wait.");
-        worker.execute();
+        view.clearOutputArea();
+        view.setOutputText("Simplifying Text, Please Wait.");
+        view.refresh();
+
+        switch (type) {
+            case INPUT_TEXT:
+                model.simplifyText(view.getInputText());
+                break;
+            case TEST_CASE:
+                model.simplifyMultipleTexts(view.getSelectedItems());
+                break;
+        }
+
+        view.clearOutputArea();
+        switch (type) {
+            case INPUT_TEXT:
+                view.setOutput(model.getResults());
+                view.setSyntacticOutput(model.getSyntacticOutput());
+                break;
+            case TEST_CASE:
+                view.setMultipleOutput(model.getTestCases());
+                break;
+        }
+
+        view.enableInterface(true);
+        view.hideDialog();
+        view.refresh();
     }
 
     public class SimplifyButtonAction implements ActionListener {

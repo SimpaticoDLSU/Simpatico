@@ -55,8 +55,9 @@ public class SimpaticoView extends javax.swing.JFrame {
         outputTextArea = new javax.swing.JTextPane();
         simplifyButton = new javax.swing.JButton();
         addTestCaseButton = new javax.swing.JButton();
-        testCasePanel = new javax.swing.JPanel();
         comboBox = new javax.swing.JComboBox();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        testCasePanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Simpatico");
@@ -68,15 +69,13 @@ public class SimpaticoView extends javax.swing.JFrame {
         testCasePreview.setRows(5);
         testCasePreview.setWrapStyleWord(true);
         jScrollPane1.setViewportView(testCasePreview);
-        
-        
+
         inputPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Input"));
 
         inputTextArea.setColumns(20);
         inputTextArea.setRows(5);
         inputTextArea.setWrapStyleWord(true);
         jScrollPane2.setViewportView(inputTextArea);
-        jScrollPane2.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         javax.swing.GroupLayout inputPanelLayout = new javax.swing.GroupLayout(inputPanel);
         inputPanel.setLayout(inputPanelLayout);
@@ -93,7 +92,7 @@ public class SimpaticoView extends javax.swing.JFrame {
 
         outputTextArea.setEditable(false);
         jScrollPane4.setViewportView(outputTextArea);
-
+        jScrollPane4.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         javax.swing.GroupLayout outputPanelLayout = new javax.swing.GroupLayout(outputPanel);
         outputPanel.setLayout(outputPanelLayout);
         outputPanelLayout.setHorizontalGroup(
@@ -109,6 +108,8 @@ public class SimpaticoView extends javax.swing.JFrame {
 
         addTestCaseButton.setText("Add Test Case");
 
+        comboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Simplify Input Text", "Simplify Test Cases" }));
+
         testCasePanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Test Cases"));
 
         javax.swing.GroupLayout testCasePanelLayout = new javax.swing.GroupLayout(testCasePanel);
@@ -119,10 +120,10 @@ public class SimpaticoView extends javax.swing.JFrame {
         );
         testCasePanelLayout.setVerticalGroup(
             testCasePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 228, Short.MAX_VALUE)
+            .addGap(0, 221, Short.MAX_VALUE)
         );
 
-        comboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Simplify Input Text", "Simplify Test Cases" }));
+        jScrollPane3.setViewportView(testCasePanel);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -133,7 +134,7 @@ public class SimpaticoView extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE)
                     .addComponent(addTestCaseButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(testCasePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(outputPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -150,8 +151,8 @@ public class SimpaticoView extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(testCasePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(addTestCaseButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane1))
@@ -281,6 +282,10 @@ public class SimpaticoView extends javax.swing.JFrame {
     }
 
     public void setOutput(ArrayList<PreSentence> sentences) {
+    	int simplified = 0;
+    	int notSimplified = 0;
+    	int words = 0;
+    	int sentencenum = 0;
         // Load the default style and add it as the "regular" text
         Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
         Style regular = doc.addStyle("regular", def);
@@ -293,16 +298,21 @@ public class SimpaticoView extends javax.swing.JFrame {
         StyleConstants.setBackground(highlightYellow, new Color(255, 255, 180));
 
         for (PreSentence s : sentences) {
+        	sentencenum++;
             for (Word w : s.getWordList()) {
+            	words++;
                 try {
                     if (w.getBestSubstitute() != null) {
                         if (!w.getBestSubstitute().equalsIgnoreCase(w.getWord())) {
+                        	simplified++;
                             doc.insertString(doc.getLength(), w.getBestSubstitute() + " ", highlightCyan);
                         } else {
+                        	notSimplified++;
                             doc.insertString(doc.getLength(), w.getWord() + " ", highlightYellow);
                         }
                     } else if (w.isComplex() && w.getBestSubstitute() == null) {
                         doc.insertString(doc.getLength(), w.getWord() + " ", highlightYellow);
+                        notSimplified++;
                     } else if (w.getWord().equalsIgnoreCase("-LSB-")) {
                         doc.insertString(doc.getLength(), "[" + " ", regular);
                     } else if (w.getWord().equalsIgnoreCase("-RSB-")) {
@@ -323,7 +333,12 @@ public class SimpaticoView extends javax.swing.JFrame {
                 }
             }
         }
-
+        try {
+			doc.insertString(doc.getLength(), "Simplified: "+simplified+"\n"+"Not Simplified: "+notSimplified+"\n"+"WordNum: "+words+"\n"+"SentenceNum: "+sentencenum+"\n", regular);
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         this.repaint();
         testCasePanel.repaint();
     }
@@ -399,6 +414,7 @@ public class SimpaticoView extends javax.swing.JFrame {
     private javax.swing.JTextArea inputTextArea;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JPanel outputPanel;
     private javax.swing.JTextPane outputTextArea;

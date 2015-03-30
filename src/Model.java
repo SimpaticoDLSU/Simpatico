@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -34,6 +35,7 @@ public class Model {
     private LexSubmodules lexSubmodules;
     private Analysis synanalysis;
     private SyntacticSubmodules syntacticSubmodules;
+    private BufferedWriter writer=null;
     public Model() {
         this.rw = new ReaderWrite();
         this.jmwe = new Jmwe();
@@ -117,9 +119,9 @@ public class Model {
         } //end if
         String lexicalOutput = "";
        
-        Cleaner c = new Cleaner();
+        //Cleaner c = new Cleaner();
         
-        result = c.cleanSentences(sentenceList);
+        
         
         for (PreSentence s : sentenceList) {
             for (Word w : s.getWordList()) {
@@ -148,38 +150,32 @@ public class Model {
  
         System.out.println("Output:");
         System.out.print(lexicalOutput);
+        result = sentenceList;
+        //END OF LEXICAL SIMPLIFICATION
         
+        //START OF SYNTACTIC SIMPLIFICATION
         syntacticSubmodules = new SyntacticSubmodules(nlp.getPipeline());
         synanalysis.StartAnalysis(lexicalOutput, nlp.getPipeline());
         ArrayList<Tree> trees = synanalysis.getTree();
         ArrayList<SemanticGraph> graphs = synanalysis.getSemanticGraph();
         
+        synanalysis.StartAnalysis(lexicalOutput, nlp.getPipeline());
+	    Analysis analysis = new Analysis();
 
-      
-
-        File input = new File("E:/Documents/GitHub/input.txt");
-    	BufferedWriter writer=null;
+        
+    	
 		try {
-			 writer = new BufferedWriter(new FileWriter(new File("E:/Documents/GitHub/result.txt")));
+			 writer = new BufferedWriter(new FileWriter(new File("E:/Documents/GitHub/lexicalresult.txt"), true));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		try (BufferedReader reader = new BufferedReader(new FileReader(input.getAbsolutePath()))) 
-		{
-		    String line = null;
-		    
-		    while ((line = reader.readLine()) != null) 
-		    {
+		
 		        
-		    	syntacticSubmodules.setCOMPOUND(0); 
-		    	syntacticSubmodules.setRELATIVE(0); 
-		    	syntacticSubmodules.setPASSIVE(0); 
-		    	syntacticSubmodules.setAPPOSITIVE(0); 
-		       
-		       synanalysis.StartAnalysis(lexicalOutput, nlp.getPipeline());
-		       Analysis analysis = new Analysis();
+		    	
+
 		    	for(int i = 0; i < trees.size(); i++){
+			    		
 		    		
 		    			SemanticGraph g = graphs.get(i);
 		    			String resultSentences = null;
@@ -191,71 +187,62 @@ public class Model {
 		    			
 		    			System.out.println("EXECUTING RELATIVE");
 		    			System.out.println(resultSentences);
-		    			
-		    			//if sentence is compound and returned results
-		    			
-		    			
-		    				
-		    				//get the dependencies of the resulting sentences outputted by the splitting of compound sentences
-		    				analysis.StartAnalysis(resultSentences, nlp.getPipeline());
-	    					resultDependencies = analysis.getSemanticGraph();
-		    				resultTrees = analysis.getTree();
-		    				resultSentences = "";
-		    				//split each sentence in the compound results
-		    				for(int k = 0; k < resultTrees.size(); k++){
-		    					resultSentences+=syntacticSubmodules.splitRelative(resultDependencies.get(k), resultTrees.get(k));
-		    				}
-		    				
 
-		    			
-		    			
-		    			
-	    				
+	    				//get the dependencies of the resulting sentences outputted by the splitting of compound sentences
+	    				analysis.StartAnalysis(resultSentences, nlp.getPipeline());
+    					resultDependencies = analysis.getSemanticGraph();
+	    				resultTrees = analysis.getTree();
+	    				resultSentences = "";
+	    				//split each sentence in the compound results
+	    				for(int k = 0; k < resultTrees.size(); k++){
+	    					resultSentences+=syntacticSubmodules.splitRelative(resultDependencies.get(k), resultTrees.get(k));
+	    				}
+		    				
 		    			System.out.println("EXECUTING APPOSITIVE");
 		    			System.out.println(resultSentences);
 		    			
 		    			
 		    			
-		    				//get the dependencies of the resulting sentences outputted by the splitting of compound sentences
-			    			analysis.StartAnalysis(resultSentences, nlp.getPipeline());
-	    					resultDependencies = analysis.getSemanticGraph();
-		    				resultTrees = analysis.getTree();
-		    				resultSentences = "";
-		    				//split each sentence in the compound results
-		    				for(int k = 0; k < resultTrees.size(); k++){
-		    					resultSentences+=syntacticSubmodules.splitAppositive(resultDependencies.get(k), resultTrees.get(k));
-		    				}
+	    				//get the dependencies of the resulting sentences outputted by the splitting of compound sentences
+		    			analysis.StartAnalysis(resultSentences, nlp.getPipeline());
+    					resultDependencies = analysis.getSemanticGraph();
+	    				resultTrees = analysis.getTree();
+	    				resultSentences = "";
+	    				//split each sentence in the compound results
+	    				for(int k = 0; k < resultTrees.size(); k++){
+	    					resultSentences+=syntacticSubmodules.splitAppositive(resultDependencies.get(k), resultTrees.get(k));
+	    				}
 		    				
-	    				
-	    				
-		    			
-		    			
 		    			System.out.println("EXECUTING PASSIVE");
 		    			System.out.println(resultSentences);
 		    			
-		    				analysis.StartAnalysis(resultSentences, nlp.getPipeline());
-	    					resultDependencies = analysis.getSemanticGraph();
-		    				resultTrees = analysis.getTree();
-		    				resultSentences = "";
-		    				for(int k = 0; k < resultTrees.size(); k++){
-		    					resultSentences+=syntacticSubmodules.toPassive(resultDependencies.get(k), resultTrees.get(k));
-		    				}
-			    				
+	    				analysis.StartAnalysis(resultSentences, nlp.getPipeline());
+    					resultDependencies = analysis.getSemanticGraph();
+	    				resultTrees = analysis.getTree();
+	    				resultSentences = "";
+	    				for(int k = 0; k < resultTrees.size(); k++){
+	    					resultSentences+=syntacticSubmodules.toPassive(resultDependencies.get(k), resultTrees.get(k));
+	    				}
 		    				
-		    				
-		    				writer.write(syntacticSubmodules.getCOMPOUND()+","+syntacticSubmodules.getRELATIVE()+","+syntacticSubmodules.getAPPOSITIVE()+","+syntacticSubmodules.getPASSIVE()+","+resultSentences+"\n");
-		    				syntacticOutput = resultSentences;
-		    		
-		    	}
-			        
-		    }
+	    				
+	    				
+	    				try {
+							writer.write(syntacticSubmodules.getCOMPOUND()+","+syntacticSubmodules.getRELATIVE()+","+syntacticSubmodules.getAPPOSITIVE()+","+syntacticSubmodules.getPASSIVE()+","+resultSentences+"\n");
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+	    				syntacticOutput = resultSentences;
 		    
-		    writer.close();
-		   
-		} catch (IOException x) 
-		{
-		    System.err.format("IOException: %s%n", x);
-		} 
+		    	}
+		    try {
+				writer.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    	
+		    
         return sentenceList;
  
     }
@@ -319,6 +306,36 @@ public class Model {
         testcases = tclist;
         return tclist;
     }
+    
+    public ArrayList<TestCase> loadTestCasesFromTxt() {
+        File txt = new File("src/documents/Testcases/testcases.txt");
+        int i = 0;
+        ArrayList<TestCase> tclist = new ArrayList<TestCase>();
+        String line;
+        try (BufferedReader reader = new BufferedReader(new FileReader(txt.getAbsolutePath()))) 
+		{
+	        while ((line = reader.readLine()) != null) 
+		    {
+	            
+	            TestCase testcase = new TestCase();
+	            
+                testcase.setFileName("test"+(i));
+				testcase.setId(i);
+				testcase.setText(line);
+				i++;
+	            
+	            tclist.add(testcase);
+	        }
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        testcases = tclist;
+        return tclist;
+    }
  
     public ArrayList<String> getTestCaseUsingID(ArrayList<Integer> ids) {
         ArrayList<String> list = new ArrayList<String>();
@@ -342,6 +359,9 @@ public class Model {
  
     public ArrayList<PreSentence> getResults() {
         return result;
+    }
+    public String getSyntacticOutput() {
+        return syntacticOutput;
     }
  
 }
