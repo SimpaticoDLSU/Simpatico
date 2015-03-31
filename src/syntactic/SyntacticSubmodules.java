@@ -35,7 +35,7 @@ import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.StringUtils;
 
 public class SyntacticSubmodules {
-	private static final int SIMPLIFICATION_THRESHOLD = 7;
+	private static final int SIMPLIFICATION_THRESHOLD = 25;
 	private  int COMPOUND = 0;
 	private  int RELATIVE = 0;
 	private  int APPOSITIVE = 0;

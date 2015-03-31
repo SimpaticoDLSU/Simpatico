@@ -280,12 +280,13 @@ public class SimpaticoView extends javax.swing.JFrame {
             Logger.getLogger(SimpaticoView.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    int simplified = 0;
+	int notSimplified = 0;
+	int words = 0;
+	int sentencenum = 0;
 
     public void setOutput(ArrayList<PreSentence> sentences) {
-    	int simplified = 0;
-    	int notSimplified = 0;
-    	int words = 0;
-    	int sentencenum = 0;
+    	
         // Load the default style and add it as the "regular" text
         Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
         Style regular = doc.addStyle("regular", def);
@@ -296,7 +297,7 @@ public class SimpaticoView extends javax.swing.JFrame {
 
         Style highlightYellow = doc.addStyle("highlight", regular);
         StyleConstants.setBackground(highlightYellow, new Color(255, 255, 180));
-
+        if(sentences != null)
         for (PreSentence s : sentences) {
         	sentencenum++;
             for (Word w : s.getWordList()) {

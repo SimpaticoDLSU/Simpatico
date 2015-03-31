@@ -36,6 +36,7 @@ public class Model {
     private Analysis synanalysis;
     private SyntacticSubmodules syntacticSubmodules;
     private BufferedWriter writer=null;
+    
     public Model() {
         this.rw = new ReaderWrite();
         this.jmwe = new Jmwe();
@@ -165,7 +166,7 @@ public class Model {
         
     	
 		try {
-			 writer = new BufferedWriter(new FileWriter(new File("E:/Documents/GitHub/lexicalresult.txt"), true));
+			 writer = new BufferedWriter(new FileWriter(new File("E:/Documents/GitHub/lexicalresult.txt")));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -175,7 +176,10 @@ public class Model {
 		    	
 
 		    	for(int i = 0; i < trees.size(); i++){
-			    		
+			    		syntacticSubmodules.setCOMPOUND(0); 
+				    	syntacticSubmodules.setRELATIVE(0); 
+				    	syntacticSubmodules.setPASSIVE(0); 
+				    	syntacticSubmodules.setAPPOSITIVE(0); 
 		    		
 		    			SemanticGraph g = graphs.get(i);
 		    			String resultSentences = null;
