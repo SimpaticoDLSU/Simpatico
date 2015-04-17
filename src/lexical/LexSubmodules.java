@@ -5,11 +5,10 @@ package lexical;
  * 
  * Author: Joren Sorilla
  */
-import it.uniroma1.lcl.babelfy.Babelfy;
-import it.uniroma1.lcl.babelfy.Babelfy.AccessType;
-import it.uniroma1.lcl.babelfy.Babelfy.Matching;
-import it.uniroma1.lcl.babelfy.data.Annotation;
-import it.uniroma1.lcl.babelfy.data.BabelSynsetAnchor;
+
+import it.uniroma1.lcl.babelfy.commons.annotation.SemanticAnnotation;
+import it.uniroma1.lcl.babelfy.core.Babelfy;
+import it.uniroma1.lcl.babelnet.BabelNet;
 import it.uniroma1.lcl.babelnet.BabelSynset;
 import it.uniroma1.lcl.jlt.util.Language;
 import it.uniroma1.lcl.jlt.wordnet.WordNet;
@@ -31,6 +30,14 @@ import language.PreSentence;
 import language.Word;
 
 import org.apache.commons.lang3.StringUtils;
+
+
+
+
+
+
+
+
 
 
 
@@ -875,22 +882,25 @@ public class LexSubmodules
 		PreSentence babelSentence 	= new PreSentence();
 		ArrayList<Word> babelList 	= new ArrayList<Word>();
 		WordNet wn 					= WordNet.getInstance();
-		Babelfy bfy 				= Babelfy.getInstance(AccessType.ONLINE);
+		Babelfy bfy = new Babelfy();
+		BabelNet bn = BabelNet.getInstance();
 		
+		List<SemanticAnnotation> bfyAnnotations  = bfy.babelfy(inputText, Language.EN);
 		
-		Annotation annotations = bfy.babelfy("", inputText, Matching.EXACT, Language.EN);
-		
-		for ( BabelSynsetAnchor annotation : annotations.getAnnotations() )
+		for ( SemanticAnnotation  annotation :	bfyAnnotations)
 		{
 			String temp 	= "";
 			String anchor 	= "";
 			Word babelWord 	= new Word();
+			String frag = inputText.substring(annotation.getCharOffsetFragment().getStart(),
+			        annotation.getCharOffsetFragment().getEnd() + 1);
 			
-			anchor = annotation.getAnchorText();
 			p.println("anchor: " + anchor);
-			babelWord.setWord( anchor );
+			babelWord.setWord( frag );
 			
-			BabelSynset synset 			= annotation.getBabelSynset();
+			BabelSynset synset 			= bn.getSynsetFromId(annotation.getBabelSynsetID());
+			if(synset == null)
+				continue;
 			List<String> wordnetOffsets = synset.getWordNetOffsets();
 			temp = removeExtraOffsets(wordnetOffsets.toString());
 			if(!temp.equals(""))
